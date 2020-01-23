@@ -1,0 +1,357 @@
+{
+  "params": {
+    "contract_abi": [
+      {
+        "name": "destroy",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "destination"
+          }
+        ]
+      },
+      {
+        "name": "temporarilyRevokeCertificate",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "hash"
+          }
+        ]
+      },
+      {
+        "name": "transfer",
+        "constant": false,
+        "payable": true,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "payable",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "destination"
+          }
+        ]
+      },
+      {
+        "name": "permanentlyRevokeCertificate",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "hash"
+          }
+        ]
+      },
+      {
+        "name": "destroy",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": []
+      },
+      {
+        "name": "owner",
+        "constant": true,
+        "payable": false,
+        "type": "function",
+        "outputs": [
+          {
+            "type": "address",
+            "name": ""
+          }
+        ],
+        "stateMutability": "view",
+        "inputs": []
+      },
+      {
+        "name": "updateIdentityMgmtAddress",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "identityMgmtAddress"
+          }
+        ]
+      },
+      {
+        "name": "storeCertificate",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "hash"
+          },
+          {
+            "type": "uint256",
+            "name": "startingDate"
+          },
+          {
+            "type": "uint256",
+            "name": "endingDate"
+          }
+        ]
+      },
+      {
+        "name": "transferOwnership",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "newOwner"
+          }
+        ]
+      },
+      {
+        "name": "getCertificate",
+        "constant": true,
+        "payable": false,
+        "type": "function",
+        "outputs": [
+          {
+            "type": "address",
+            "name": ""
+          },
+          {
+            "type": "bytes32",
+            "name": ""
+          },
+          {
+            "type": "uint256",
+            "name": ""
+          },
+          {
+            "type": "uint256",
+            "name": ""
+          },
+          {
+            "type": "uint256",
+            "name": ""
+          },
+          {
+            "type": "bool",
+            "name": ""
+          }
+        ],
+        "stateMutability": "view",
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "hash"
+          }
+        ]
+      },
+      {
+        "name": "destroyAndSend",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "_recipient"
+          }
+        ]
+      },
+      {
+        "name": "reactivateCertificate",
+        "constant": false,
+        "payable": false,
+        "type": "function",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "hash"
+          }
+        ]
+      },
+      {
+        "type": "constructor",
+        "stateMutability": "nonpayable",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "identityMgmtAddress"
+          }
+        ],
+        "payable": false
+      },
+      {
+        "type": "fallback",
+        "stateMutability": "payable",
+        "payable": true
+      },
+      {
+        "anonymous": false,
+        "name": "CertificateStored",
+        "type": "event",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "caller",
+            "indexed": false
+          },
+          {
+            "type": "bytes32",
+            "name": "hash",
+            "indexed": false
+          },
+          {
+            "type": "address",
+            "name": "institution",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "startingDate",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "endingDate",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "timestamp",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "anonymous": false,
+        "name": "CertificatePermanentlyRevoked",
+        "type": "event",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "caller",
+            "indexed": false
+          },
+          {
+            "type": "address",
+            "name": "institution",
+            "indexed": false
+          },
+          {
+            "type": "bytes32",
+            "name": "hash",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "timestamp",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "anonymous": false,
+        "name": "CertificateTemporarilyRevoked",
+        "type": "event",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "caller",
+            "indexed": false
+          },
+          {
+            "type": "address",
+            "name": "institution",
+            "indexed": false
+          },
+          {
+            "type": "bytes32",
+            "name": "hash",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "timestamp",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "anonymous": false,
+        "name": "CertificateReactivated",
+        "type": "event",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "caller",
+            "indexed": false
+          },
+          {
+            "type": "address",
+            "name": "institution",
+            "indexed": false
+          },
+          {
+            "type": "bytes32",
+            "name": "hash",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "timestamp",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "anonymous": false,
+        "name": "OwnershipTransferred",
+        "type": "event",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "previousOwner",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "newOwner",
+            "indexed": true
+          }
+        ]
+      }
+    ],
+    "ethereum_url": "http://yanacocha.fit.fraunhofer.de:22000",
+    "contract_address": "0x38243761c6486d4bff9adf84d57780f0ce095d2f",
+    "transaction_hash": "0x31b425b8611fc92805dde406ac0d7a1fc141b39ea503a0136471d3c9ff5bd109"
+  },
+  "contract_name": "CertMgmt"
+}
