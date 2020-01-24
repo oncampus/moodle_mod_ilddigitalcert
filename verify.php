@@ -4,6 +4,8 @@ require_once(__DIR__.'/../../config.php');
 require_once('locallib.php');
 require_once('web3lib.php');
 
+// TODO call $PAGE-> functions
+
 echo $OUTPUT->header();
 $url = get_config('ilddigitalcert', 'blockchain_url');
 
