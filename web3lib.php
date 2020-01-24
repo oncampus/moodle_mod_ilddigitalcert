@@ -39,10 +39,10 @@ function get_contract_abi($contractname) {
 }
 
 function get_contract_address($contractname) {
-	global $CFG, $contract_names;
+	global  $contract_names;//, $CFG;
 	$contractname = $contract_names[$contractname];
-	$filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
-	$contract = json_decode(file_get_contents($filename));
+	//$filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
+	//$contract = json_decode(file_get_contents($filename));
 
 	if ($contractname == $contract_names['CertMgmt']) {
 		$CertMgmt_address = get_config('ilddigitalcert', 'CertMgmt_address');
@@ -59,10 +59,10 @@ function get_contract_address($contractname) {
 }
 
 function get_contract_url($contractname) {
-	global $CFG, $contract_names;
+	global $contract_names;//, $CFG;
 	$contractname = $contract_names[$contractname];
-	$filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
-	$contract = json_decode(file_get_contents($filename));
+	//$filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
+	//$contract = json_decode(file_get_contents($filename));
 	
 	$blockchain_url = get_config('ilddigitalcert', 'blockchain_url');
 	$failover_url = get_config('ilddigitalcert', 'failover_url');
