@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  * Post installation procedure
  */
 function xmldb_ilddigitalcert_install() {
+    global $CFG;
     $result = true;
     
     $old_menu = $CFG->customusermenuitems;
