@@ -1,17 +1,17 @@
 # Digitales Zertifikat #
 
-## License ##
+## Installation ##
 
-2020 ILD TH Lübeck <support@oncampus.de>
+`clone repository into mod/ilddigitalcert/`
 
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
+For interacting with the blockchain, you need to install the following extensions:
+  * https://github.com/sc0Vu/web3.php
+  * https://github.com/web3p/ethereum-tx
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+For creating PDF documents with attached certificate metadata, you need to install the following extensions:
+  * https://packagist.org/packages/mpdf/mpdf
+  * https://packagist.org/packages/mpdf/qrcode
+  
+The file composer.json is already included in this repository. So simply run:
 
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see <http://www.gnu.org/licenses/>.
+`run "composer install" on command line`
