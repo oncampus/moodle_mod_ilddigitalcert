@@ -74,6 +74,7 @@ $string['examination_regulations_date'] = 'Examination regulations date';
 $string['expertise'] = 'Kenntnisse';
 $string['expiredate'] = 'Expire date';
 $string['expireperiod'] = 'Expire period';
+$string['generate_adr_from_pk'] = 'Generate blockchain adress and private key';
 $string['generate_pk'] = 'Link zum generieren des Private Key per E-Mail versenden';
 $string['headerconfig'] = 'Issuer';
 $string['html'] = 'Certificate';

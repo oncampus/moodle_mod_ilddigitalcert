@@ -75,6 +75,7 @@ $string['examination_regulations_date'] = 'Prüfungsordnung Datum';
 $string['expertise'] = 'Kenntnisse';
 $string['expiredate'] = 'Ablaufdatum';
 $string['expireperiod'] = 'Ablaufzeitraum';
+$string['generate_adr_from_pk'] = 'Blockchain Adresse und Private Key ermitteln';
 $string['generate_pk'] = 'Link zum generieren des Private Key per E-Mail versenden';
 $string['headerconfig'] = 'Aussteller / Zertifizierungsstelle';
 $string['html'] = 'Zertifikat';
