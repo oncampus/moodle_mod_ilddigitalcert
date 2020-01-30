@@ -32,7 +32,7 @@ if (isset($user_pref) and strpos($user_pref, 'not_registered_token') !== false) 
         $new_pk = strtoupper(bin2hex($bytes));
         $new_address = get_address_from_pk($new_pk);
         // TODO: check if address already exists in Blockchain
-        $new_pk = strtoupper(bin2hex($bytes));
+        // TODO: Testen! Zeile wurde als Bugfix entfernt // $new_pk = strtoupper(bin2hex($bytes));
         $a = new stdClass();
         $a->pk = $new_pk;
         echo get_string('new_pk_generated', 'mod_ilddigitalcert', $a);
