@@ -5,6 +5,13 @@ require_once('locallib.php');
 require_once('web3lib.php');
 
 // TODO call $PAGE-> functions
+$context = context_system::instance();
+
+$PAGE->set_context($context);
+$PAGE->set_url('/mod/ilddigitalcert/verify.php');
+//$PAGE->set_pagelayout('admin');
+$PAGE->set_title(format_string(get_string('pluginname', 'mod_ilddigitalcert')));
+$PAGE->set_heading(get_string('pluginname', 'mod_ilddigitalcert'));
 
 echo $OUTPUT->header();
 $url = get_config('ilddigitalcert', 'blockchain_url');
