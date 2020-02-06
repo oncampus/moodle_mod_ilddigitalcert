@@ -20,6 +20,8 @@ if (isguestuser()) {
 #/*
 $PAGE->requires->js(new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/js/pk_form.js'));
 
+$id = optional_param('id', 0, PARAM_INT);
+$ueid = optional_param('ueid', 0, PARAM_INT);
 $search = optional_param('search', '', PARAM_ALPHA);
 $check_only_bc = optional_param('check_only_bc', '', PARAM_RAW);
 $check_only_nonbc = optional_param('check_only_nonbc', '', PARAM_RAW);
