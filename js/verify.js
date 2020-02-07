@@ -153,7 +153,7 @@ async function dateiauswahl(evt) {
 	h_1.innerHTML += ' '+gewaehlteDateien[0].name;
 	
 	if (gewaehlteDateien[0].type == 'application/pdf') { // PDF
-		console.log('verificationStepUrl: '+verificationStepUrl);
+		//console.log('verificationStepUrl: '+verificationStepUrl);
 		let formData = new FormData();
 		formData.append('action', 'pdf');
 		formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
@@ -288,7 +288,7 @@ function showCert(meta) {
 }
 
 async function processHash(hash, meta = null) {
-	console.log('Hash: '+hash);
+	//console.log('Hash: '+hash);
 	var result = '';
 	botti_2.style.display = "none";
 	botti_3.style.display = "block";
@@ -303,7 +303,7 @@ async function processHash(hash, meta = null) {
 			hash: hash
 		})
 	}).responseText;
-	console.log(result);
+	//console.log(result);
 	cert = JSON.parse(result);
 	await sleep(sleepTime);
 	if (cert.institution == '0x0000000000000000000000000000000000000000') {
