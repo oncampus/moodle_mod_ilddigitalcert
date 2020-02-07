@@ -54,8 +54,6 @@ elseif ($action == 'pdf' and !empty($_FILES['file']['name']) and $_FILES['file']
 	else {
 		$attachment_file = array_pop($attachments);
 		$basename_attachment_file = basename($attachment_file);
-		//$path = $CFG->dirroot.'/mod/ilddigitalcert/attachments/'.$basename_attachment_file;
-		// TODO: prüfen ob das Verzeichnis attachments noch irgendwo anders benötigt wird. Andernfalls entfernen
 		if (!is_dir($CFG->dataroot.'/temp/ilddigitalcert')) {
 			mkdir($CFG->dataroot.'/temp/ilddigitalcert', 0775);
 		}
@@ -63,7 +61,6 @@ elseif ($action == 'pdf' and !empty($_FILES['file']['name']) and $_FILES['file']
 			mkdir($CFG->dataroot.'/temp/ilddigitalcert/attachments', 0775);
 		}
 		$path = $CFG->dataroot.'/temp/ilddigitalcert/attachments/'.$basename_attachment_file;
-		// TODO Berechtigungen für attachmentsverzeichnis reichen nicht aus -> anders speichern!
 		$detach_result = `pdfdetach -save 1 -o $path $pdf 2>&1`;
 		if (!isset($detach_result)) {
 			$file_content = file_get_contents($path);
