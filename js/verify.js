@@ -148,38 +148,43 @@ async function dateiauswahl(evt) {
 	
 	var result = 'error';
 	var gewaehlteDateien = evt.dataTransfer.files; // FileList Objekt
-
-	//p_1.innerHTML += '('+gewaehlteDateien[0].name+')';
-	h_1.innerHTML += ' '+gewaehlteDateien[0].name;
 	
-	if (gewaehlteDateien[0].type == 'application/pdf') { // PDF
-		//console.log('verificationStepUrl: '+verificationStepUrl);
-		let formData = new FormData();
-		formData.append('action', 'pdf');
-		formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-		result = $.ajax({
-			type: 'POST',
-			async: false,
-			url: verificationStepUrl, //'return_verificationstep.php',
-			data: formData,
-			contentType: false,
-			cache: false,
-			processData:false
-		}).responseText;
+	//p_1.innerHTML += '('+gewaehlteDateien[0].name+')';
+	if (gewaehlteDateien.length == 0) {
+		console.log('Error: no file!');
 	}
-	else if (gewaehlteDateien[0].type == 'application/json' || gewaehlteDateien[0].name.match('.bcrt')) { // JSON
-		let formData = new FormData();
-		formData.append('action', 'validateJSON');
-		formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-		result = $.ajax({
-			type: 'POST',
-			async: false,
-			url: verificationStepUrl,
-			data: formData,
-			contentType: false,
-			cache: false,
-			processData:false
-		}).responseText;
+	else {
+		h_1.innerHTML += ' '+gewaehlteDateien[0].name;
+	
+		if (gewaehlteDateien[0].type == 'application/pdf') { // PDF
+			//console.log('verificationStepUrl: '+verificationStepUrl);
+			let formData = new FormData();
+			formData.append('action', 'pdf');
+			formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
+			result = $.ajax({
+				type: 'POST',
+				async: false,
+				url: verificationStepUrl, //'return_verificationstep.php',
+				data: formData,
+				contentType: false,
+				cache: false,
+				processData:false
+			}).responseText;
+		}
+		else if (gewaehlteDateien[0].type == 'application/json' || gewaehlteDateien[0].name.match('.bcrt')) { // JSON
+			let formData = new FormData();
+			formData.append('action', 'validateJSON');
+			formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
+			result = $.ajax({
+				type: 'POST',
+				async: false,
+				url: verificationStepUrl,
+				data: formData,
+				contentType: false,
+				cache: false,
+				processData:false
+			}).responseText;
+		}
 	}
 	//console.log('meta: '+result);
 	//textbox.innerHTML += '<br />*'+result;
