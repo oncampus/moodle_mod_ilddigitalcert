@@ -37,7 +37,7 @@ function download_json($modulecontextid, $icid, $download) {
 		}
 		
 		$mpdf->WriteHTML($html);
-		$mpdf->AddPage();
+		//$mpdf->AddPage();
 		//$html .= get_pdf_footerhtml($hash);
 		$mpdf->WriteHTML(get_pdf_footerhtml($hash));
 
@@ -65,25 +65,19 @@ function get_pdf_footerhtml($hash) {
 	$html = '
 		<div style="border: 1px solid #000;padding: 10px;">
 		<table class="items" width="100%" cellpadding="8" border="0">
-			<thead>
 				<tr>
-					<td><h3>'.get_string('verify_authenticity', 'mod_ilddigitalcert').'</h3></td>
-					<td></td>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>'.get_string('verify_authenticity_descr', 'mod_ilddigitalcert', array('url' => $verify_url, 'hash' => $hash)).'
+					<td style="font-size: 11px;">'.
+						'<b>'.get_string('verify_authenticity', 'mod_ilddigitalcert').'</b><br/><br/>'.
+						get_string('verify_authenticity_descr', 'mod_ilddigitalcert', array('url' => $verify_url, 'hash' => $hash)).'
 					</td>
 					<td class="barcodecell">
 						<a href="'.$verify_url.'?hash='.$hash.'">
 							<div>
-								<barcode code="'.$CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash.'" type="QR" class="barcode" size="1.5" error="M" disableborder="1" />
+								<barcode code="'.$CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash.'" type="QR" class="barcode" size="1" error="M" disableborder="1" />
 							</div>
 						</a>
 					</td>
 				</tr>
-			</tbody>
 		</table>
 		</div>';
 	return $html;
