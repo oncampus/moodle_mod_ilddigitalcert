@@ -109,7 +109,13 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 	$hash = calculate_hash($metadata);
 	//$startdate = $issued_certificate->timemodified;
 	$startdate = strtotime(json_decode($metadata)->issuedOn);
-	$enddate = strtotime(json_decode($metadata)->expires);
+	if (isset(json_decode($metadata)->expires)) {
+		$enddate = strtotime(json_decode($metadata)->expires);
+	}
+	else {
+		// Wenn kein expires angegeben wurde, automatisch auf 100 Jahre in der Zukunft setzen
+		$enddate = time() + 60 * 60 * 24 * 365 * 100;
+	}
 	if ($enddate <= $startdate) {
 		return false;
 	}
@@ -265,7 +271,9 @@ function generate_certmetadata($cm) {
 	$metadata = new stdClass();
 	
 	$metadata->badge = get_badge($cm, $digitalcert);
-	$metadata->expires = get_expiredate($digitalcert->expiredate, $digitalcert->expireperiod);
+	if ($expiredate = get_expiredate($digitalcert->expiredate, $digitalcert->expireperiod)) {
+		$metadata->expires = $expiredate;
+	}
 	$metadata->{'extensions:examinationRegulationsB4E'} = get_extension_examinationRegulationsB4E($digitalcert);
 	$metadata->{'@context'} = $CONTEXT_URL->openbadges;
 	$metadata->recipient = get_recipient();
@@ -434,6 +442,9 @@ function get_extension_examinationRegulationsB4E($digitalcert) {
 
 function get_expiredate($expiredate, $expireperiod) {
 	if ($expiredate == 0) {
+		if ($expireperiod == 0) {
+			return false;
+		}
 		$expiredate = time() + $expireperiod;
 	}
 	return date('c', $expiredate);
