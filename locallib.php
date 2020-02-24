@@ -225,10 +225,12 @@ function sort_obj($obj) {
 function get_certificatehtml($id, $certmetadatajson) {
 	global $DB;
 	$html = $DB->get_field('ilddigitalcert', 'template', array('id' => $id));
-
 	$matches = array();
-	while (preg_match('~{(.+?)}~s', $html, $matches)) {
-		$elements = explode('|', $matches[1]);
+	preg_match_all('~{(.+?)}~s', $html, $matches);
+	foreach ($matches[1] as $match) {
+		//print_object($match);
+		$elements = explode('|', $match);
+		//print_object($elements);
 		$jsonobj = json_decode($certmetadatajson);
 		foreach ($elements as $element) {
 			foreach($jsonobj as $name => $value) {
@@ -241,6 +243,9 @@ function get_certificatehtml($id, $certmetadatajson) {
 						$jsonobj .= '</ul>';
 					}
 					else {
+						if ($name == 'issuedOn') {
+							$value = date('d.m.Y', strtotime($value));
+						}
 						$jsonobj = $value;
 					}
 					break;
@@ -248,7 +253,8 @@ function get_certificatehtml($id, $certmetadatajson) {
 			}
 		}
 		try {
-			$html = str_replace($matches[0], $jsonobj, $html);
+			//print_object($jsonobj);
+			$html = str_replace('{'.$match.'}', $jsonobj, $html);
 		}
 		catch (Exception $e) {
 			//print_object($e);
