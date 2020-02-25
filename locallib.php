@@ -25,7 +25,8 @@ function download_json($modulecontextid, $icid, $download) {
 
 		require_once __DIR__ . '/vendor/autoload.php';
 
-		$mpdf = new \Mpdf\Mpdf();
+		$mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0, 'format' => [210, 297]]);
+		//$mpdf = new \Mpdf\Mpdf();
 		$mpdf->showImageErrors = true;
 
 		$html = '<h1>Error</h1>';
@@ -36,9 +37,20 @@ function download_json($modulecontextid, $icid, $download) {
 			$html = base64_decode($jsonobj->{'extensions:assertionpageB4E'}->assertionpage);
 		}
 		
-		$mpdf->WriteHTML($html);
+		/*
 		//$mpdf->AddPage();
 		//$html .= get_pdf_footerhtml($hash);
+		if (strpos($html, '<div id="zertifikat-page">') === 0) {
+
+			$mpdf->WriteHTML($html);
+		}
+		else {
+			$mpdf->WriteHTML($html);
+			$mpdf->WriteHTML(get_pdf_footerhtml($hash));
+		}
+		#*/
+
+		$mpdf->WriteHTML($html);
 		$mpdf->WriteHTML(get_pdf_footerhtml($hash));
 
 		$fileid = $stored_file->get_id(); // fileid ermitteln
@@ -63,19 +75,19 @@ function get_pdf_footerhtml($hash) {
 	$verify_url = $CFG->wwwroot.'/mod/ilddigitalcert/verify.php';
 
 	$html = '
-		<div style="border: 1px solid #000;padding: 10px;">
-		<table class="items" width="100%" cellpadding="8" border="0">
+		<div style="border: 0px solid #000;padding-top: 15px;padding-left: 8px;position:absolute;top:975px;left:0px;">
+		<table class="items" width="50%" cellpadding="3" border="0">
 				<tr>
-					<td style="font-size: 11px;">'.
-						'<b>'.get_string('verify_authenticity', 'mod_ilddigitalcert').'</b><br/><br/>'.
-						get_string('verify_authenticity_descr', 'mod_ilddigitalcert', array('url' => $verify_url, 'hash' => $hash)).'
-					</td>
-					<td class="barcodecell">
-						<a href="'.$verify_url.'?hash='.$hash.'">
+					<td class="barcodecell" width="100px">
+						<a href="'.$verify_url.'?hash='.$hash.'" style="color: rgb(0,0,0) !important;">
 							<div>
 								<barcode code="'.$CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash.'" type="QR" class="barcode" size="1" error="M" disableborder="1" />
 							</div>
 						</a>
+					</td>
+					<td style="font-family: verdana;font-size: 7pt;">'.//color: rgb(112,112,111);">'.
+						'<b>'.get_string('verify_authenticity', 'mod_ilddigitalcert').'</b><br/><br/>'.
+						get_string('verify_authenticity_descr', 'mod_ilddigitalcert', array('url' => $verify_url, 'hash' => $hash)).'
 					</td>
 				</tr>
 		</table>

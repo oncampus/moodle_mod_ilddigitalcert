@@ -121,7 +121,7 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 		echo '<pre>'.$certmetadatajson.'</pre>';
 	}
 	elseif ($view == 'html') {
-		echo '<div id="zertifikat-page" style="border: 1px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
+		echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
 		echo get_certificatehtml($cm->instance, $certmetadatajson);
 		echo '</div>';
 		
@@ -147,7 +147,7 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 	echo $OUTPUT->header();
 	echo $OUTPUT->heading(get_string('pluginname', 'mod_ilddigitalcert'));
 	echo '<p>'.get_string('preview', 'mod_ilddigitalcert').' "'.$moduleinstance->name.'"</p>';
-	echo '<div id="zertifikat-page" style="border: 1px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
+	echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
 	echo get_certificatehtml($cm->instance, json_encode(generate_certmetadata($cm)));
 	echo '</div>';
 	echo '<p>'.html_writer::link($CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$id.'&ueid='.$ueid, get_string('back')).'</p>';
@@ -394,7 +394,7 @@ else {
 		echo '<pre>'.$certmetadatajson.'</pre>';
 	}
 	elseif ($view == 'html') {
-		echo '<div id="zertifikat-page" style="border: 1px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
+		echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
 		echo get_certificatehtml($cm->instance, $certmetadatajson);
 		echo '</div>';
 		
