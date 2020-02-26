@@ -375,7 +375,7 @@ else {
 	
 	//TODO nur anzeigen wenn schon in blockchain. ansonsten:
 	if (!isset($issued_certificate->txhash)) {
-		echo '<h3 style="color:#00ce0a;">Dieses Zertifikat wartet auf Registrierung und Signierung in der Blockchain durch einen akkreditierten Zertifizierer</h3>';
+		\core\notification::info(get_string('cert_waiting_for_registration', 'mod_ilddigitalcert'));
 	}
 	echo html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&view=html&ueid='.$ueid), get_string('html', 'mod_ilddigitalcert'));
 	echo ' | ';
