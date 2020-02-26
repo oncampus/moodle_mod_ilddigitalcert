@@ -38,6 +38,7 @@ $string['block_summary'] = '<p>Verify the authenticity of your digital certifica
 <p>Simply drag and drop your certificate (PDF or BCRT file) into the field.</ p>
 <p>You can check your printed version of the certificate by scanning the QR code below.
 </p>';
+$string['cert_waiting_for_registration'] = 'Dieses Zertifikat wartet auf Registrierung und Signierung in der Blockchain durch einen akkreditierten Zertifizierer.';
 $string['certhash'] = 'Zertifikat-Hash';
 $string['certificate'] = 'Certificate';
 $string['certificate_overview'] = 'All certificates in this course';
@@ -97,6 +98,34 @@ $string['issueremail'] = 'E-Mail';
 $string['issuerdescription'] = 'Description';
 
 $string['json'] = 'JSON';
+$string['subject_new_certificate'] = 'Neues digitales Zertifikat';
+$string['subject_new_digital_certificate'] = 'Neues digitales Zertifikat in der Blockchain';
+$string['message_new_certificate'] = 'Hallo {$a->fullname},
+
+Sie haben ein digitales Zertifikat erhalten.
+
+Hier können Sie sich Ihr Zertifikat ansehen: {$a->url}.
+
+Viele Grüße
+Ihr {$a->from} Team';
+$string['message_new_certificate_html'] = '<p>Hallo {$a->fullname},</p>
+<p>Sie haben ein digitales Zertifikat erhalten.</p>
+<p>Hier können Sie sich Ihr Zertifikat ansehen: <a href="{$a->url}">{$a->url}</a>.</p>
+<p>Viele Grüße</p>
+<p>Ihr {$a->from} Team</p>';
+$string['message_new_digital_certificate'] = 'Hallo {$a->fullname},
+
+Ihr digitales Zertifikat wurde in der Blockchain registriert und signiert.
+
+Hier können Sie sich Ihr Zertifikat ansehen: {$a->url}.
+
+Viele Grüße
+Ihr {$a->from} Team';
+$string['message_new_digital_certificate_html'] = '<p>Hallo {$a->fullname},</p>
+<p>Ihr digitales Zertifikat wurde in der Blockchain registriert und signiert.</p>
+<p>Hier können Sie sich Ihr Zertifikat ansehen: <a href="{$a->url}">{$a->url}</a>.</p>
+<p>Viele Grüße</p>
+<p>Ihr {$a->from} Team</p>';
 $string['message_generate_pk'] = 'Hallo {$a->fullname},
 
 Sie wurden als neuer Zertifizierer auf {$a->url} hinzugefügt.

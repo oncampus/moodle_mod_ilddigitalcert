@@ -96,7 +96,7 @@ function get_pdf_footerhtml($hash) {
 }
 
 function to_blockchain($issued_certificate, $fromuser, $pk) {
-	global $DB;
+	global $DB, $CFG, $SITE;
 	#/*
 	require_once('web3lib.php');
 	$pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $fromuser);
@@ -149,7 +149,22 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 		//print_object(json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 		
 		if ($receiver = $DB->get_record('user', array('id' => $issued_certificate->userid))) {
-			//TODO email an user
+			//email to user
+			//message_new_digital_certificate
+			//message_new_digital_certificate_html
+			//subject_new_digital_certificate
+			$from_user = core_user::get_support_user();
+			$fullname = explode(' ', get_string('modulenameplural', 'mod_ilddigitalcert'));
+			$from_user->firstname = $fullname[0];
+			$from_user->lastname = $fullname[1];
+			$subject = get_string('subject_new_digital_certificate', 'mod_ilddigitalcert');
+			$a = new stdClass();
+			$a->fullname = $receiver->firstname.' '.$receiver->lastname;
+			$a->url = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$issued_certificate->cmid;
+			$a->from = $SITE->fullname;
+			$message = get_string('message_new_digital_certificate', 'mod_ilddigitalcert', $a);
+			$message_html = get_string('message_new_digital_certificate_html', 'mod_ilddigitalcert', $a);
+			email_to_user($receiver, $from_user, $subject, $message, $message_html);
 		}
 		return true;
 	}
@@ -311,7 +326,7 @@ function get_issued_certificate($userid, $cmid, $ueid) {
 }
 
 function issue_certificate($certmetadata, $userid, $cmid) {
-	global $DB, $CFG;
+	global $DB, $CFG, $SITE;
 
 	$courseid = $DB->get_field('course_modules', 'course', array('id' => $cmid));
 
@@ -367,6 +382,21 @@ function issue_certificate($certmetadata, $userid, $cmid) {
 	$issued->metadata = $json;
 	
 	$DB->update_record('ilddigitalcert_issued', $issued);
+	// email to user
+	if ($user = $DB->get_record('user', array('id' => $userid))) {
+		$from_user = core_user::get_support_user();
+		$fullname = explode(' ', get_string('modulenameplural', 'mod_ilddigitalcert'));
+		$from_user->firstname = $fullname[0];
+		$from_user->lastname = $fullname[1];
+		$subject = get_string('subject_new_certificate', 'mod_ilddigitalcert');
+		$a = new stdClass();
+		$a->fullname = $user->firstname.' '.$user->lastname;
+		$a->url = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$cmid;
+		$a->from = $SITE->fullname;
+		$message = get_string('message_new_certificate', 'mod_ilddigitalcert', $a);
+		$message_html = get_string('message_new_certificate_html', 'mod_ilddigitalcert', $a);
+		email_to_user($user, $from_user, $subject, $message, $message_html);
+	}
 	
 	return $json;
 }
