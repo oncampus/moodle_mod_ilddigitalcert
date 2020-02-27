@@ -14,3 +14,4 @@ $CONTEXT_URL->addressB4E = 					'https://myotis.fit.fraunhofer.de/blockchain/pub
 $CONTEXT_URL->signatureB4E =				'https://myotis.fit.fraunhofer.de/blockchain/pub/bscw.cgi/d5031/context.json';
 $CONTEXT_URL->verification = 				'https://myotis.fit.fraunhofer.de/blockchain/pub/bscw.cgi/d5051/context.json';
 $CONTEXT_URL->assertionreferenceB4E = 		'https://myotis.fit.fraunhofer.de/blockchain/pub/bscw.cgi/d4972/context.json';
+$CONTEXT_URL->institutionTokenILD = 		'https://raw.githubusercontent.com/ild-thl/schema_extension_ild/master/institution_token_ild.json';

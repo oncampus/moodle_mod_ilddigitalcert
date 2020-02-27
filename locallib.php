@@ -118,7 +118,22 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 	$issued_certificate = add_signature($issued_certificate, $fromuser);
 	//print_object($issued_certificate);
 	$metadata = $issued_certificate->metadata;
+
+	// save salt/token to file
+	if (!$tokenid = save_token()) {
+		$tokenid = 'error';
+	}
+	$salt = get_token($tokenid);
+	$metadata = json_decode($metadata);
+	$metadata->{'extensions:institutionTokenILD'} = get_extension_institutionTokenILD($salt);
+	$metadata = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
 	$hash = calculate_hash($metadata);
+	// institutionToken wieder entfernen nur beim download (pdf und json) muss es zur datei hinzugefügt werden
+	$metadata = json_decode($metadata);
+	unset($metadata->{'extensions:institutionTokenILD'});
+	$metadata = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
 	//$startdate = $issued_certificate->timemodified;
 	$startdate = strtotime(json_decode($metadata)->issuedOn);
 	if (isset(json_decode($metadata)->expires)) {
@@ -136,23 +151,19 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 		// verification hinzu
 		$metadata = json_decode($metadata);
 		$metadata->verification = get_verification($hash);
-		// TODO: salt token hinzu
-		$token = bin2hex(random_bytes(32));
+
 		//$metadata->salt = get_salt($token);
 		$json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 		// hashes in db issued speichern
 		$issued_certificate->certhash = $hashes->certhash;
 		$issued_certificate->txhash = $hashes->txhash;
 		$issued_certificate->metadata = $json;
-		$issued_certificate->institution_token = $token; // TODO testen
+		$issued_certificate->institution_token = $tokenid;
 		$DB->update_record('ilddigitalcert_issued', $issued_certificate);
 		//print_object(json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 		
 		if ($receiver = $DB->get_record('user', array('id' => $issued_certificate->userid))) {
 			//email to user
-			//message_new_digital_certificate
-			//message_new_digital_certificate_html
-			//subject_new_digital_certificate
 			$from_user = core_user::get_support_user();
 			$fullname = explode(' ', get_string('modulenameplural', 'mod_ilddigitalcert'));
 			$from_user->firstname = $fullname[0];
@@ -169,6 +180,42 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 		return true;
 	}
 	return false;
+}
+
+function save_token() {
+	global $CFG;
+	try {
+		if (!is_dir($CFG->dataroot.'/ilddigitalcert_data')) {
+			if (!mkdir($CFG->dataroot.'/ilddigitalcert_data', 0775)) {
+				return false;
+			}
+		}
+		$id = uniqid();
+		$filename = $CFG->dataroot.'/ilddigitalcert_data/'.$id;
+		while (file_exists($filename)) {
+			$id = uniqid();
+			$filename = $CFG->dataroot.'/ilddigitalcert_data/'.$id;
+		}
+		$token = bin2hex(random_bytes(32));
+		if (!file_put_contents($filename, $token)) {
+			return false;
+		}
+	}
+	catch (Exception $e) {
+		return false;
+	}
+	return $id;
+}
+
+function get_token($tokenid) {
+	global $CFG;
+	$filename = $CFG->dataroot.'/ilddigitalcert_data/'.$tokenid;
+	if (file_exists($filename)) {
+		return file_get_contents($filename);
+	}
+	else {
+		return false;
+	}
 }
 
 function add_signature($issued_certificate, $fromuser) {
@@ -642,6 +689,15 @@ function get_issuer($issuerid) {
 	$issuer->image = get_issuerimage_base64($issuerid);
 	
 	return $issuer;
+}
+
+function get_extension_institutionTokenILD($token) {
+	global $CONTEXT_URL;
+	$extension = new stdClass();
+	$extension->{'@context'} = $CONTEXT_URL->institutionTokenILD;
+	$extension->type = array('Extension', 'InstitutionTokenILD');
+	$extension->institutionToken = $token;
+	return $extension;
 }
 
 function get_extension_assertionpageB4E($cmid, $certmetadatajson) {
