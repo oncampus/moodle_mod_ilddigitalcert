@@ -77,12 +77,6 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 	$issued_certificate = $DB->get_record('ilddigitalcert_issued', array('id' => $issuedid));
 	$certmetadatajson = $issued_certificate->metadata;
 
-	// institution token / salt hinzufügen damit der Hash auch richtig berechnet werden kann
-	$token = get_token($issued_certificate->institution_token);
-	$metadata = json_decode($certmetadatajson);
-	$metadata->{'extensions:institutionTokenILD'} = get_extension_institutionTokenILD($token);
-	$certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-	
 	if ($view == 'download') {
 		$fs = get_file_storage();
 		$fileinfo = array(
@@ -97,6 +91,13 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 		if ($file) {
 			$file->delete();
 		}
+
+		// institution token / salt hinzufügen damit der Hash auch richtig berechnet werden kann
+		$token = get_token($issued_certificate->institution_token);
+		$metadata = json_decode($certmetadatajson);
+		$metadata->{'extensions:institutionTokenILD'} = get_extension_institutionTokenILD($token);
+		$certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
 		$fs->create_file_from_string($fileinfo, $certmetadatajson);
 		//redirect($CFG->wwwroot.'/mod/ilddigitalcert/download.php?id='.$modulecontext->id.'&icid='.$issued_certificate->id.'&cmid='.$cm->id);
 		
