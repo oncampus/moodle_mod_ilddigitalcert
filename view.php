@@ -285,7 +285,7 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 		$user = $DB->get_record_sql('select id, firstname, lastname from {user} where id = :id ', array('id' => $issued_certificate->userid));
 		
 		// TODO Zertifikat anzeigen 
-		$data[] = html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&issuedid='.$issued_certificate->id.'&ueid='.$ueid), $issued_certificate->name);
+		$data[] = html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$issued_certificate->cmid.'&issuedid='.$issued_certificate->id.'&ueid='.$ueid), $issued_certificate->name);
 		
 		$data[] = html_writer::link(new moodle_url('/user/view.php?id='.$user->id.'&course='.$course->id.'&ueid='.$ueid), $user->firstname.' '.$user->lastname);
 		$data[] = date('d.m.Y - H:i', $issued_certificate->timecreated);

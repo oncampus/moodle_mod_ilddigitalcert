@@ -109,7 +109,7 @@ echo '</div>';
 
 //zoom: 0.75; -moz-transform: scale(0.75); -moz-transform-origin: 0 0; -o-transform: scale(0.75); -o-transform-origin: 0 0; -webkit-transform: scale(0.75); -webkit-transform-origin: 0 0;
 //echo '<iframe id="certpageiframe" style="display:none;border: 1px solid #bfbfbf;padding:15px;margin: 20px auto;width:100%;max-width: 800px;-webkit-transform: scale(1.00); -webkit-transform-origin: 0 0;"></iframe>';
-echo '<iframe id="certpageiframe" style="display:none;border: 1px solid #bfbfbf;padding:15px;margin: 20px auto;width:100%;max-width: 800px;"></iframe>';
+echo '<iframe id="certpageiframe" style="display:none;border: 0px solid #bfbfbf;padding:15px;margin: 20px auto;width:100%;max-width: 800px;"></iframe>';
 
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/js/verify.js'));
