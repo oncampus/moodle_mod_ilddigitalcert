@@ -19,6 +19,12 @@ function download_json($modulecontextid, $icid, $download) {
 		$hash = '';
 		if ($issued_certificate = $DB->get_record('ilddigitalcert_issued', array('id' => $icid))) {
 			$metadata_json = $issued_certificate->metadata;
+
+			$salt = get_token($issued_certificate->institution_token);
+			$metadata = json_decode($metadata_json);
+			$metadata->{'extensions:institutionTokenILD'} = get_extension_institutionTokenILD($salt);
+			$metadata_json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
 			$hash = calculate_hash($metadata_json);
 		}
 		$content = $stored_file->get_content();

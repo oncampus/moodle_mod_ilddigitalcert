@@ -135,6 +135,12 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 			// QR-Code anzeigen
 			echo '<br />';
 			echo '<h3>Zertifikat in der Blockchain überprüfen</h3>'; // TODO sprachpaket
+
+			$salt = get_token($issued_certificate->institution_token);
+			$metadata = json_decode($certmetadatajson);
+			$metadata->{'extensions:institutionTokenILD'} = get_extension_institutionTokenILD($salt);
+			$certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
 			$hash = calculate_hash($certmetadatajson);
 			$url = $CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash;
 			$img = '<img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl='.$url.'&choe=UTF-8" title="Zertifikat überprüfen" />';
@@ -415,6 +421,12 @@ else {
 			// QR-Code anzeigen
 			echo '<br />';
 			echo '<h3>Zertifikat in der Blockchain überprüfen</h3>';
+
+			$salt = get_token($issued_certificate->institution_token);
+			$metadata = json_decode($certmetadatajson);
+			$metadata->{'extensions:institutionTokenILD'} = get_extension_institutionTokenILD($salt);
+			$certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
 			$hash = calculate_hash($certmetadatajson);
 			
 			$url = $CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash;
