@@ -86,8 +86,12 @@ function store_certificate($hash, $startdate, $enddate, $pk) {
 	$contract_abi = 	get_contract_abi('CertMgmt');
 	$contract_adress = 	get_contract_address('CertMgmt');
 	$storehash = 		$hash;
-	$startdate = 		new BigInteger($startdate,10);
-	$enddate   = 		new BigInteger($enddate,10);
+	//print_object($startdate);
+	// TODO $startdate = 		new BigInteger($startdate,10);
+	//print_object($startdate);
+	// TODO $enddate   = 		new BigInteger($enddate,10);
+	//$startdate = 		strval($startdate);
+	//$enddate   = 		strval($enddate);
 	$chainid = 			10; //quorum chainid 10 // TODO: in die Settings
 
 	$web3 = new Web3(new HttpProvider(new HttpRequestManager($url, 30)));
@@ -220,12 +224,44 @@ function getCertificate($certhash) {
 			throw $err;
 		}
 		if ($result) {
-			//var_dump($result);
-			$cert->institution = $result[0];
-			$cert->institutionProfile = $result[1];
-			$cert->startingDate = $result[2][0];#->toString();
-			$cert->endingDate = $result[4][1];#->toString();
-			$cert->onHold = $result[5];#->toString();
+			//print_object($result);
+			/*
+			Array
+			(
+				[0] => 0xe53d1b462e5d4dbda8edf1bf756856fc526a9f23
+				[1] => 0xaedd1f3f6c7b0f169c99bfaaff4d33962952bc18ecba40aad10ff5f2cf2db851
+				[2] => 0xe53d1b462e5d4dbda8edf1bf756856fc526a9f23
+				[3] => 0xaedd1f3f6c7b0f169c99bfaaff4d33962952bc18ecba40aad10ff5f2cf2db851
+				[4] => Array
+					(
+						[0] => phpseclib\Math\BigInteger Object
+							(
+								[value] => 0x5e596496
+								[engine] => gmp
+							)
+
+						[1] => phpseclib\Math\BigInteger Object
+							(
+								[value] => 0x621c0270
+								[engine] => gmp
+							)
+
+					)
+
+				[5] => phpseclib\Math\BigInteger Object
+					(
+						[value] => 0x
+						[engine] => gmp
+					)
+
+				[6] => 1
+			)
+			*/
+			$cert->institution = $result[2];
+			$cert->institutionProfile = $result[3];
+			$cert->startingDate = $result[4][0]->value;
+			$cert->endingDate = $result[4][1]->value;
+			$cert->onHold = $result[5]->value;
 			$cert->valid = $result[6];
 		}
 	});

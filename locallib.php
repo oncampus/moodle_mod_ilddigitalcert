@@ -350,8 +350,8 @@ function get_certificatehtml($id, $certmetadatajson) {
 	return $html;
 }
 
-function generate_certmetadata($cm) {
-	global $CFG, $DB, $USER, $CONTEXT_URL;;
+function generate_certmetadata($cm, $user) {
+	global $CONTEXT_URL;
 	$digitalcert = get_digitalcert($cm);
 	
 	$metadata = new stdClass();
@@ -363,7 +363,7 @@ function generate_certmetadata($cm) {
 	$metadata->{'extensions:examinationRegulationsB4E'} = get_extension_examinationRegulationsB4E($digitalcert);
 	$metadata->{'@context'} = $CONTEXT_URL->openbadges;
 	$metadata->recipient = get_recipient();
-	$metadata->{'extensions:recipientB4E'} = get_extension_recipientB4E();
+	$metadata->{'extensions:recipientB4E'} = get_extension_recipientB4E($user);
 	$metadata->{'extensions:examinationB4E'} = get_extension_examinationB4E($digitalcert);
 	$metadata->type = 'Assertion';	
 	
@@ -376,6 +376,58 @@ function get_issued_certificate($userid, $cmid, $ueid) {
 		return $issued->metadata;
 	}
 	return false;
+}
+
+function reissue_certificate($certmetadata, $userid, $cmid) {
+	global $DB, $CFG;
+	$courseid = $DB->get_field('course_modules', 'course', array('id' => $cmid));
+	// Enrolmentid ermitteln
+	$sql = 'SELECT ue.id FROM {user_enrolments} as ue, {enrol} e 
+			 WHERE ue.enrolid = e.id 
+			   and e.courseid = :courseid 
+			   and ue.userid = :userid ';
+	$params = array('courseid' => $courseid, 'userid' => $userid);
+	$enrolmentid = 0;
+	if ($enrolment = $DB->get_records_sql($sql, $params)) {
+		if (count($enrolment) > 1) {
+			print_error('to_many_enrolments', 'mod_ilddigitalcert', new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid)));
+		}
+		else {
+			foreach($enrolment as $em) {
+				$enrolmentid = $em->id;
+			}
+		}
+	}
+	else {
+		print_error('not_enrolled', 'mod_ilddigitalcert', new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid)));
+	}
+	if ($issued = $DB->get_record('ilddigitalcert_issued', array ('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $enrolmentid))) {
+		// check if cert is already in blockchain. if so, print error
+		if (isset($issued->certhash)) {
+			print_error('already_in_blockchain', 'mod_ilddigitalcert', new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid)));
+		}
+
+		$issued->name = $certmetadata->badge->name;
+		$issued->timemodified = time();
+		
+		$certmetadata->id = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?issuedid='.$issued->id;
+		$certmetadata->issuedOn = date('c', $issued->timemodified);
+		$certmetadata->{'extensions:assertionreferenceB4E'} = get_extension_assertionreferenceB4E($issued->id);
+		
+		// assertionpageB4E enthält das komplette html, das aus dem Template + kompletten Metadaten erstellt wird
+		$json = json_encode($certmetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);	
+		$certmetadata->{'extensions:assertionpageB4E'} = get_extension_assertionpageB4E($cmid, $json);
+		// deswegen muss das json anschließend mit html erneut erzeugt werden
+		$json = json_encode($certmetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+		
+		$issued->metadata = $json;
+
+		$DB->update_record('ilddigitalcert_issued', $issued);
+		return true;
+	}
+	else {
+		print_error('certificate_not_found', 'mod_ilddigitalcert', new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid)));
+	}
 }
 
 function issue_certificate($certmetadata, $userid, $cmid) {
@@ -495,16 +547,16 @@ function get_extension_examinationB4E($digitalcert) {
 	return $extension;
 }
 
-function get_extension_recipientB4E() {
-	global $USER, $CFG, $CONTEXT_URL;
+function get_extension_recipientB4E($user) {
+	global $CONTEXT_URL;
 	$extension = new stdClass();
-	$userprofilefields = profile_user_record($USER->id);
+	$userprofilefields = profile_user_record($user->id);
 	
 	if (isset($userprofilefields->birthdate) and $userprofilefields->birthdate != 0) {
 		$extension->birthdate = date('c', $userprofilefields->birthdate);
 	}
-	$extension->reference = $USER->id;
-	$extension->email = $USER->email;
+	$extension->reference = $user->id;
+	$extension->email = $user->email;
 	if (isset($userprofilefields->gender) and $userprofilefields->gender != '') {
 		$extension->gender = $userprofilefields->gender;
 	}
@@ -513,11 +565,11 @@ function get_extension_recipientB4E() {
 	}
 	$extension->{'@context'} = $CONTEXT_URL->recipientB4E;
 	$extension->type = array('Extension', 'RecipientB4E');
-	$extension->givenname = $USER->firstname;
+	$extension->givenname = $user->firstname;
 	if (isset($userprofilefields->birthname) and $userprofilefields->birthname != '') {
 		$extension->birthname = $userprofilefields->birthname;
 	}
-	$extension->surname = $USER->lastname;
+	$extension->surname = $user->lastname;
 	return $extension;
 }
 
@@ -793,7 +845,7 @@ function get_institution($ipfs_hash) {
 
 function add_certifier($userid, $user_address, $admin_pk) {
 	require_once('web3lib.php');
-	global $DB, $USER;
+	global $DB;
 	// Check if user already exists in user_preferences
 	//if (get_user_preferences('mod_ilddigitalcert_certifier', false, $userid)) {
 	if ($user_pref = $DB->get_record('user_preferences', array('name' => 'mod_ilddigitalcert_certifier', 'userid' => $userid))) {
@@ -898,7 +950,7 @@ function get_issuer_name_from_address($institution_address) {
 }
 
 function reset_user($courseid, $userid) {
-	global $DB, $USER;
+	global $DB;
 
 	$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 #/*

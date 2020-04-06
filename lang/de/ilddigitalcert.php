@@ -234,8 +234,8 @@ des Zertifikats überprüfen. Laden Sie dazu die PDF-Datei unter der
 URL <a href="{$a->url}">{$a->url}</a> hoch. 
 <br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.
 <br />HASH: <a href="{$a->url}?hash={$a->hash}">{$a->hash}</a>'; */
-$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter der 
-URL <a href="{$a->url}">{$a->url}</a> hoch. 
+$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter 
+<a href="{$a->url}">{$a->url}</a> hoch. 
 <br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.';
 $string['verify_description'] = 'Überprüfen Sie hier Ihre digitalen Zertifikate in der Blockchain';
 $string['waiting_for_pk_generation'] = 'Warte auf Erstellung eines Private Key durch Nutzer/in';

@@ -161,7 +161,7 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 	echo $OUTPUT->heading(get_string('pluginname', 'mod_ilddigitalcert'));
 	echo '<p>'.get_string('preview', 'mod_ilddigitalcert').' "'.$moduleinstance->name.'"</p>';
 	echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
-	echo get_certificatehtml($cm->instance, json_encode(generate_certmetadata($cm)));
+	echo get_certificatehtml($cm->instance, json_encode(generate_certmetadata($cm, $USER)));
 	echo '</div>';
 	echo '<p>'.html_writer::link($CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$id.'&ueid='.$ueid, get_string('back')).'</p>';
 	echo $OUTPUT->footer();
@@ -208,6 +208,7 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 	$action = optional_param('action', '', PARAM_RAW);
 	$issued = optional_param('issued', 0, PARAM_INT);
 	$pk = optional_param('pk', '', PARAM_RAW); 
+	$reissueid = optional_param('reissueid', 0, PARAM_INT);
 	//print_object('action: '.$action);print_object('issued: '.$issued);print_object('pk: '.$pk);
 	if ($action == 'toblockchain' and $issued > 0) {
 		$issued_certificate = $DB->get_record('ilddigitalcert_issued', array('id' => $issued));
@@ -222,6 +223,17 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 		#*/
 		//to_blockchain($issued_certificate, $USER);
 	}
+	elseif ($action == 'reissue' and $reissueid > 0) {
+		//echo '*reissue* 0';
+		if ($reissue = $DB->get_record('ilddigitalcert_issued', array('id' => $reissueid))) {
+			//echo '*reissue* 1';
+			if ($reissue_user = $DB->get_record('user', array('id' => $reissue->userid, 'confirmed' => 1, 'deleted' => 0))) {
+				//echo '*reissue* 2';
+				$certmetadata = generate_certmetadata($cm, $reissue_user);
+				reissue_certificate($certmetadata, $reissue->userid, $cm->id);
+			}
+		}
+	} 
 	$search = optional_param('search', '', PARAM_ALPHA);
 	$check_only_bc = optional_param('check_only_bc', '', PARAM_RAW);
 	$check_only_nonbc = optional_param('check_only_nonbc', '', PARAM_RAW);
@@ -292,7 +304,8 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 		// TODO Zertifikat neu ausstellen
 		// Zertifikat in Blockchain speichern
 		if (!isset($issued_certificate->txhash)) {
-			$data[] = '<button class="myBtn" value="'.$issued_certificate->id.'">'.get_string('toblockchain', 'mod_ilddigitalcert').'</button>';
+			$data[] = '<button class="myBtn" value="'.$issued_certificate->id.'">'.get_string('toblockchain', 'mod_ilddigitalcert').'</button> '.
+					  html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$issued_certificate->cmid.'&reissueid='.$issued_certificate->id.'&action=reissue'), 'reissue');
 			
 		}
 		else {
@@ -328,7 +341,7 @@ else {
 	// TODO unterscheiden ob $ueid (dann neue Funtktion get_issued_certificate) oder aktuelles enrolment
 
 	// Zertifikat ansehen/erstellen als student
-	$certmetadata = generate_certmetadata($cm);
+	$certmetadata = generate_certmetadata($cm, $USER);
 
 	if ($ueid == 0) {
 		$certmetadatajson = issue_certificate($certmetadata, $USER->id, $cm->id);

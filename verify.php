@@ -100,6 +100,7 @@ echo '<div id="verifydiv" align="center">
 	  
 echo '<p id="assertionPage" style="clear: both;"></p>';
 
+// TODO Sprachpaket
 echo '<div id="certdata" align="center" style="display:none;padding:20px;min-width:300px;width:100%;max-width:650px;margin:30px auto;border: 0px solid #bfbfbf;">';
 echo '<p align="left" style="margin: 0 auto;max-width: 610px;">Hash: <span id="span-result-hash" style="color:#106F6F;word-wrap: break-word;"></span><br/>';
 echo 'Gültig von <span id="span-result-start" style="color:#106F6F;"></span> ';

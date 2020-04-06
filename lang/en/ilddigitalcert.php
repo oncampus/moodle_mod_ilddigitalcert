@@ -216,15 +216,14 @@ $string['valid'] = 'Valid certificate';
 $string['validation'] = 'Valid';
 $string['verify'] = 'Zertifikate überprüfen';
 $string['verify_authenticity'] = 'Echtheit überprüfen';
-$string['verify_authenticity'] = 'Echtheit überprüfen';
 /* $string['verify_authenticity_descr'] = 'In die PDF Version dieses Zertifikates ist eine Datei im JSON-Format eingebettet. 
 Deren Hashwert ist in der Zertifikats-Blockchain gespeichert. So lässt sich jederzeit die Echtheit 
 des Zertifikats überprüfen. Laden Sie dazu die PDF-Datei unter der 
 URL <a href="{$a->url}">{$a->url}</a> hoch. 
 <br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.
 <br />HASH: <a href="{$a->url}?hash={$a->hash}">{$a->hash}</a>'; */
-$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter der 
-URL <a href="{$a->url}">{$a->url}</a> hoch. 
+$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter 
+<a href="{$a->url}">{$a->url}</a> hoch. 
 <br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.';
 $string['verify_description'] = 'Verify your digital certificates here in the blockchain.';
 $string['waiting_for_pk_generation'] = 'Waiting for user to generate private key';

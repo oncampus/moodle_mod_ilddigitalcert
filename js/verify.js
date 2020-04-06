@@ -308,7 +308,7 @@ async function processHash(hash, meta = null) {
 			hash: hash
 		})
 	}).responseText;
-	//console.log(result);
+	console.log(result);
 	cert = JSON.parse(result);
 	await sleep(sleepTime);
 	if (cert.institution == '0x0000000000000000000000000000000000000000') {
@@ -341,10 +341,17 @@ async function processHash(hash, meta = null) {
 		// show certificate details
 		divCertData.style.display = "block";
 		spanResultHash.innerHTML = hash;
-		let startDate = new Date(cert.startingDate/1000000);
-		let endDate = new Date(cert.endingDate/1000000);
-		spanResultStart.innerHTML = startDate.getDate()+'.'+(startDate.getMonth()+1)+'.'+startDate.getFullYear();
-		spanResultEnd.innerHTML = endDate.getDate()+'.'+(endDate.getMonth()+1)+'.'+endDate.getFullYear();
+		//let startDate = new Date(cert.startingDate/1000000);
+		//let endDate = new Date(cert.endingDate/1000000);
+		let startDate = new Date(cert.startingDate);
+		let endDate = new Date(cert.endingDate);
+		//console.log(endDate);
+		//spanResultStart.innerHTML = startDate.getDate()+'.'+(startDate.getMonth()+1)+'.'+startDate.getFullYear();
+		spanResultStart.innerHTML = cert.startingDate;
+		//spanResultEnd.innerHTML = endDate.getDate()+'.'+(endDate.getMonth()+1)+'.'+endDate.getFullYear();
+		spanResultEnd.innerHTML = cert.endingDate;
+		//spanResultStart.innerHTML = cert.startingDate;
+		//spanResultEnd.innerHTML = cert.endingDate;
 		spanResultInstitution.innerHTML = imgLoader.outerHTML;
 		// return_verificationstep.php action: institution_profile, institution_profile
 		institution = $.ajax({
