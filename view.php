@@ -305,6 +305,14 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 		// Zertifikat in Blockchain speichern
 		if (!isset($issued_certificate->txhash)) {
 			$data[] = '<button class="myBtn" value="'.$issued_certificate->id.'">'.get_string('toblockchain', 'mod_ilddigitalcert').'</button> '.
+					  /*
+					  '<form method="post" action="'.new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/view.php').'"> 
+						<input type="hidden" name="action" value="reissue">
+						<input type="hidden" name="id" value="'.$issued_certificate->cmid.'">
+						<input type="hidden" name="reissueid" value="'.$issued_certificate->id.'">
+						<button type="submit">'.get_string('reissue', 'mod_ilddigitalcert').'</button>
+					   </form>';
+					   */
 					  html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$issued_certificate->cmid.'&reissueid='.$issued_certificate->id.'&action=reissue'), 'reissue');
 			
 		}

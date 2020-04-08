@@ -147,7 +147,7 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 	}
 	else {
 		// Wenn kein expires angegeben wurde, automatisch auf 100 Jahre in der Zukunft setzen
-		$enddate = time() + 60 * 60 * 24 * 365 * 100;
+		$enddate = 0;//time() + 60 * 60 * 24 * 365 * 100;
 	}
 	if ($enddate <= $startdate) {
 		return false;
@@ -156,7 +156,7 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 	if (isset($hashes->txhash)) {
 		// verification hinzu
 		$metadata = json_decode($metadata);
-		$metadata->verification = get_verification($hash);
+		$metadata->{'extensions:verifyB4E'} = get_extension_verifyB4E($hash);
 
 		//$metadata->salt = get_salt($token);
 		$json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -626,14 +626,14 @@ function get_digitalcert($cm) {
 	return $digitalcert;
 }
 
-function get_verification($hash) {
-	global $CONTEXT_URL;
+function get_extension_verifyB4E($hash) {
+	global $CFG, $CONTEXT_URL;
 	$verification = new stdClass();
-	// TODO url aus settings holen
-	$verification->verifyaddress = 'https://myotis.fit.fraunhofer.de/thluebeck/pub/bscw.cgi?op=checkcert&_doit=1&_certhash='.$hash;
+	// TODO alternative url aus settings holen
+	$verification->verifyaddress = $CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash;
 	$verification->type = array('Extension', 'VerifyB4E');
 	$verification->assertionhash = 'sha256$'.$hash;
-	$verification->{'@context'} = $CONTEXT_URL->verification;
+	$verification->{'@context'} = $CONTEXT_URL->verifyB4E;
 	return $verification;
 }
 
