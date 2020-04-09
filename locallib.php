@@ -109,7 +109,6 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 	if (!$pref) {
 		print_error('not_a_certifier', 'mod_ilddigitalcert');
 	}
-	
 	else {
 		if ($pref != get_address_from_pk($pk)) {
 			print_error('wrong_private_key', 'mod_ilddigitalcert');
@@ -149,7 +148,7 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 		// Wenn kein expires angegeben wurde, automatisch auf 100 Jahre in der Zukunft setzen
 		$enddate = 0;//time() + 60 * 60 * 24 * 365 * 100;
 	}
-	if ($enddate <= $startdate) {
+	if ($enddate != 0 and $enddate <= $startdate) {
 		return false;
 	}
 	$hashes = save_hash_in_blockchain($hash, $startdate, $enddate, $pk);
@@ -1016,7 +1015,7 @@ function display_metadata($metadata) {
 					echo '<img src="'.$value.'" style="max-width:150px; max-height:150px;">';
 				}
 				else {
-					if ($key == 'issuedOn' or $key == 'date' or $key == 'expires') {
+					if ($key == 'issuedOn' or $key == 'date' or $key == 'expires' or $key == 'certificationdate') {
 						$value = date('d.m.Y', strtotime($value));
 					}
 					if ($key == 'startdate') {
