@@ -1012,16 +1012,16 @@ function display_metadata($metadata) {
 		foreach ($metadata as $key => $value) {
 			if ($key != '@context' and $key != 'type' and $value != '' and $key != 'extensions:assertionpageB4E') {
 				if ($key == 'image') {
-					//echo '<li>';
 					echo '<br />';
 					echo '<img src="'.$value.'" style="max-width:150px; max-height:150px;">';
-					//echo '</li>';
 				}
 				else {
 					if ($key == 'issuedOn' or $key == 'date' or $key == 'expires') {
 						$value = date('d.m.Y', strtotime($value));
 					}
-					//echo has_content($value);
+					if ($key == 'startdate') {
+						$value = date('d.m.Y', $value);
+					}
 					if (has_content($value)) {
 						echo '<li>';
 						echo '<b>'.$key.'</b>: ';
@@ -1036,7 +1036,6 @@ function display_metadata($metadata) {
 	else {
 		echo $metadata;
 	}
-	//echo '</div>';
 }
 
 function has_content($metadata_obj) {
