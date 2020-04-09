@@ -125,7 +125,12 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 	}
 	// TODO Zertifikat anzeigen
 	if ($view == 'data') {
-		echo '<pre>'.$certmetadatajson.'</pre>';
+		$metadata = json_decode($certmetadatajson);
+		echo '<div><p>';
+		display_metadata($metadata);
+		echo '</p></div>';
+		//print_object($metadata);
+		//echo '<pre>'.$certmetadatajson.'</pre>';
 	}
 	elseif ($view == 'html') {
 		echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';

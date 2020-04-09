@@ -996,6 +996,61 @@ function reset_user($courseid, $userid) {
 #*/
 }
 
+function display_metadata($metadata) {
+	//echo '<div>';
+	if (is_array($metadata)) {
+		echo '<ul>';
+		foreach ($metadata as $value) {
+			echo '<li>';
+			echo $value;
+			echo '</li>';
+		}
+		echo '</ul>';
+	}
+	elseif (is_object($metadata)){
+		echo '<ul>';
+		foreach ($metadata as $key => $value) {
+			if ($key != '@context' and $key != 'type' and $value != '' and $key != 'extensions:assertionpageB4E') {
+				if ($key == 'image') {
+					//echo '<li>';
+					echo '<br />';
+					echo '<img src="'.$value.'" style="max-width:150px; max-height:150px;">';
+					//echo '</li>';
+				}
+				else {
+					if ($key == 'issuedOn' or $key == 'date' or $key == 'expires') {
+						$value = date('d.m.Y', strtotime($value));
+					}
+					//echo has_content($value);
+					if (has_content($value)) {
+						echo '<li>';
+						echo '<b>'.$key.'</b>: ';
+						display_metadata($value);
+						echo '</li>';
+					}
+				}
+			}
+		}
+		echo '</ul>';
+	}
+	else {
+		echo $metadata;
+	}
+	//echo '</div>';
+}
+
+function has_content($metadata_obj) {
+	if (is_string($metadata_obj) and $metadata_obj != '') {
+		return true;
+	}
+	foreach ($metadata_obj as $key => $value) {
+		if ($key != '@context' and $key != 'type' and $value != '' and $key != 'extensions:assertionpageB4E') {
+			return true;
+		}
+	}
+	return false;
+}
+
 function download_file($fileid) {
 	global $DB, $CFG;
 	
