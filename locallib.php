@@ -10,13 +10,14 @@ function download_json($modulecontextid, $icid, $download) {
 											  'metadata',
 											  $icid,
 											  '/',
-											  'metadata.json');
+											  'certificate.bcrt');
 											  
 	if ($download == 'json') {
 		send_stored_file($stored_file, null, 0, true);
 	}
 	elseif ($download == 'pdf') {
 		$hash = '';
+		$filename = 'certificate';
 		if ($issued_certificate = $DB->get_record('ilddigitalcert_issued', array('id' => $icid))) {
 			$metadata_json = $issued_certificate->metadata;
 
@@ -26,14 +27,19 @@ function download_json($modulecontextid, $icid, $download) {
 			$metadata_json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 			$hash = calculate_hash($metadata_json);
+
+			$filename = $issued_certificate->name.'_'.
+					$metadata->{'extensions:recipientB4E'}->givenname.'_'.
+					$metadata->{'extensions:recipientB4E'}->surname.'_'.
+					strtotime($metadata->issuedOn);
 		}
 		$content = $stored_file->get_content();
 
 		require_once __DIR__ . '/vendor/autoload.php';
 
-		$mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0, 'format' => [210, 297]]);
-		//$mpdf = new \Mpdf\Mpdf();
-		$mpdf->showImageErrors = true;
+		$certificate = new \Mpdf\Mpdf(['mode' => 'utf-8', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0, 'format' => [210, 297]]);
+		//$certificate = new \Mpdf\Mpdf();
+		$certificate->showImageErrors = true;
 
 		$html = '<h1>Error</h1>';
 
@@ -44,32 +50,32 @@ function download_json($modulecontextid, $icid, $download) {
 		}
 		
 		/*
-		//$mpdf->AddPage();
+		//$certificate->AddPage();
 		//$html .= get_pdf_footerhtml($hash);
 		if (strpos($html, '<div id="zertifikat-page">') === 0) {
 
-			$mpdf->WriteHTML($html);
+			$certificate->WriteHTML($html);
 		}
 		else {
-			$mpdf->WriteHTML($html);
-			$mpdf->WriteHTML(get_pdf_footerhtml($hash));
+			$certificate->WriteHTML($html);
+			$certificate->WriteHTML(get_pdf_footerhtml($hash));
 		}
 		#*/
 
-		$mpdf->WriteHTML($html);
-		$mpdf->WriteHTML(get_pdf_footerhtml($hash));
+		$certificate->WriteHTML($html);
+		$certificate->WriteHTML(get_pdf_footerhtml($hash));
 
 		$fileid = $stored_file->get_id(); // fileid ermitteln
 
-		$mpdf->SetAssociatedFiles([[
-			'name' => 'certificate_metadata.bcrt',
+		$certificate->SetAssociatedFiles([[
+			'name' => $filename.'.bcrt',
 			'mime' => 'application/json',
 			'description' => 'some description',
 			'AFRelationship' => 'Alternative',
 			'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$fileid
 		]]);
 
-		$mpdf->Output();
+		$certificate->Output($filename.'.pdf', 'I');
 
 		return;
 	}

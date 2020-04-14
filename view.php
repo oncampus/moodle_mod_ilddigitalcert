@@ -77,6 +77,13 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 	$issued_certificate = $DB->get_record('ilddigitalcert_issued', array('id' => $issuedid));
 	$certmetadatajson = $issued_certificate->metadata;
 
+	$metadataobj = json_decode($certmetadatajson);
+	$filename = $issued_certificate->name.'_'.
+				$metadataobj->{'extensions:recipientB4E'}->givenname.'_'.
+				$metadataobj->{'extensions:recipientB4E'}->surname.'_'.
+				strtotime($metadataobj->issuedOn).'.bcrt';
+	$filename = 'certificate.bcrt';
+//echo $filename; die();
 	if ($view == 'download') {
 		$fs = get_file_storage();
 		$fileinfo = array(
@@ -85,7 +92,7 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 			'filearea' => 'metadata',     			// usually = table name
 			'itemid' => $issued_certificate->id,	// usually = ID of row in table
 			'filepath' => '/',           			// any path beginning and ending in /
-			'filename' => 'metadata.json'); 		// any filename
+			'filename' => $filename); 		// any filename
 		$file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], 
 				$fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
 		if ($file) {
@@ -378,7 +385,13 @@ else {
 		
 		$fs = get_file_storage();
 		#/*
-
+		$metadataobj = json_decode($certmetadatajson);
+		$filename = $issued_certificate->name.'_'.
+					$metadataobj->{'extensions:recipientB4E'}->givenname.'_'.
+					$metadataobj->{'extensions:recipientB4E'}->surname.'_'.
+					strtotime($metadataobj->issuedOn).'.bcrt';
+					//echo $filename; die();
+		$filename = 'certificate.bcrt';
 		// Prepare file record object
 		$fileinfo = array(
 			'contextid' => $modulecontext->id, 		// ID of context
@@ -386,7 +399,7 @@ else {
 			'filearea' => 'metadata',     			// usually = table name
 			'itemid' => $issued_certificate->id,	// usually = ID of row in table
 			'filepath' => '/',           			// any path beginning and ending in /
-			'filename' => 'metadata.json'); 		// any filename
+			'filename' => $filename); 		// any filename
 			
 		// Get file
 		$file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], 
@@ -428,10 +441,10 @@ else {
 	echo html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&view=data&ueid='.$ueid), get_string('data', 'mod_ilddigitalcert'));
 	if (isset($issued_certificate->txhash)) {
 		echo '<br />'.get_string('download').': ';
-		echo html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&view=download&ueid='.$ueid), get_string('json', 'mod_ilddigitalcert'));
+		// echo html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&view=download&ueid='.$ueid), get_string('json', 'mod_ilddigitalcert'));
 		$pdf = true; // TODO in die Settings
 		if ($pdf) {
-			echo ' | ';
+			//echo ' | ';
 			echo html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&view=download&download=pdf&ueid='.$ueid), get_string('pdf', 'mod_ilddigitalcert'));
 		}
 	}
