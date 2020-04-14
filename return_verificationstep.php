@@ -17,7 +17,12 @@ if ($action == 'meta' and $meta != '') {
 elseif ($action == 'hash' and $hash != '') {
 	$cert = getCertificate($hash);
 	$cert->startingDate = date('d.m.Y', intval($cert->startingDate));
-	$cert->endingDate = date('d.m.Y', intval($cert->endingDate));
+	if (intval($cert->endingDate) != 0) {
+		$cert->endingDate = date('d.m.Y', intval($cert->endingDate));
+	}
+	else {
+		$cert->endingDate = false;
+	}
     echo json_encode($cert);
 }
 elseif ($action == 'validateJSON' and !empty($_FILES['file']['name']) and 

@@ -104,7 +104,7 @@ echo '<p id="assertionPage" style="clear: both;"></p>';
 echo '<div id="certdata" align="center" style="display:none;padding:20px;min-width:300px;width:100%;max-width:650px;margin:30px auto;border: 0px solid #bfbfbf;">';
 echo '<p align="left" style="margin: 0 auto;max-width: 610px;">Hash: <span id="span-result-hash" style="color:#106F6F;word-wrap: break-word;"></span><br/>';
 echo 'Gültig von <span id="span-result-start" style="color:#106F6F;"></span> ';
-echo 'bis <span id="span-result-end" style="color:#106F6F;"></span><br/>';
+echo '<span id="prespan-result-end" style="display:none;">bis </span><span id="span-result-end" style="color:#106F6F;"></span><br/>';
 echo 'Zertifizierungsstelle: <br/><span id="span-result-institution"></span></p>';
 echo '</div>';
 

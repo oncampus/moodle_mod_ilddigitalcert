@@ -33,6 +33,7 @@ var imgCheckLoad4Url = imgCheckLoad4.src;
 var divCertData = document.getElementById('certdata');
 var spanResultHash = document.getElementById('span-result-hash');
 var spanResultStart = document.getElementById('span-result-start');
+var prespanResultEnd = document.getElementById('prespan-result-end');
 var spanResultEnd = document.getElementById('span-result-end');
 var spanResultInstitution = document.getElementById('span-result-institution');
 
@@ -263,6 +264,7 @@ function resetBotti() {
 	
 	spanResultHash.innerHTML ='';
 	spanResultStart.innerHTML ='';
+	prespanResultEnd.style.display = "none";
 	spanResultEnd.innerHTML ='';
 	spanResultInstitution.innerHTML ='';
 	divCertData.style.display = "none";
@@ -349,7 +351,10 @@ async function processHash(hash, meta = null) {
 		//spanResultStart.innerHTML = startDate.getDate()+'.'+(startDate.getMonth()+1)+'.'+startDate.getFullYear();
 		spanResultStart.innerHTML = cert.startingDate;
 		//spanResultEnd.innerHTML = endDate.getDate()+'.'+(endDate.getMonth()+1)+'.'+endDate.getFullYear();
-		spanResultEnd.innerHTML = cert.endingDate;
+		if (cert.endingDate) {
+			prespanResultEnd.style.display = "block";
+			spanResultEnd.innerHTML = cert.endingDate;
+		}
 		//spanResultStart.innerHTML = cert.startingDate;
 		//spanResultEnd.innerHTML = cert.endingDate;
 		spanResultInstitution.innerHTML = imgLoader.outerHTML;

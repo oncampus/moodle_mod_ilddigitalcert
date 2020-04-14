@@ -98,7 +98,7 @@ $string['issuerurl'] = 'URL';
 $string['issueremail'] = 'E-Mail';
 $string['issuerdescription'] = 'Beschreibung';
 
-$string['json'] = 'JSON';
+$string['json'] = 'Metadaten';
 $string['subject_new_certificate'] = 'Neues digitales Zertifikat';
 $string['subject_new_digital_certificate'] = 'Neues digitales Zertifikat in der Blockchain';
 $string['message_new_certificate'] = 'Hallo {$a->fullname},
