@@ -1024,7 +1024,10 @@ function display_metadata($metadata) {
 					if ($key == 'issuedOn' or $key == 'date' or $key == 'expires' or $key == 'certificationdate') {
 						$value = date('d.m.Y', strtotime($value));
 					}
-					if ($key == 'startdate') {
+					if ($key == 'startdate') { // TODO
+						$value = date('d.m.Y', $value);
+					}
+					if ($key == 'enddate') { // TODO
 						$value = date('d.m.Y', $value);
 					}
 					if (has_content($value)) {

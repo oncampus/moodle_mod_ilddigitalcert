@@ -351,7 +351,7 @@ async function processHash(hash, meta = null) {
 		//spanResultStart.innerHTML = startDate.getDate()+'.'+(startDate.getMonth()+1)+'.'+startDate.getFullYear();
 		spanResultStart.innerHTML = cert.startingDate;
 		//spanResultEnd.innerHTML = endDate.getDate()+'.'+(endDate.getMonth()+1)+'.'+endDate.getFullYear();
-		if (cert.endingDate) {
+		if (cert.endingDate != 'false') {
 			prespanResultEnd.style.display = "block";
 			spanResultEnd.innerHTML = cert.endingDate;
 		}

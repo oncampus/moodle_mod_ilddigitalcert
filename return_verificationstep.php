@@ -21,7 +21,7 @@ elseif ($action == 'hash' and $hash != '') {
 		$cert->endingDate = date('d.m.Y', intval($cert->endingDate));
 	}
 	else {
-		$cert->endingDate = false;
+		$cert->endingDate = 'false';
 	}
     echo json_encode($cert);
 }
