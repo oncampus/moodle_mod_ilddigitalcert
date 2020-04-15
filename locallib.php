@@ -593,8 +593,9 @@ function get_extension_examinationRegulationsB4E($digitalcert) {
 	$extension->url = $digitalcert->examination_regulations_url;
 	$extension->{'@context'} = $CONTEXT_URL->examinationRegulationsB4E;
 	$extension->type = array('Extension', 'ExaminationRegulationsB4E');
-	$extension->date = date('c', $digitalcert->examination_regulations_date);
-	
+	if ($digitalcert->examination_regulations_date != 0) {
+		$extension->date = date('c', $digitalcert->examination_regulations_date);
+	}
 	return $extension;
 }
 

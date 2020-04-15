@@ -325,7 +325,7 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 						<button type="submit">'.get_string('reissue', 'mod_ilddigitalcert').'</button>
 					   </form>';
 					   */
-					  html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$issued_certificate->cmid.'&reissueid='.$issued_certificate->id.'&action=reissue'), 'reissue');
+					  html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$issued_certificate->cmid.'&reissueid='.$issued_certificate->id.'&action=reissue'), '<img alt="reissue certificate" title="reissue certificate" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/refresh_grey_24x24.png">');
 			
 		}
 		else {
