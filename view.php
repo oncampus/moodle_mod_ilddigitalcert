@@ -224,16 +224,21 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 	//print_object('action: '.$action);print_object('issued: '.$issued);print_object('pk: '.$pk);
 	if ($action == 'toblockchain' and $issued > 0) {
 		$issued_certificate = $DB->get_record('ilddigitalcert_issued', array('id' => $issued));
-		
-		#/*
 		if (to_blockchain($issued_certificate, $USER, $pk)) {
-			echo '<p style="color:#00ce0a;">Zertifikat erfolgreich in der Blockchain gespeichert und signiert!</p>'; // TODO ins Sprachpaket
+			$recipient = json_decode($issued_certificate->metadata)->{'extensions:recipientB4E'};
+			$recipient_name = $recipient->givenname.' '.$recipient->surname;
+			$message = '<p>'.get_string('registered_and_signed', 'mod_ilddigitalcert').'</p>';
+			$message .= '<p>Recipient: <b>'.$recipient_name.'</b><br/>';
+			$message .= 'Hash: <b>'.$issued_certificate->certhash.'</b><br/>';
+			$message .= 'Startdate: <b>'.json_decode($issued_certificate->metadata)->issuedOn.'</b><br/>';
+			$message .= 'Enddate: <b>'.json_decode($issued_certificate->metadata)->expires.'</b></p>';
+			\core\notification::success($message);
 		}
 		else {
-			echo '<p style="color:red;">Fehler beim Speichern in der Blockchain!</p>'; // TODO ins Sprachpaket
+			//echo '<p style="color:red;">Fehler beim Speichern in der Blockchain!</p>';
+			//https://dev.oncampus.de/moodle3/mod/ilddigitalcert/view.php?id=703
+			print_error('error_register_cert', 'mod_ilddigitalcert', new moodle_url('/mod/ilddigitalcert/view.php', array('id' => $id)));
 		}
-		#*/
-		//to_blockchain($issued_certificate, $USER);
 	}
 	elseif ($action == 'reissue' and $reissueid > 0) {
 		//echo '*reissue* 0';

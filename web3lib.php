@@ -128,7 +128,7 @@ function store_certificate($hash, $startdate, $enddate, $pk) {
 		if ($err !== null) {
 			throw $err;
 		}
-		print_object('tx hash: '.$tx);
+		//print_object('tx hash: '.$tx);
 		$hashes->txhash = $tx;
 	});
 	

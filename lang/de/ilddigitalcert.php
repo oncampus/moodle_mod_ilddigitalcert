@@ -66,6 +66,7 @@ $string['drag_n_drop'] = 'Hier klicken oder Dateien in dieses Feld ziehen (Drag 
 $string['edit_certifiers'] = 'Zertifizierer verwalten';
 $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Wählen Sie eine Zertifizierungsstelle';
+$string['error_register_cert'] = 'Fehler beim Speichern in der Blockchain';
 $string['examination_end'] = 'Prüfungsende';
 $string['examination_place'] = 'Prüfungsort';
 $string['examination_start'] = 'Prüfungsstart';

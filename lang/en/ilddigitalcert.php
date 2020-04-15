@@ -65,6 +65,7 @@ $string['drag_n_drop'] = 'Click here or drag and drop to upload file';
 $string['edit_certifiers'] = 'Manage certifiers';
 $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Choose issuer';
+$string['error_register_cert'] = 'Fehler beim Speichern in der Blockchain';
 $string['examination_end'] = 'Examniation end';
 $string['examination_place'] = 'Examniation place';
 $string['examination_start'] = 'Examination start';

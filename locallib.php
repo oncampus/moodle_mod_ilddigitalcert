@@ -273,12 +273,14 @@ function save_hash_in_blockchain($hash, $startdate, $enddate, $pk) {
 	$hashes = store_certificate($hash, $startdate, $enddate, $pk);
 	
 	if (isset($hashes->txhash)) {
+		/*
 		print_object('certificate hash: '.$hashes->certhash);
 		print_object('startdate:        '.$startdate);
 		print_object('enddate:          '.$enddate);
 		print_object('tx hash:          '.$hashes->txhash);
 		$cert = getCertificate($hashes->certhash);
 		print_object($cert);
+		*/
 		return $hashes;
 	}
 	return false;
