@@ -241,7 +241,7 @@ function add_signature($issued_certificate, $fromuser) {
 	$extension->surname = $fromuser->lastname;
 	$extension->{'@context'} = $CONTEXT_URL->signatureB4E;
 	$extension->role = 'Trainer/in'; // TODO aus profilefield Rolle mit der man in den Kurs eingeschrieben ist?
-	$extension->certificationdate = date('c', time()); 	// TODO ist das so korrekt?
+	$extension->certificationdate = date('c', time()); 
 	$extension->type = array('Extension', 'SignatureB4E');
 	$extension->givenname = $fromuser->firstname;
 	if (isset($fromuser->city) and $fromuser->city != '') {
@@ -540,10 +540,10 @@ function get_extension_examinationB4E($digitalcert) {
 	$extension->{'@context'} = $CONTEXT_URL->examinationB4E;
 	$extension->type = array('Extension', 'ExaminationB4E');
 	if ($digitalcert->examination_start > 0) {
-		$extension->startdate = $digitalcert->examination_start;
+		$extension->startdate = date('c', $digitalcert->examination_start);
 	}
 	if ($digitalcert->examination_end > 0) {
-		$extension->enddate = $digitalcert->examination_end;
+		$extension->enddate =  date('c', $digitalcert->examination_end);
 	}
 	if ($digitalcert->examination_place != '') {
 		$extension->place = $digitalcert->examination_place;
@@ -1025,10 +1025,10 @@ function display_metadata($metadata) {
 						$value = date('d.m.Y', strtotime($value));
 					}
 					if ($key == 'startdate') { // TODO
-						$value = date('d.m.Y', $value);
+						$value = date('d.m.Y', strtotime($value));
 					}
 					if ($key == 'enddate') { // TODO
-						$value = date('d.m.Y', $value);
+						$value = date('d.m.Y', strtotime($value));
 					}
 					if (has_content($value)) {
 						echo '<li>';
