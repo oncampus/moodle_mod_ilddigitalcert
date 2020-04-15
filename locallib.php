@@ -28,7 +28,7 @@ function download_json($modulecontextid, $icid, $download) {
 
 			$hash = calculate_hash($metadata_json);
 
-			$filename = $issued_certificate->name.'_'.
+			$filename = str_replace(' ', '_', $issued_certificate->name).'_'.
 					$metadata->{'extensions:recipientB4E'}->givenname.'_'.
 					$metadata->{'extensions:recipientB4E'}->surname.'_'.
 					strtotime($metadata->issuedOn);
@@ -1072,4 +1072,17 @@ function download_file($fileid) {
 		send_stored_file($stored_file, null, 0, false);
 	}
 	
+}
+
+function debug_email($to, $message, $debug_object = NULL) {
+	global $USER;
+	$subject = 'debug';
+	$from = $USER;
+	if (isset($debug_object)) {
+		ob_start();
+		print_object($debug_object);
+		$message .= ob_get_contents();
+		ob_end_clean();
+	}
+	email_to_user($to, $from, $subject, $message, $message);
 }
