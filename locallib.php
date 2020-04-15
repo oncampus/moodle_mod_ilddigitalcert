@@ -785,7 +785,9 @@ function get_extension_addressB4E($issuerrecord) {
 	$address->street = $issuerrecord->street;
 	$address->{'@context'} = $CONTEXT_URL->addressB4E;
 	$address->type = array('Extension', 'AddressB4E');
-	$address->pob = $issuerrecord->pob;
+	if ($issuerrecord->pob != 0) {
+		$address->pob = $issuerrecord->pob;
+	}
 	
 	return $address;
 }
@@ -808,7 +810,7 @@ function get_institution($ipfs_hash) {
 	$institution = new stdClass();
 	
 	$ipfs_url = 'https://ipfs.io/ipfs/'.$ipfs_hash;
-	
+
 	try {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $ipfs_url);
