@@ -69,7 +69,7 @@ echo '<div id="verifydiv" align="center">
 		<div id="iconerrordiv" style="display:none;"><img id="img-error" width="16px" style="margin-right: 5px;vertical-align:top; float:left;clear:left;" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_error.png'.'" /></div>
 		<div id="iconerrordiv" style="display:none;"><img  id="img-check"width="16px" style="margin-right: 5px;vertical-align:top; float:left;clear:left;" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check.png'.'" /></div>
 		<div align="left" style="padding: 10px;float:left;width:50%;max-width: 250px;">
-			<h3 id="h1" style="display:none;">Verifiziere</h3>
+			<h3 id="h1" style="display:none;word-wrap: break-word;">Verifiziere</h3>
 			<p id="p-hash" style="font-size: 10pt;word-wrap: break-word;display:none"></p>
 			<p id="p1" style="display:none; margin:0px;clear: both;">
 				<img id="img-check-load-1" width="16px" style="margin-right:5px; vertical-align:top; float:left;clear:left;" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />
@@ -104,7 +104,7 @@ echo '<p id="assertionPage" style="clear: both;"></p>';
 echo '<div id="certdata" align="center" style="display:none;padding:20px;min-width:300px;width:100%;max-width:650px;margin:30px auto;border: 0px solid #bfbfbf;">';
 echo '<p align="left" style="margin: 0 auto;max-width: 610px;">Hash: <span id="span-result-hash" style="color:#106F6F;word-wrap: break-word;"></span><br/>';
 echo 'Gültig ab <span id="span-result-start" style="color:#106F6F;"></span> ';
-echo '<span id="prespan-result-end" style="display:none;">bis </span><span id="span-result-end" style="color:#106F6F;"></span><br/>';
+echo '<span id="prespan-result-end" style="display:none;">bis <span id="span-result-end" style="color:#106F6F;"></span></span>';
 echo 'Zertifizierungsstelle: <br/><span id="span-result-institution"></span></p>';
 echo '</div>';
 
