@@ -44,12 +44,12 @@ if ($hassiteconfig) {
 	$settings->add(new admin_setting_configtext(            
 		'ilddigitalcert/blockchain_url',            
 		get_string('configlabel_blockchain_url', 'mod_ilddigitalcert'),            
-		get_string('configdesc_blockchain_url', 'mod_ilddigitalcert'), 'http://quorum.oncampus.de:8545'
+		get_string('configdesc_blockchain_url', 'mod_ilddigitalcert'), 'http://certotrust-01.th-luebeck.de:57010'
 	));
 	$settings->add(new admin_setting_configtext(
 		'ilddigitalcert/failover_url',
 		get_string('configlabel_failover_url', 'mod_ilddigitalcert'),            
-		get_string('configdesc_failover_url', 'mod_ilddigitalcert'), 'http://quorum.th-luebeck.de:8545'
+		get_string('configdesc_failover_url', 'mod_ilddigitalcert'), 'http://certotrust-01.th-luebeck.de:57010'
 	));
 	$settings->add(new admin_setting_configtext(            
 		'ilddigitalcert/CertMgmt_address',            
