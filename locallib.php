@@ -262,6 +262,7 @@ function calculate_hash($metadatajson) {
 	$metadatajson->recipient->hashed = false; // TODO kann es auch passieren, dass hier etwas anderes drinsteht? das geht sicher auch eleganter
 	//verification entfernen (wenn bereits vorhanden)
 	unset($metadatajson->{'extensions:verifyB4E'});
+	unset($metadatajson->{'verification'}); // bleibt drin um abwärtskompatibel zu bleiben
 	$metadatajson = json_encode($metadatajson, JSON_UNESCAPED_SLASHES);
 	$hash = '0x'.hash('sha256', $metadatajson);
 	return $hash;
