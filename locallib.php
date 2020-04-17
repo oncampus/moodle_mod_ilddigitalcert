@@ -161,7 +161,8 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 	if (isset($hashes->txhash)) {
 		// verification hinzu
 		$metadata = json_decode($metadata);
-		$metadata->{'extensions:verifyB4E'} = get_extension_verifyB4E($hash);
+		$metadata->verification = new stdClass();
+		$metadata->verification->{'extensions:verifyB4E'} = get_extension_verifyB4E($hash);
 
 		//$metadata->salt = get_salt($token);
 		$json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

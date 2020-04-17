@@ -199,7 +199,7 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 					<p>&nbsp;</p>
 					<p>'.get_string('sign_with_pk', 'mod_ilddigitalcert').'</p>
 					<form method="post" action="'.new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$id.'&ueid='.$ueid).'">
-						Private Key: <input class="pk-input" id="pk" type="text" name="pk" pattern="[A-Za-z0-9]{64}" required>
+						Private Key: <input class="pk-input" id="pk" type="password" name="pk" pattern="[A-Za-z0-9]{64}" required>
 						<input id="issued" type="hidden" name="issued" value="-1">
 						<input type="hidden" name="action" value="toblockchain"><br/><br/>
 						<p style="text-align: center;">
