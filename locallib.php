@@ -642,7 +642,7 @@ function get_extension_verifyB4E($hash) {
 	// TODO alternative url aus settings holen
 	$verification->verifyaddress = $CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash;
 	$verification->type = array('Extension', 'VerifyB4E');
-	$verification->assertionhash = 'sha256$'.$hash;
+	$verification->assertionhash = 'sha256$'.substr($hash, 2);
 	$verification->{'@context'} = $CONTEXT_URL->verifyB4E;
 	return $verification;
 }
