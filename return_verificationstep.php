@@ -111,13 +111,23 @@ elseif ($action == 'institution_profile' and $institution_profile != '') {
 	
 }
 elseif ($action == 'cert' and $hash != '') {
-	// TODO echo metadaten wenn cert/hash im system vorhanden
+	
 	if ($result = $DB->get_record('ilddigitalcert_issued', array('certhash' => $hash))) {
-		echo $result->metadata;
+		// echo TODO nur anzeigen wenn token vorhanden ist // $result->metadata;
+		#/*
+		$metadata = json_decode($result->metadata);
+		$meta_badge = new stdClass();
+		$metad_badge->issuer = $metadata->badge->issuer;
+		$meta_result = new stdClass();
+		$meta_result->badge = $metad_badge;
+		$metadata = json_encode($meta_result);
+		echo $metadata;
+		#*/
 	}
 	else {
 		echo null;
 	}
+	
 }
 else {
 	echo 'result - action: '.$action.
