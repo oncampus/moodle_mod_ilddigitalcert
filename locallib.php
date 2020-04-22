@@ -137,6 +137,9 @@ function to_blockchain($issued_certificate, $fromuser, $pk) {
 	$salt = get_token($tokenid);
 	$metadata = json_decode($metadata);
 	$metadata->{'extensions:institutionTokenILD'} = get_extension_institutionTokenILD($salt);
+	// contract parameter
+	$metadata->{'extensions:contractB4E'} = get_extension_contractB4E();
+
 	$metadata = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 	$hash = calculate_hash($metadata);
@@ -722,6 +725,20 @@ function get_issuerimage_base64($issuerid) {
 	return $img_base64;
 }
 
+function get_extension_contractB4E() {
+	require_once('web3lib.php');
+	global $CONTEXT_URL;
+	$extension = new stdClass();
+
+	$extension->{'@context'} = $CONTEXT_URL->contractB4E;
+	$extension->type = array('Extension', 'ContractB4E');
+	$extension->abi = get_contract_abi('CertMgmt');
+	$extension->address = get_contract_address('CertMgmt');
+	$extension->node = get_contract_url('CertMgmt');
+
+	return $extension;
+}
+
 function get_extension_badgetemplateB4E() {
 	global $CONTEXT_URL;
 	$extension = new stdClass();
@@ -1022,7 +1039,7 @@ function display_metadata($metadata) {
 	elseif (is_object($metadata)){
 		echo '<ul>';
 		foreach ($metadata as $key => $value) {
-			if ($key != '@context' and $key != 'type' and $value != '' and $key != 'extensions:assertionpageB4E') {
+			if ($key != 'abi' and $key != '@context' and $key != 'type' and $value != '' and $key != 'extensions:assertionpageB4E') {
 				if ($key == 'image') {
 					echo '<br />';
 					echo '<img src="'.$value.'" style="max-width:150px; max-height:150px;">';
@@ -1031,12 +1048,17 @@ function display_metadata($metadata) {
 					if ($key == 'issuedOn' or $key == 'date' or $key == 'expires' or $key == 'certificationdate') {
 						$value = date('d.m.Y', strtotime($value));
 					}
-					if ($key == 'startdate') { // TODO
+					if ($key == 'startdate') {
 						$value = date('d.m.Y', strtotime($value));
 					}
-					if ($key == 'enddate') { // TODO
+					if ($key == 'enddate') {
 						$value = date('d.m.Y', strtotime($value));
 					}
+					/*
+					if ($key == 'abi') {
+						$value = substr($value, 0, 256).'...}]';
+					}
+					*/
 					if (has_content($value)) {
 						echo '<li>';
 						echo '<b>'.$key.'</b>: ';
