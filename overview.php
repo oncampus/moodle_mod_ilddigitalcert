@@ -81,7 +81,7 @@ foreach ($issued_certificates as $issued_certificate) {
     $data = array();
     $icon = '<img height="32px" title="'.get_string('pluginname', 'mod_ilddigitalcert').'" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
     if (isset($issued_certificate->txhash)) {
-        $icon .= '<img height="32px" title="'.get_string('registered_and_signed', 'mod_ilddigitalcert').'" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain-block.svg">';
+        $icon = '<img height="32px" title="'.get_string('registered_and_signed', 'mod_ilddigitalcert').'" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain-block.svg">';
     }
     $data[] = $icon;
     //$user = $DB->get_record_sql('select id, firstname, lastname from {user} where id = :id ', array('id' => $issued_certificate->userid));
