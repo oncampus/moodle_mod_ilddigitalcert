@@ -185,6 +185,8 @@ $string['new_pk_generated'] = '<p>Herzlichen Glückwunsch!</p>
 $string['No_institution_found_in_IPFS'] = 'No issuer information found in IPFS';
 $string['no_pref_found'] = 'No user preference "mod_ilddigitalcert_certifier" found for user {$a->fullname}. 
 Please check if you are logged in correctly.';
+$string['not_installed_correctly'] = 'Das Plugin "Digitale Zertifikate" wurde nicht vollständig installiert. 
+Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
 $string['only_blockchain'] = 'Nur Zertifikate, die in der Blockchain registriert sind';
 $string['only_nonblockchain'] = 'Nur Zertifikate, die nicht in der Blockchain registriert sind';
 $string['overview'] = 'Overview';

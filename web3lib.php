@@ -1,4 +1,11 @@
 <?php 
+if (!file_exists('vendor/autoload.php')) {
+	require_once(__DIR__.'/../../config.php');
+	echo $OUTPUT->header();
+	\core\notification::error(get_string('not_installed_correctly', 'mod_ilddigitalcert'));
+	echo $OUTPUT->footer();
+	die();
+}
 require('vendor/autoload.php');
 
 use Web3\Web3;
