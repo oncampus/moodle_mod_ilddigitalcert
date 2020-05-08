@@ -54,12 +54,12 @@ if ($hassiteconfig) {
 	$settings->add(new admin_setting_configtext(            
 		'ilddigitalcert/CertMgmt_address',            
 		get_string('configlabel_CertMgmt_address', 'mod_ilddigitalcert'),            
-		get_string('configdesc_CertMgmt_address', 'mod_ilddigitalcert'), '0x83351591391e960924f10Fa49C078dad63CEd6C0'
+		get_string('configdesc_CertMgmt_address', 'mod_ilddigitalcert'), '0x8a7e3622D3f200aBb1B00D25126f86256c7368dB'
 	));
 	$settings->add(new admin_setting_configtext(            
 		'ilddigitalcert/IdentityMgmt_address',            
 		get_string('configlabel_IdentityMgmt_address', 'mod_ilddigitalcert'),            
-		get_string('configdesc_IdentityMgmt_address', 'mod_ilddigitalcert'), '0xBf4Cc235a96A74C359Fb25773764516494a1a031'
+		get_string('configdesc_IdentityMgmt_address', 'mod_ilddigitalcert'), '0xF40ec6b07009de471F3E2773b276F434F2c1c567'
 	));
 	
 	$settings->add(new admin_setting_heading(            
