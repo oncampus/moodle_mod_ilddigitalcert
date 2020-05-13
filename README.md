@@ -11,7 +11,13 @@ For interacting with the blockchain, you need to install the following extension
 For creating PDF documents with attached certificate metadata, you need to install the following extensions:
   * https://packagist.org/packages/mpdf/mpdf
   * https://packagist.org/packages/mpdf/qrcode
+
+Also make sure that PHP extension gmp is installed
   
 The file composer.json is already included in this repository. So simply run:
 
 `run "composer install" on command line`
+
+For detaching metadata from PDF files, you need to install Poppler (https://poppler.freedesktop.org/)
+
+`yum install poppler poppler-utils`
