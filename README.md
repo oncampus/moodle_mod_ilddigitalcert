@@ -14,9 +14,11 @@ For creating PDF documents with attached certificate metadata, you need to insta
 
 Also make sure that PHP extension gmp is installed
   
-The file composer.json is already included in this repository. So simply run:
+The file composer.json is already included in this repository. So simply:
 
 `run "composer install" on command line`
+
+To enable PDF download, make sure that temporary files directory "mod/ilddigitalcert/vendor/mpdf/mpdf/tmp" is writable
 
 For detaching metadata from PDF files, you need to install Poppler (https://poppler.freedesktop.org/)
 
