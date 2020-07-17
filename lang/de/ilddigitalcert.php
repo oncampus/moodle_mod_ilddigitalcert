@@ -223,6 +223,7 @@ $string['subject_generate_pk'] = 'Generieren Sie Ihren Private Key als Zertifizi
 $string['template'] = 'HTML Template';
 $string['title'] = 'Zertifikat';
 $string['toblockchain'] = 'In Blockchain registrieren und signieren';
+$string['to_many_enrolments'] = 'Das Zertifikat kann aufgrund mehrerer paralleler Einschreibungen in diesen Kurs nicht ausgestellt werden.';
 $string['unknown'] = 'Das Zertifikat ist in der Blockchain unbekannt';
 $string['upload'] = 'Zertifikat hier hochladen';
 $string['upload_again'] = 'Neues Zertifikat hochladen';

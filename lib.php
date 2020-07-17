@@ -97,3 +97,40 @@ function ilddigitalcert_delete_instance($id) {
 
     return true;
 }
+
+function ilddigitalcert_cm_info_dynamic(cm_info $cm) {
+    global $USER, $CFG, $DB;
+    // User can access the activity.
+    if ($cm->uservisible) {
+        if ($cm->available && !empty($cm->availability)) { // TODO nur wenn Voraussetzung eingestellt ist??? $cm->available && 
+            $courseid = $cm->get_course()->id;
+            $coursecontext = context_course::instance($courseid);
+            if (!is_enrolled($coursecontext, $USER)) {
+                return;
+            }
+            // Enrolmentid ermitteln
+            $sql = 'SELECT ue.id FROM {user_enrolments} as ue, {enrol} e 
+                    WHERE ue.enrolid = e.id 
+                    and e.courseid = :courseid 
+                    and ue.userid = :userid ';
+            $params = array('courseid' => $courseid, 'userid' => $USER->id);
+            if ($enrolment = $DB->get_records_sql($sql, $params)) {
+                if (count($enrolment) > 1) {
+                    //echo count($enrolment);
+                    \core\notification::info(get_string('to_many_enrolments', 'mod_ilddigitalcert'));
+                    return;
+                }
+            }
+            // issue certificate
+            require_once($CFG->dirroot.'/mod/ilddigitalcert/locallib.php');
+            $certmetadata = generate_certmetadata($cm, $USER);
+            issue_certificate($certmetadata, $USER->id, $cm->id); // Zertifikat wird nicht verliehen, wenn wenn user mit mehreren enrolments in den selben Kurs eingeschrieben ist
+        }
+    } else if ($cm->availableinfo) {
+        // User cannot access the activity, but on the course page they will
+        // see a link to it, greyed-out, with information (HTML format) from
+        // $cm->availableinfo about why they can't access it.
+    } else {
+        // User cannot access the activity and they will not see it at all.
+    }
+}

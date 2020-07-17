@@ -83,7 +83,7 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 				$metadataobj->{'extensions:recipientB4E'}->surname.'_'.
 				strtotime($metadataobj->issuedOn).'.bcrt';
 	$filename = 'certificate.bcrt';
-//echo $filename; die();
+	//echo $filename; die();
 	if ($view == 'download') {
 		$fs = get_file_storage();
 		$fileinfo = array(
@@ -177,7 +177,7 @@ elseif (has_capability('moodle/grade:viewall', context_course::instance($course-
 	echo '</div>';
 	echo '<p>'.html_writer::link($CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$id.'&ueid='.$ueid, get_string('back')).'</p>';
 	echo $OUTPUT->footer();
-}
+}// TODO elseif (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view == 'issue_teacher')
 elseif (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view != 'download') {
 	// Zertifikatsübersicht als Teacher/certifier
 	$PAGE->requires->css(new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/css/pk_form.css'));

@@ -390,6 +390,14 @@ function get_issued_certificate($userid, $cmid, $ueid) {
 	return false;
 }
 
+function is_issued($userid, $cmid, $ueid) {
+	global $DB;
+	if ($DB->record_exists('ilddigitalcert_issued', array('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $ueid))) {
+		return true;
+	}
+	return false;
+}
+
 function reissue_certificate($certmetadata, $userid, $cmid) {
 	global $DB, $CFG;
 	$courseid = $DB->get_field('course_modules', 'course', array('id' => $cmid));
