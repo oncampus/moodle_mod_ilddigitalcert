@@ -46,8 +46,8 @@ url = window.location.href;
 if (url.includes('course/view.php')) {
 	var verificationStepUrl = url.substr(0, url.indexOf('course/view.php')) + 'mod/ilddigitalcert/return_verificationstep.php';
 }
-else if (url.includes('www.oncampus.de')) {
-	var verificationStepUrl = 'https://www.oncampus.de/mod/ilddigitalcert/return_verificationstep.php';
+else {
+	var verificationStepUrl = url.substr(0, url.indexOf('mod/ilddigitalcert')) + 'mod/ilddigitalcert/return_verificationstep.php';
 }
 
 function getUrlParameterByName(name, url) {
