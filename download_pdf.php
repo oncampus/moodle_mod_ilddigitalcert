@@ -15,17 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod_ilddigitalcert
- * @copyright  2020 Jan Rieger, ILD, University of Applied Sciences Lübeck <jan.rieger@fh-luebeck.de>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * This script is producing a downloadable file
+ *
+ * @package     mod_ilddigitalcert
+ * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
 require_once('locallib.php');
 
+require_login();
+
 $fileid = optional_param('id', 0, PARAM_INT);
 
 // TODO: check if user is logged in!?
 if ($fileid > 0) {
-	download_file($fileid);
+    download_file($fileid);
 }

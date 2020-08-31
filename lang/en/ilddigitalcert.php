@@ -19,7 +19,7 @@
  *
  * @package     mod_ilddigitalcert
  * @category    string
- * @copyright   2020 ILD TH Lübeck <support@oncampus.de>
+ * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -183,9 +183,9 @@ $string['new_pk_generated'] = '<p>Herzlichen Glückwunsch!</p>
 <p>Mit Ihrem Private Key registrieren und signieren Sie Digitale Zertifikate in der Blockchain.</p>
 <p>Schließen Sie diese Seite nicht und laden Sie sie nicht neu, bevor Sie Ihren Private Key gesichert haben!</p>';
 $string['No_institution_found_in_IPFS'] = 'No issuer information found in IPFS';
-$string['no_pref_found'] = 'No user preference "mod_ilddigitalcert_certifier" found for user {$a->fullname}. 
+$string['no_pref_found'] = 'No user preference "mod_ilddigitalcert_certifier" found for user {$a->fullname}.
 Please check if you are logged in correctly.';
-$string['not_installed_correctly'] = 'Das Plugin "Digitale Zertifikate" wurde nicht vollständig installiert. 
+$string['not_installed_correctly'] = 'Das Plugin "Digitale Zertifikate" wurde nicht vollständig installiert.
 Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
 $string['only_blockchain'] = 'Nur Zertifikate, die in der Blockchain registriert sind';
 $string['only_nonblockchain'] = 'Nur Zertifikate, die nicht in der Blockchain registriert sind';
@@ -196,7 +196,7 @@ $string['preview'] = 'Vorschau für das Zertifikat';
 $string['recipient'] = 'Recipient';
 $string['registered_and_signed'] = 'Das Zertifikat ist in der Blockchain registriert und signiert';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
-$string['settings_descconfig'] = '<p>Diese Parameter werden benötigt um eine Verbindung zur Blockchain aufzubauen und 
+$string['settings_descconfig'] = '<p>Diese Parameter werden benötigt um eine Verbindung zur Blockchain aufzubauen und
 um die Smart Contracts auszuführen, die verwendet werden um Zertifikate und Zertifizierer zu verwalten.</p>
 <p><strong>Es können einfach die voreingestellten Default-Parameter verwendet werden um die DigiCerts Blockchain zu benutzen.</strong></p>
 <p>Nähere Informationen finden Sie hier <a href="https://www.digicerts.de">DigiCerts</a>.</p>';
@@ -220,14 +220,8 @@ $string['valid'] = 'Valid certificate';
 $string['validation'] = 'Valid';
 $string['verify'] = 'Zertifikate überprüfen';
 $string['verify_authenticity'] = 'Echtheit überprüfen';
-/* $string['verify_authenticity_descr'] = 'In die PDF Version dieses Zertifikates ist eine Datei im JSON-Format eingebettet. 
-Deren Hashwert ist in der Zertifikats-Blockchain gespeichert. So lässt sich jederzeit die Echtheit 
-des Zertifikats überprüfen. Laden Sie dazu die PDF-Datei unter der 
-URL <a href="{$a->url}">{$a->url}</a> hoch. 
-<br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.
-<br />HASH: <a href="{$a->url}?hash={$a->hash}">{$a->hash}</a>'; */
-$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter 
-<a href="{$a->url}">{$a->url}</a> hoch. 
+$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter
+<a href="{$a->url}">{$a->url}</a> hoch.
 <br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.';
 $string['verify_description'] = 'Verify your digital certificates here in the blockchain.';
 $string['waiting_for_pk_generation'] = 'Waiting for user to generate private key';

@@ -8,8 +8,6 @@ var reset_btn = document.getElementById("pk_button_reset");
 var submit_btn = document.getElementById("pk_submit");
 var submit_reset_btn = document.getElementById("pk_submit_reset");
 
-//var testBtn = document.getElementById("testBtn");
-
 var btns = document.getElementsByClassName("deleteBtn");
 var registerBtns = document.getElementsByClassName("registerBtn");
 var modal = document.getElementById('myModal');
@@ -41,7 +39,7 @@ radiogroup1.onclick = function() {
 }
 
 select.onclick = function() {
-    //console.log(select.selectedIndex);
+    // Debug: console.log(select.selectedIndex); //!
 }
 
 btn.onclick = function() {
@@ -50,20 +48,20 @@ btn.onclick = function() {
         pk_input.style.display = "block";
         submit.style.display = "block";
         buttons.style.display = "none";
-		warning_select_user.style.display = "none";
+        warning_select_user.style.display = "none";
     }
-	if (select.selectedIndex == -1) {
-		// console.log("select user! required!");
-		warning_select_user.style.display = "block";
-	}
+    if (select.selectedIndex == -1) {
+        // Debug: console.log("select user! required!"); //!
+        warning_select_user.style.display = "block";
+    }
 }
-//*
+
 reset_btn.onclick = function() {
     adr_input.disabled = true;
     adr_input.required = false;
     adr_input.value = "";
 }
-//*/
+
 submit_reset_btn.onclick = function() {
     pk_input.required = false;
     pk_input.style.display = "none";
@@ -71,43 +69,41 @@ submit_reset_btn.onclick = function() {
     buttons.style.display = "block";
 }
 
-for(var i=0; i<btns.length; i++){
-    btns[i].addEventListener("click", (function(i) { 
-      return function(){ 
-        modal.style.display = "block"; 
-        userpref.value = btns[i].value;
-      }
-    })(i))
-  }
-  
-for(var i=0; i<registerBtns.length; i++){
-    registerBtns[i].addEventListener("click", (function(i) { 
-      return function(){ 
-        modalAdd.style.display = "block"; 
-        userprefAdd.value = registerBtns[i].value;
-      }
+for(var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener("click", (function(i) {
+        return function() {
+            modal.style.display = "block";
+            userpref.value = btns[i].value;
+        }
     })(i))
 }
 
-for(var i=0; i<spans.length; i++){
-	spans[i].addEventListener("click", (function(i) { 
-		return function() {
-			modal.style.display = "none";
-			modalAdd.style.display = "none";
+for(var i = 0; i < registerBtns.length; i++) {
+    registerBtns[i].addEventListener("click", (function(i) {
+        return function() {
+            modalAdd.style.display = "block";
+            userprefAdd.value = registerBtns[i].value;
+        }
+    })(i))
+}
+
+for(var i = 0; i < spans.length; i++) {
+    spans[i].addEventListener("click", (function(i) {
+        return function() {
+            modal.style.display = "none";
+            modalAdd.style.display = "none";
             pk.value = '';
             pkAdd.value = '';
-		}
-	})(i))
+        }
+    })(i))
 }
 
-// When the user clicks anywhere outside of the modal, close it
+// When the user clicks anywhere outside of the modal, close it.
 window.onclick = function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
-        //pk.value = '';
     }
     else if (event.target == modalAdd) {
         modalAdd.style.display = "none";
-        //pkAdd.value = '';
     }
 }

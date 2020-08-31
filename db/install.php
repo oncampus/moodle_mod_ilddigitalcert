@@ -18,7 +18,7 @@
  * post installation hook for adding entry in customusermenu.
  *
  * @package    mod_ilddigitalcert
- * @copyright  2020 Jan Rieger <jan.rieger@th-luebeck.de> ILD Technische Hochschule Lübeck
+ * @copyright  2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,10 +30,10 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_ilddigitalcert_install() {
     global $CFG;
     $result = true;
-    
-    $old_menu = $CFG->customusermenuitems;
-    $new_menu = $old_menu .= "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
-    set_config('customusermenuitems', $new_menu);
+
+    $oldmenu = $CFG->customusermenuitems;
+    $newmenu = $oldmenu .= "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
+    set_config('customusermenuitems', $newmenu);
 
     return $result;
 }

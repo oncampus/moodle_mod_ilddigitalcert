@@ -1,21 +1,43 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Upgrade the database when upgrading the plugin.
+ *
+ * @package    mod_ilddigitalcert
+ * @copyright  2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 function xmldb_ilddigitalcert_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
-	
-	if ($oldversion < 2018110800) {
+
+    if ($oldversion < 2018110800) {
 
         // Define field expireperiod to be added to ilddigitalcert.
         $table = new xmldb_table('ilddigitalcert');
-		
-		$field = new xmldb_field('expiredate', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timemodified');
+
+        $field = new xmldb_field('expiredate', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timemodified');
 
         // Conditionally launch add field expiredate.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
+
         $field = new xmldb_field('expireperiod', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'expiredate');
 
         // Conditionally launch add field expireperiod.
@@ -26,69 +48,81 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018110800, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018110801) {
+
+    if ($oldversion < 2018110801) {
 
         // Define field criteria to be added to ilddigitalcert.
         $table = new xmldb_table('ilddigitalcert');
-		
+
         $field = new xmldb_field('criteria', XMLDB_TYPE_TEXT, null, null, null, null, null, 'expireperiod');
 
         // Conditionally launch add field criteria.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('expertise', XMLDB_TYPE_TEXT, null, null, null, null, null, 'criteria');
+
+        $field = new xmldb_field('expertise', XMLDB_TYPE_TEXT, null, null, null, null, null, 'criteria');
 
         // Conditionally launch add field expertise.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('examination_start', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'expertise');
+
+        $field = new xmldb_field('examination_start', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'expertise');
 
         // Conditionally launch add field examination_start.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('examination_end', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'examination_start');
+
+        $field = new xmldb_field('examination_end', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'examination_start');
 
         // Conditionally launch add field examination_end.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('examination_place', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'examination_end');
+
+        $field = new xmldb_field('examination_place', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'examination_end');
 
         // Conditionally launch add field examination_place.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('examination_regulations', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'examination_place');
+
+        $field = new xmldb_field('examination_regulations', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'examination_place');
 
         // Conditionally launch add field examination_regulations.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('examination_regulations_url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'examination_regulations');
+
+        $field = new xmldb_field('examination_regulations_url',
+                                 XMLDB_TYPE_CHAR,
+                                 '255',
+                                 null, null, null, null,
+                                 'examination_regulations');
 
         // Conditionally launch add field examination_regulations_url.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('examination_regulations_id', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'examination_regulations_url');
+
+        $field = new xmldb_field('examination_regulations_id',
+                                XMLDB_TYPE_CHAR,
+                                '100',
+                                null, null, null, null,
+                                'examination_regulations_url');
 
         // Conditionally launch add field examination_regulations_id.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('examination_regulations_date', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'examination_regulations_id');
+
+        $field = new xmldb_field('examination_regulations_date',
+                                 XMLDB_TYPE_INTEGER,
+                                 '10',
+                                 null, null, null, null,
+                                 'examination_regulations_id');
 
         // Conditionally launch add field examination_regulations_date.
         if (!$dbman->field_exists($table, $field)) {
@@ -98,8 +132,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018110801, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018110900) {
+
+    if ($oldversion < 2018110900) {
 
         // Define table ilddigitalcert_issuer to be created.
         $table = new xmldb_table('ilddigitalcert_issuer');
@@ -127,8 +161,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018110900, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018111000) {
+
+    if ($oldversion < 2018111000) {
 
         // Define table ilddigitalcert_issued to be created.
         $table = new xmldb_table('ilddigitalcert_issued');
@@ -150,8 +184,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018111000, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018111001) {
+
+    if ($oldversion < 2018111001) {
 
         // Define field cmid to be added to ilddigitalcert_issued.
         $table = new xmldb_table('ilddigitalcert_issued');
@@ -165,8 +199,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018111001, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018111500) {
+
+    if ($oldversion < 2018111500) {
 
         // Define field issuer to be added to ilddigitalcert.
         $table = new xmldb_table('ilddigitalcert');
@@ -180,8 +214,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018111500, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018111501) {
+
+    if ($oldversion < 2018111501) {
 
         // Define field template to be added to ilddigitalcert.
         $table = new xmldb_table('ilddigitalcert');
@@ -195,20 +229,20 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018111501, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018111600) {
+
+    if ($oldversion < 2018111600) {
 
         // Define field courseid to be added to ilddigitalcert_issued.
         $table = new xmldb_table('ilddigitalcert_issued');
-        
-		$field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'cmid');
+
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'cmid');
 
         // Conditionally launch add field courseid.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('inblockchain', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'courseid');
+
+        $field = new xmldb_field('inblockchain', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'courseid');
 
         // Conditionally launch add field inblockchain.
         if (!$dbman->field_exists($table, $field)) {
@@ -218,8 +252,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018111600, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018111601) {
+
+    if ($oldversion < 2018111601) {
 
         // Define field name to be added to ilddigitalcert_issued.
         $table = new xmldb_table('ilddigitalcert_issued');
@@ -233,8 +267,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018111601, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018112000) {
+
+    if ($oldversion < 2018112000) {
 
         // Define field timemodified to be added to ilddigitalcert_issued.
         $table = new xmldb_table('ilddigitalcert_issued');
@@ -248,8 +282,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2018112000, 'ilddigitalcert');
     }
-	
-	if ($oldversion < 2018112200) {
+
+    if ($oldversion < 2018112200) {
 
         // Define field certhash to be added to ilddigitalcert_issued.
         $table = new xmldb_table('ilddigitalcert_issued');
@@ -259,8 +293,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-		
-		$field = new xmldb_field('txhash', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'certhash');
+
+        $field = new xmldb_field('txhash', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'certhash');
 
         // Conditionally launch add field txhash.
         if (!$dbman->field_exists($table, $field)) {
@@ -300,8 +334,8 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         // Ilddigitalcert savepoint reached.
         upgrade_mod_savepoint(true, 2019052200, 'ilddigitalcert');
     }
-	
-	    if ($oldversion < 2019101800) {
+
+    if ($oldversion < 2019101800) {
 
         // Define field institution_token to be added to ilddigitalcert_issued.
         $table = new xmldb_table('ilddigitalcert_issued');

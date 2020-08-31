@@ -18,7 +18,7 @@
  * Display information about all the mod_ilddigitalcert modules in the requested course.
  *
  * @package     mod_ilddigitalcert
- * @copyright   2020 ILD Fachhochschule Lübeck <support@oncampus.de>
+ * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
