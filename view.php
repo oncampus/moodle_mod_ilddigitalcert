@@ -308,8 +308,8 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         // TODO Zertifikat anzeigen.
         $data[] = html_writer::link(
             $CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.
-              $issued_certificate->cmid.'&issuedid='.$issued_certificate->id.'&ueid='.$ueid,
-            $issued_certificate->name);
+              $issuedcertificate->cmid.'&issuedid='.$issuedcertificate->id.'&ueid='.$ueid,
+            $issuedcertificate->name);
 
         $data[] = html_writer::link(
             new moodle_url('/user/view.php?id='.
