@@ -227,7 +227,7 @@ function get_certificate($certhash) {
 
     $contract = new Contract($web3->provider, get_contract_abi('CertMgmt'));
     $contract->at(get_contract_address('CertMgmt'));
-    $contract->call('get_certificate', $certhash, function ($err, $result) use ($cert) {
+    $contract->call('getCertificate', $certhash, function ($err, $result) use ($cert) {
         if ($err !== null) {
             throw $err;
         }
