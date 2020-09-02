@@ -55,7 +55,7 @@ if ($action == 'meta' and $meta != '') {
     $file = $_FILES['file'];
     $pdf = $file['tmp_name'];
     // Get Attachments.
-    $attachmentlistresult = shell_exec('pdfdetach -list $pdf 2>&1');
+    $attachmentlistresult = shell_exec('pdfdetach -list '.$pdf.' 2>&1');
     $attachmentlist = explode("\n", $attachmentlistresult);
     $attachments = array();
     $n = 0;
@@ -87,7 +87,7 @@ if ($action == 'meta' and $meta != '') {
             mkdir($CFG->dataroot.'/temp/ilddigitalcert/attachments', 0775);
         }
         $path = $CFG->dataroot.'/temp/ilddigitalcert/attachments/'.$basenameattachmentfile;
-        shell_exec('pdfdetach -save 1 -o $path $pdf 2>&1');
+        shell_exec('pdfdetach -save 1 -o '.$path.' '.$pdf.' 2>&1');
         if (!isset($detachresult)) {
             $filecontent = file_get_contents($path);
             $json = $filecontent;
