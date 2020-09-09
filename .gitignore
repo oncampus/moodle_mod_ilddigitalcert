@@ -2,3 +2,5 @@ vendor/*
 
 composer.lock
 test.php
+test_connector.php
+test_return_validation.php
