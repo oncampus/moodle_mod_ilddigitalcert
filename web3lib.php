@@ -172,7 +172,7 @@ function store_certificate($hash, $startdate, $enddate, $pk) {
 }
 
 function revoke_certificate($certhash, $pk) {
-    // TODO: implementieren und testen.
+    // TODO: testen.
     $url = get_contract_url('CertMgmt');
     $account = get_address_from_pk($pk);
     $contractabi = get_contract_abi('CertMgmt');
@@ -212,12 +212,18 @@ function revoke_certificate($certhash, $pk) {
         }
     });
 
-    $cert = get_certificate($certhash);
-    if ($cert->onHold == 0) {
-        return true;
-    } else {
-        return false;
+    $start = time();
+    while (1) {
+        $now = time();
+        $cert = get_certificate($certhash);
+        if (isset($cert->valid) and $cert->valid != 1) {
+            return true;
+        }
+        if ($now - $start > 30) {
+            break;
+        }
     }
+    return false;
 }
 
 function get_certificate($certhash) {
