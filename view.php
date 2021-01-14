@@ -130,6 +130,12 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
                     '/mod/ilddigitalcert/view.php?id='.$id.'&issuedid='.$issuedid.'&view=download&download=pdf&ueid='.$ueid),
                 get_string('pdf', 'mod_ilddigitalcert'));
         }
+        echo ' | ';
+        echo html_writer::link(
+            new moodle_url(
+                '/mod/ilddigitalcert/send_to_wallet.php?id='.$cm->id),
+                get_string('send_to_wallet', 'mod_ilddigitalcert')
+            );
     }
     // TODO Zertifikat anzeigen!
     if ($view == 'data') {
@@ -447,6 +453,12 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
                 new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&view=download&download=pdf&ueid='.$ueid),
                     get_string('pdf', 'mod_ilddigitalcert'));
         }
+        echo ' | ';
+        echo html_writer::link(
+            new moodle_url(
+                '/mod/ilddigitalcert/send_to_wallet.php?id='.$cm->id),
+                get_string('send_to_wallet', 'mod_ilddigitalcert')
+            );
     }
 
     if ($view == 'data') {

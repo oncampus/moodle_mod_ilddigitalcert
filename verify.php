@@ -153,7 +153,7 @@ echo '</div>';
 // Backup: width:100%;max-width: 800px;-webkit-transform: scale(1.00); -webkit-transform-origin: 0 0;"></iframe>;//!
 echo '<iframe id="certpageiframe"
         style="display:none;border: 0px solid #bfbfbf;padding:15px;margin: 20px auto;width:100%;max-width: 800px;"></iframe>';
-
+echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>'; // TODO
 $PAGE->requires->js(new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/js/verify.js'));
 
 echo $OUTPUT->footer();

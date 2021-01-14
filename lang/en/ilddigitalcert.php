@@ -51,13 +51,19 @@ $string['configlabel_failover_url'] = 'Alternative Blockchain URL';
 $string['configlabel_IdentityMgmt_address'] = 'Smart-Contract-Adresse IdentityMgmt';
 $string['configlabel_max_token_age'] = 'Max token age';
 $string['configdesc_blockchain_url'] = 'Diese Adresse wird benötigt um die Verbindung zu einem geeigneten Blockchain-Knoten herzustellen.';
-$string['configdesc_CertMgmt_address'] = 'Dies ist die Adresse des Smart Contracts für die Verwaltung der Zertifikate in der Blockchain.';
+$string['configdesc_CertMgmt_address'] = 'Address of the smart contract for the management of certificates in the blockchain.<br/>
+Address of the current (2020-09-28) contract: 0x8a7e3622D3f200aBb1B00D25126f86256c7368dB';
 $string['configdesc_custom_menu_entry'] = 'Fügt einen Eintrag im Nutzermenü hinzu, der zur persönlichen Zertifikatsübersicht führt.';
 $string['configdesc_failover_url'] = 'Diese URL wird verwendet, wenn die primäre Blockchain URL nicht erreichbar ist.';
-$string['configdesc_IdentityMgmt_address'] = 'Dies ist die Adresse des Smart Contracts für die Verwaltung der Benutzerrollen in der Blockchain.';
+$string['configdesc_IdentityMgmt_address'] = 'Address of the smart contract for the management of user roles in the blockchain.<br/>
+Address of the current (2020-09-28) contract: 0xF40ec6b07009de471F3E2773b276F434F2c1c567';
 $string['configdesc_max_token_age'] = 'Diese Dauer gibt an nach welcher Zeit der Link zum Generieren eines Privat Keys seine Gültigkeit verliert.';
 $string['criteria'] = 'Criteria';
 $string['data'] = 'Certificate data';
+$string['dcxapikey'] = 'API key';
+$string['dcconnectorid'] = 'Connector id';
+$string['dcconnectorsettings'] = 'Connector settings';
+$string['dchost'] = 'Domain';
 $string['delete_certifier'] = 'Aus Blockchain entfernen';
 $string['descconfig'] = 'Information about the issuer';
 $string['description'] = 'Description';
@@ -76,6 +82,7 @@ $string['examination_regulations_date'] = 'Examination regulations date';
 $string['expertise'] = 'Kenntnisse';
 $string['expiredate'] = 'Expire date';
 $string['expireperiod'] = 'Expire period';
+$string['file_upload_error'] = 'Error while sending file';
 $string['generate_adr_from_pk'] = 'Generate blockchain adress and private key';
 $string['generate_pk'] = 'Link zum generieren des Private Key per E-Mail versenden';
 $string['headerconfig'] = 'Issuer';
@@ -151,6 +158,8 @@ $string['message_html_generate_pk'] = '<p>Hallo {$a->fullname},</p>
 <p>&nbsp;</p>
 <p>Viele Grüße</p>
 <p>Ihr {$a->from} Team</p>';
+$string['missingcertid'] = 'Certificate id is missing';
+$string['msg_send_error'] = 'Error while sending message';
 $string['new_certifier_message'] = 'Hallo {$a->fullname}
 
 Sie wurden als neuer Zertifizierer für die Zertifizierungsstelle {$a->institution} auf {$a->url} hinzugefügt.
@@ -187,6 +196,7 @@ $string['no_pref_found'] = 'No user preference "mod_ilddigitalcert_certifier" fo
 Please check if you are logged in correctly.';
 $string['not_installed_correctly'] = 'Das Plugin "Digitale Zertifikate" wurde nicht vollständig installiert.
 Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
+$string['not_logged_in'] = 'You are not logged in.';
 $string['only_blockchain'] = 'Nur Zertifikate, die in der Blockchain registriert sind';
 $string['only_nonblockchain'] = 'Nur Zertifikate, die nicht in der Blockchain registriert sind';
 $string['overview'] = 'Overview';
@@ -195,7 +205,11 @@ $string['pdf'] = 'PDF';
 $string['preview'] = 'Vorschau für das Zertifikat';
 $string['recipient'] = 'Recipient';
 $string['registered_and_signed'] = 'Das Zertifikat ist in der Blockchain registriert und signiert';
+$string['scan_qr_code'] = 'To send your digital certificate to your wallet, you have to establish a connection first. To do this, open the app and scan the qr-code. Afterwards follow the instructions in the App.';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
+$string['send_to_wallet'] = 'Send to wallet';
+$string['send_certificate_to_wallet'] = 'Send the digital certificate to your wallet. Afterwards you can find it in your app on your smartphone and share it with other institutions.';
+$string['send_certificate_to_wallet_success'] = 'The certificate has been sent to your wallet. You can find it in your app on your smartphone.';
 $string['settings_descconfig'] = '<p>Diese Parameter werden benötigt um eine Verbindung zur Blockchain aufzubauen und
 um die Smart Contracts auszuführen, die verwendet werden um Zertifikate und Zertifizierer zu verwalten.</p>
 <p><strong>Es können einfach die voreingestellten Default-Parameter verwendet werden um die DigiCerts Blockchain zu benutzen.</strong></p>
@@ -225,4 +239,7 @@ $string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu übe
 <br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.';
 $string['verify_description'] = 'Verify your digital certificates here in the blockchain.';
 $string['waiting_for_pk_generation'] = 'Waiting for user to generate private key';
+$string['waiting_for_request'] = 'Waiting for request';
 $string['waiting_for_registration'] = 'Waiting for registration in Blockchain';
+$string['wrongcertidornotloggedin'] = 'Wrong certificate id';
+$string['wrong_relationship'] = 'The connection between your wallet and the system is incorrect. Please contact an administrator.';

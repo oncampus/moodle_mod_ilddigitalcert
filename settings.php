@@ -96,7 +96,10 @@ if ($hassiteconfig) {
                 new admin_externalpage('ilddigitalcert_edit_certifiers',
                                        get_string('edit_certifiers', 'mod_ilddigitalcert'),
                                        $CFG->wwwroot . '/mod/ilddigitalcert/edit_certifiers.php'));
-
+    $ADMIN->add('modildilddigitalcertfolder',
+                new admin_externalpage('ilddigitalcert_dcconnectorsettings',
+                                       get_string('dcconnectorsettings', 'mod_ilddigitalcert'),
+                                       $CFG->wwwroot . '/mod/ilddigitalcert/dcconnectorsettings.php'));
 }
 // Prevent Moodle from adding settings block in standard location.
 $settings = null;
