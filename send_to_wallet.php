@@ -83,8 +83,8 @@ if ($walletid != 'error' and $relationshipid != 'error') {
             $messagedata = new stdClass();
             $messagedata->recipients = array($walletid);
             $messagedata->content->{'@type'} = 'Mail';
-            $messagedata->content->body = 'message_body_your_cert'; // TODO lang file.
-            $messagedata->content->subject = 'message_subject_your_cert'; // TODO lang file.
+            $messagedata->content->body = 'Im Anhang dieser Nachricht erhalten Sie Ihr digitales Zertifikat zur weiteren Verwendung. Sie finden es außerdem im Ordner Dateien.'; // TODO lang file.
+            $messagedata->content->subject = 'Ihr digitales Zertifikat'; // TODO lang file.
             $messagedata->content->to = array($walletid);
             $messagedata->attachments = array($fileid);
             $messagedata = json_encode($messagedata, JSON_PRETTY_PRINT);
