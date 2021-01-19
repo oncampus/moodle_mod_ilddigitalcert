@@ -52,7 +52,12 @@ function download_json($modulecontextid, $icid, $download) {
 
             $hash = calculate_hash($metadatajson);
 
-            $filename = str_replace(' ', '_', $issuedcertificate->name).'_'.
+            $certificatename = str_replace(array(' ',
+                                                 '(',
+                                                 ')'),
+                                           '_', 
+                                           $issuedcertificate->name);
+            $filename = $certificatename.'_'.
                     $metadata->{'extensions:recipientB4E'}->givenname.'_'.
                     $metadata->{'extensions:recipientB4E'}->surname.'_'.
                     strtotime($metadata->issuedOn);
