@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once('schema.php');
+require_once('bcert.php');
 
 function download_json($modulecontextid, $icid, $download) {
     global $DB, $CFG;
@@ -50,6 +51,10 @@ function download_json($modulecontextid, $icid, $download) {
             $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($salt);
             $metadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
+            // add salt to edci
+            $bcert = BCert::from_edci($issuedcertificate->edci);
+            $bcert->add_institution_token($salt);
+            $issuedcertificate->edci = $bcert->get_edci_cert();
             $hash = calculate_hash($metadatajson);
 
             $certificatename = str_replace(array(' ',
@@ -188,6 +193,14 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
         $issuedcertificate->txhash = $hashes->txhash;
         $issuedcertificate->metadata = $json;
         $issuedcertificate->institution_token = $tokenid;
+
+
+        //// Create edci-Certificate
+        //Convert openBadge metadata to edci
+        $edci = BCert::from_ob($metadata)->get_edci_cert();
+        //add edci to $issuedcertificate
+        $issuedcertificate->edci = $edci;
+
         $DB->update_record('ilddigitalcert_issued', $issuedcertificate);
 
         if ($receiver = $DB->get_record('user', array('id' => $issuedcertificate->userid))) {
