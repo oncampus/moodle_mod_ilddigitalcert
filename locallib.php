@@ -617,7 +617,7 @@ function get_extension_examinationregulations_b4e($digitalcert) {
     $extension = new stdClass();
     $extension->title = $digitalcert->examination_regulations;
     $extension->regulationsid = $digitalcert->examination_regulations_id;
-    $extension->url = $digitalcert->examination_regulations_url;
+    $extension->url = validate_url($digitalcert->examination_regulations_url);
     $extension->{'@context'} = $contexturl->examinationRegulationsB4E;
     $extension->type = array('Extension', 'ExaminationRegulationsB4E');
     if ($digitalcert->examination_regulations_date != 0) {
@@ -777,7 +777,7 @@ function get_issuer($issuerid) {
     $issuer->{'extensions:addressB4E'} = get_extension_address_b4e($issuerrecord);
     $issuer->email = $issuerrecord->email;
     $issuer->name = $issuerrecord->name;
-    $issuer->url = $issuerrecord->url;
+    $issuer->url = validate_url($issuerrecord->url);
     $issuer->{'@context'} = $contexturl->openbadges;
     $issuer->type = 'Issuer';
     $issuer->id = $CFG->wwwroot.'/mod/ilddigitalcert/edit_issuers.php?action=edit&id='.$issuerrecord->id;
@@ -1108,4 +1108,20 @@ function debug_email($to, $message, $debugobject = null) {
         ob_end_clean();
     }
     email_to_user($to, $from, $subject, $message, $message);
+}
+
+/**
+ * Makes sure that the given url includes the protocol.
+ * If there is no Protocol, returns new string that includes an https protocol.
+ *
+ * @param string $url an Url.
+ * @return string A Url including protocol info.
+ */
+function validate_url($url) {
+    if(!str_starts_with($url, 'https://')) {
+        if(!str_starts_with($url, 'http://')) {
+            $url = 'https://'.$url;
+        }
+    }
+    return $url;
 }
