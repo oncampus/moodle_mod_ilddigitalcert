@@ -27,40 +27,62 @@ defined('MOODLE_INTERNAL') || die();
 require_once('schema.php');
 require_once('/bcert/bcert.php');
 
+/**
+ * Initiates and controls the download of the certificate in the requested format.
+ * The certificate can be downloaded as .bcrt file in obenBadge format, .xml file  in edci or as a pdf.
+ *
+ * @param int $modulecontextid needed to locate the srored certificates in file storage.
+ * @param string $icid itemid usually corresponding row id of database table.
+ * @param string $download Controls waht kind of file gets sent to the user. Expected values are 'json', 'edci' and 'pdf'.
+ */
 function download_json($modulecontextid, $icid, $download) {
     global $DB, $CFG;
 
     $fs = get_file_storage();
+    // Retrieves openBadge cert from file storage.
     $storedfile = $fs->get_file($modulecontextid,
-                                              'mod_ilddigitalcert',
-                                              'metadata',
-                                              $icid,
-                                              '/',
-                                              'certificate.bcrt');
+                                'mod_ilddigitalcert',
+                                'metadata',
+                                $icid,
+                                '/',
+                                'certificate.bcrt');
+    // Retrieves edci cert from file storage.
+    $storededci = $fs->get_file($modulecontextid,
+                                'mod_ilddigitalcert',
+                                'metadata',
+                                $icid,
+                                '/',
+                                'certificate.xml');
 
     if ($download == 'json') {
         send_stored_file($storedfile, null, 0, true);
+    } else if ($download == 'edci') {
+        send_stored_file($storededci, null, 0, true);
     } else if ($download == 'pdf') {
         $hash = '';
         $filename = 'certificate';
+        // Retrieve issued certificate from database.
         if ($issuedcertificate = $DB->get_record('ilddigitalcert_issued', array('id' => $icid))) {
             $metadatajson = $issuedcertificate->metadata;
 
+            // Add salt to openBadge cert.
             $salt = get_token($issuedcertificate->institution_token);
             $metadata = json_decode($metadatajson);
             $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($salt);
             $metadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-            // add salt to edci
+            // Add salt to edci.
             $bcert = BCert::from_edci($issuedcertificate->edci);
             $bcert->add_institution_token($salt);
             $issuedcertificate->edci = $bcert->get_edci();
+
+            // Now that the salt is added a hash can be created.
             $hash = calculate_hash($metadatajson);
 
             $certificatename = str_replace(array(' ',
                                                  '(',
                                                  ')'),
-                                           '_', 
+                                           '_',
                                            $issuedcertificate->name);
             $filename = $certificatename.'_'.
                     $metadata->{'extensions:recipientB4E'}->givenname.'_'.
@@ -71,6 +93,7 @@ function download_json($modulecontextid, $icid, $download) {
 
         require_once(__DIR__ . '/vendor/autoload.php');
 
+        // Generate empty PDF and set basic format settings.
         $certificate = new \Mpdf\Mpdf(['mode' => 'utf-8',
                                       'margin_top' => 0,
                                       'margin_left' => 0,
@@ -79,6 +102,7 @@ function download_json($modulecontextid, $icid, $download) {
                                       'format' => [210, 297]]);
         $certificate->showImageErrors = true;
 
+        // Decode the assertionpage info included in the ob certificate and write it as html to the pdf
         $html = '<h1>Error</h1>';
 
         $json = $content;
@@ -88,24 +112,43 @@ function download_json($modulecontextid, $icid, $download) {
         }
 
         $certificate->WriteHTML($html);
+
+        // Generate pdf footer section including the hash value of the ob certificate.
         $certificate->WriteHTML(get_pdf_footerhtml($hash));
 
         $fileid = $storedfile->get_id(); // Get fileid.
 
-        $certificate->SetAssociatedFiles([[
-            'name' => $filename.'.bcrt',
-            'mime' => 'application/json',
-            'description' => 'some description',
-            'AFRelationship' => 'Alternative',
-            'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$fileid
-        ]]);
+        // add openBadge and edci files as attachements to the pdf
+        $certificate->SetAssociatedFiles([
+            [
+                'name' => $filename.'.bcrt',
+                'mime' => 'application/json',
+                'description' => 'some description',
+                'AFRelationship' => 'Alternative',
+                'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$fileid
+            ],
+            [
+                'name' => $filename.'.xml',
+                'mime' => 'application/xml',
+                'description' => 'some description',
+                'AFRelationship' => 'Alternative',
+                'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$storededci->get_id()
+            ],
+        ]);
 
+        // Start download of the pdf file.
         $certificate->Output($filename.'.pdf', 'I');
 
         return;
     }
 }
 
+/**
+ * Generates a html footer section for use in a pdf certificate. Includes a qr code and hash that enables verifying the certificate.
+ *
+ * @param string $hash Hash value of an openBadge certificate.
+ * @return string
+ */
 function get_pdf_footerhtml($hash) {
     global $CFG;
 
@@ -133,6 +176,15 @@ function get_pdf_footerhtml($hash) {
     return $html;
 }
 
+/**
+ * Stores a hash of an openBadge certificate in the clockchain.
+ * Before calculating the hash the signature and institution token has to be added to the certificate.
+ *
+ * @param object $issuedcertificate Object that contains the certificate that needs to be stored in the bc.
+ * @param core_user $fromuser Moodle user that signs the certificate.
+ * @param string $pk private key of the certifier.
+ * @return bool Returns false if the cert couldn´t be written to the blockchain.
+ */
 function to_blockchain($issuedcertificate, $fromuser, $pk) {
     global $DB, $CFG, $SITE;
 
