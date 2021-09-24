@@ -33,6 +33,7 @@ $string['pluginadministration'] = 'Plugin Administration';
 $string['ilddigitalcertname'] = 'Name';
 
 $string['add_certifier'] = 'Add certifier';
+$string['automation'] = 'Automation';
 $string['block_heading'] = 'Digital certificates in the blockchain';
 $string['block_summary'] = '<p>Verify the authenticity of your digital certificates here.</ p>
 <p>Simply drag and drop your certificate (PDF or BCRT file) into the field.</ p>
@@ -42,6 +43,7 @@ $string['cert_waiting_for_registration'] = 'Dieses Zertifikat wartet auf Registr
 $string['certhash'] = 'Zertifikat-Hash';
 $string['certificate'] = 'Certificate';
 $string['certificate_overview'] = 'All certificates in this course';
+$string['certifier'] = 'Certifier';
 $string['certifier_address'] = 'Blockchain address of the certifier';
 $string['choose'] = 'Choose';
 $string['configlabel_blockchain_url'] = 'Blockchain URL';
@@ -71,6 +73,7 @@ $string['drag_n_drop'] = 'Click here or drag and drop to upload file';
 $string['edit_certifiers'] = 'Manage certifiers';
 $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Choose issuer';
+$string['error_choose_certifier'] = 'Choose certifier';
 $string['error_register_cert'] = 'Fehler beim Speichern in der Blockchain';
 $string['examination_end'] = 'Examniation end';
 $string['examination_place'] = 'Examniation place';
@@ -191,6 +194,7 @@ $string['new_pk_generated'] = '<p>Herzlichen Glückwunsch!</p>
 <p>Behandeln Sie Ihren Private Key wie ein wichtiges Passwort und geben Sie ihn nicht weiter.</p>
 <p>Mit Ihrem Private Key registrieren und signieren Sie Digitale Zertifikate in der Blockchain.</p>
 <p>Schließen Sie diese Seite nicht und laden Sie sie nicht neu, bevor Sie Ihren Private Key gesichert haben!</p>';
+$string['no_certifier'] = 'No suitable certifiers found';
 $string['No_institution_found_in_IPFS'] = 'No issuer information found in IPFS';
 $string['no_pref_found'] = 'No user preference "mod_ilddigitalcert_certifier" found for user {$a->fullname}.
 Please check if you are logged in correctly.';

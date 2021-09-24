@@ -26,7 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 if (!file_exists('vendor/autoload.php')) {
     require_once(__DIR__.'/../../config.php');
+
     require_login();
+    $context = context_system::instance();
+
+    $PAGE->set_context($context);
+    $PAGE->set_url('/mod/ilddigitalcert/web3lib.php');
+    $PAGE->set_title('web3lib.php error');
+    $PAGE->set_heading('web3lib.php error');
+
     echo $OUTPUT->header();
     \core\notification::error(get_string('not_installed_correctly', 'mod_ilddigitalcert'));
     echo $OUTPUT->footer();

@@ -33,6 +33,7 @@ $string['pluginadministration'] = 'Plugin Administration';
 $string['ilddigitalcertname'] = 'Name';
 
 $string['add_certifier'] = 'Zertifizierer hinzufügen';
+$string['automation'] = 'Automatisierung';
 $string['block_heading'] = 'Digitale Zertifikate in der Blockchain';
 $string['block_summary'] = '<p>Überprüfe hier die Echtheit Deiner digitalen Zertifikate.</p>
 <p>Ziehe dazu einfach Dein Zertifikat (PDF oder BCRT-Datei) per Drag and Drop in das Feld.</p>
@@ -43,6 +44,7 @@ $string['cert_waiting_for_registration'] = 'Dieses Zertifikat wartet auf Registr
 $string['certhash'] = 'Zertifikat-Hash';
 $string['certificate'] = 'Zertifikat';
 $string['certificate_overview'] = 'Alle Zertifikate im Kurs';
+$string['certifier'] = 'Zertifizierer:in';
 $string['certifier_address'] = 'Blockchain-Adresse des Zertifizierers';
 $string['choose'] = 'Bitte wählen';
 $string['configlabel_blockchain_url'] = 'Blockchain URL';
@@ -72,6 +74,7 @@ $string['drag_n_drop'] = 'Hier klicken oder Dateien in dieses Feld ziehen (Drag 
 $string['edit_certifiers'] = 'Zertifizierer verwalten';
 $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Wählen Sie eine Zertifizierungsstelle';
+$string['error_choose_certifier'] = 'Wählen Sie eine:n Zertizierer:in';
 $string['error_register_cert'] = 'Fehler beim Speichern in der Blockchain';
 $string['examination_end'] = 'Prüfungsende';
 $string['examination_place'] = 'Prüfungsort';
@@ -203,6 +206,7 @@ $string['new_pk_generated'] = '<p>Herzlichen Glückwunsch!</p>
 <p>Behandeln Sie Ihren Private Key wie ein wichtiges Passwort und geben Sie ihn nicht weiter.</p>
 <p>Mit Ihrem Private Key registrieren und signieren Sie Digitale Zertifikate in der Blockchain.</p>
 <p>Schließen Sie diese Seite nicht und laden Sie sie nicht neu, bevor Sie Ihren Private Key gesichert haben!</p>';
+$string['no_certifier'] = 'Keine geeigneten Zertifizierer gefunden';
 $string['No_institution_found_in_IPFS'] = 'Es konnten keine Informationen zur Zertifizierungsstelle im IPFS gefunden werden';
 $string['no_pref_found'] = 'Nutzereigenschaft "mod_ilddigitalcert_certifier" nicht gefunden für {$a->fullname}.
 Kontrollieren Sie bitte ob Sie korrekt angemeldet sind.';

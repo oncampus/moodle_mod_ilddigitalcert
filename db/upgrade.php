@@ -350,5 +350,24 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019101800, 'ilddigitalcert');
     }
 
+    if ($oldversion < 2021091900) {
+
+        // Define field institution_token to be added to ilddigitalcert_issued.
+        $table = new xmldb_table('ilddigitalcert');
+        $field1 = new xmldb_field('certifier', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'examination_regulations_date');
+        $field2 = new xmldb_field('automation', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'examination_regulations_date');
+
+        // Conditionally launch add field institution_token.
+        if (!$dbman->field_exists($table, $field1)) {
+            $dbman->add_field($table, $field1);
+        }
+        if (!$dbman->field_exists($table, $field2)) {
+            $dbman->add_field($table, $field2);
+        }
+
+        // Ilddigitalcert savepoint reached.
+        upgrade_mod_savepoint(true, 2021091900, 'ilddigitalcert');
+    }
+
     return true;
 }

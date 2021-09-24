@@ -166,6 +166,55 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
                                  'stopyear' => intval(date('Y', time())) + 10,
                                  'optional' => true));
 
+        // Automation and process configuration section
+        $mform->addElement('header', 'automationheader', get_string('automation', 'mod_ilddigitalcert'));
+        $mform->setExpanded('automationheader');
+
+        // Enable automation checkbox.
+        $mform->addElement('advcheckbox', 'automation', get_string('automation', 'mod_ilddigitalcert'), get_string('enable'), array('group' => 1), array(0, 1));
+
+        // Get Certifiers taht are enroled in the course.
+        $certifiers = $DB->get_records('user_preferences', array('name' => 'mod_ilddigitalcert_certifier'));
+        if(!empty($certifiers)) {
+            $certifierids = [];
+            foreach ($certifiers as $certifier) {
+                $certifierids[] = $certifier->userid;
+            }
+            list($insql, $inparams) = $DB->get_in_or_equal($certifierids, SQL_PARAMS_NAMED, 'ctx');
+            $sql = "SELECT u.id as id, u.firstname, u.lastname
+                FROM mdl_role_assignments ra
+                JOIN mdl_user u ON u.id = ra.userid
+                JOIN mdl_role r ON r.id = ra.roleid
+                JOIN mdl_context cxt ON cxt.id = ra.contextid
+                JOIN mdl_course c ON c.id = cxt.instanceid
+                WHERE ra.userid = u.id
+                AND ra.contextid = cxt.id
+                AND cxt.contextlevel = 50
+                AND cxt.instanceid = c.id
+                AND  roleid < 5
+                AND c.id = :course";
+            $conditions = array('course' => $this->get_course()->id);
+            if(!empty($certifierids)) {
+                $sql .= " AND u.id $insql";
+                $conditions = array_merge($conditions, $inparams);
+            }
+            $records = $DB->get_records_sql($sql, $conditions);
+            $certifiers = array('a' => get_string('choose', 'mod_ilddigitalcert'));
+            foreach ($records as $record) {
+                $certifiers[$record->id] = $record->firstname . ' ' . $record->lastname;
+            }
+        }
+
+        if(!$certifiers) {
+            $certifiers = array('a' => get_string('no_certifier', 'mod_ilddigitalcert'));
+        }
+
+        // Choose moodle-user that is responsible for certification.
+        $mform->addElement('select', 'certifier', get_string('certifier', 'mod_ilddigitalcert'), $certifiers);
+        $mform->setDefault('certifier', 'a');
+        // $mform->addRule('certifier', get_string('error_choose_certifier', 'mod_ilddigitalcert'), 'numeric', null, 'client');
+        // $mform->addRule('certifier', null, 'required', null, 'client');
+
         // Add standard elements.
         $this->standard_coursemodule_elements();
 
@@ -190,6 +239,18 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $data->template = $data->template['text'];
         file_save_draft_area_files($data->image, $this->context->id, 'mod_ilddigitalcert', 'content',
                    0, array('maxfiles' => 1));
+
+        // Make sure only valid userids are stored in db.
+        if(!is_int($data->certifier)) {
+            $data->certifier = null;
+        }
+
+        // if checkbox has'nt been checked set value to 0
+        // if(!$data->automation) {
+        //     $data->automation = 0;
+        // } else {
+        //     $data->automation = 1;
+        // }
 
         return $data;
     }
