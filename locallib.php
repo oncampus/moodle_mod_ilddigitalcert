@@ -177,7 +177,7 @@ function get_pdf_footerhtml($hash) {
 }
 
 /**
- * Stores a hash of an openBadge certificate in the blockchain.
+ * Stores a hash of an openBadge certificate in the clockchain.
  * Before calculating the hash the signature and institution token has to be added to the certificate.
  *
  * @param object $issuedcertificate Object that contains the certificate that needs to be stored in the bc.
