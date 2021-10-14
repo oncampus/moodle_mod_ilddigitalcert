@@ -12,11 +12,21 @@ For creating PDF documents with attached certificate metadata, you need to insta
   * https://packagist.org/packages/mpdf/mpdf
   * https://packagist.org/packages/mpdf/qrcode
 
+For encrypting data like private keys with a keyphrase:
+  * https://github.com/defuse/php-encryption
+
 Also make sure that PHP extension gmp is installed
-  
+
 The file composer.json is already included in this repository. So simply:
 
 `run "composer install" on command line`
+
+PHP-Encrypt is needed to allow an automated singing process for issued certificates.
+To enable the automated process a key has to be generated and stored in moodles filesystem.
+  * To generate a key open a command prompt in your moodle directory and run folowing command
+`$ vendor/bin/generate-defuse-key`
+  * Copy the generated key and save it in .txt file in moodledata/filedir/ilddigitalcert-secret_key.txt.
+
 
 To enable PDF download, make sure that temporary files directory "mod/ilddigitalcert/vendor/mpdf/mpdf/tmp" is writable
 

@@ -34,6 +34,12 @@ $string['ilddigitalcertname'] = 'Name';
 
 $string['add_certifier'] = 'Add certifier';
 $string['automation'] = 'Automation';
+$string['automation_help'] = 'If automation is active, certificats will be signed and written to the blockchain automatically by the selected certifier.';
+$string['auto_certifier'] = 'Automatic certifier';
+$string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificats will be automatically signed.';
+$string['auto_pk'] = 'Private key of certifier';
+$string['auto_pk_help'] = 'Set the private key of the selected certifier here.';
+$string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificats will be automatically signed.';
 $string['block_heading'] = 'Digital certificates in the blockchain';
 $string['block_summary'] = '<p>Verify the authenticity of your digital certificates here.</ p>
 <p>Simply drag and drop your certificate (PDF or BCRT file) into the field.</ p>

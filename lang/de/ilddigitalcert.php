@@ -34,6 +34,11 @@ $string['ilddigitalcertname'] = 'Name';
 
 $string['add_certifier'] = 'Zertifizierer hinzufügen';
 $string['automation'] = 'Automatisierung';
+$string['automation_help'] = 'Wenn die Automatisierung aktiviert ist, werden die Zertifikate automatisch von dem angegebenen Zertifizierer signiert und in die Blockchain geschrieben. ';
+$string['auto_certifier'] = 'Automatischer Zertifizierer';
+$string['auto_certifier_help'] = 'Geben sie hier eine oder einen Zertifizierer*in an, in dessen/dessem Namen die Zertifikate automatisiert signiert werden sollen. Geeignete Zertifizierer müssen in diesem Kurs eingeschrieben sein und bereits eine gültige Blockchain-Adresse haben.';
+$string['auto_pk'] = 'Privater Schlüssel des Zertifizierers';
+$string['auto_pk_help'] = 'Geben Sie hier den privaten Schlüssel des oben angegebenen Zertifizierers an.';
 $string['block_heading'] = 'Digitale Zertifikate in der Blockchain';
 $string['block_summary'] = '<p>Überprüfe hier die Echtheit Deiner digitalen Zertifikate.</p>
 <p>Ziehe dazu einfach Dein Zertifikat (PDF oder BCRT-Datei) per Drag and Drop in das Feld.</p>

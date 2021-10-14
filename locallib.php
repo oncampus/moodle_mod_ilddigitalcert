@@ -55,7 +55,7 @@ function download_json($modulecontextid, $icid, $download) {
             $certificatename = str_replace(array(' ',
                                                  '(',
                                                  ')'),
-                                           '_', 
+                                           '_',
                                            $issuedcertificate->name);
             $filename = $certificatename.'_'.
                     $metadata->{'extensions:recipientB4E'}->givenname.'_'.
@@ -516,8 +516,22 @@ function issue_certificate($certmetadata, $userid, $cmid) {
     $issued->metadata = $json;
 
     $DB->update_record('ilddigitalcert_issued', $issued);
-    // Email to user.
-    if ($user = $DB->get_record('user', array('id' => $userid))) {
+
+    $cert_settings = $DB->get_record('ilddigitalcert', array('id' => $cmid), 'automation, auto_certifier, auto_pk', IGNORE_MISSING);
+
+    // If automation is enabled, issued certificate will be signed and written
+    // to the blockchain using the pk of the selected certifier.
+    $in_blockchain = false;
+    if($cert_settings->automation && $cert_settings->auto_certifier && $cert_settings->auto_pk) {
+        if($certifier = $DB->get_record('user', array('id' => $cert_settings->auto_certifier), '*', IGNORE_MISSING)) {
+            if($pk = \mod_ilddigitalcert\crypto_manager::decrypt($cert_settings->auto_pk)) {
+                $in_blockchain = to_blockchain($issued, $certifier, $pk);
+            }
+        }
+    }
+
+    // Email to user, if it has to be signed and written to the blockchain still.
+    if (!$in_blockchain && $user = $DB->get_record('user', array('id' => $userid))) {
         $fromuser = core_user::get_support_user();
         $fullname = explode(' ', get_string('modulenameplural', 'mod_ilddigitalcert'));
         $fromuser->firstname = $fullname[0];

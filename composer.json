@@ -1,9 +1,10 @@
 {
-	"minimum-stability": "dev",
-	"require": {
-		"sc0vu/web3.php": "dev-master",
-		"web3p/ethereum-tx": "dev-master",
-		"mpdf/mpdf": "dev-master",
-		"mpdf/qrcode": "dev-master"
-	}
+  "minimum-stability": "dev",
+  "require": {
+    "sc0vu/web3.php": "dev-master",
+    "web3p/ethereum-tx": "dev-master",
+    "mpdf/mpdf": "dev-master",
+    "mpdf/qrcode": "dev-master",
+    "defuse/php-encryption": "^2.3"
+  }
 }

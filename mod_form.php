@@ -172,8 +172,9 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
 
         // Enable automation checkbox.
         $mform->addElement('advcheckbox', 'automation', get_string('automation', 'mod_ilddigitalcert'), get_string('enable'), array('group' => 1), array(0, 1));
+        $mform->addHelpButton('automation', 'automation', 'mod_ilddigitalcert');
 
-        // Get Certifiers taht are enroled in the course.
+        // Get Certifiers that are enroled in the course.
         $certifiers = $DB->get_records('user_preferences', array('name' => 'mod_ilddigitalcert_certifier'));
         if(!empty($certifiers)) {
             $certifierids = [];
@@ -210,10 +211,13 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         }
 
         // Choose moodle-user that is responsible for certification.
-        $mform->addElement('select', 'certifier', get_string('certifier', 'mod_ilddigitalcert'), $certifiers);
-        $mform->setDefault('certifier', 'a');
-        // $mform->addRule('certifier', get_string('error_choose_certifier', 'mod_ilddigitalcert'), 'numeric', null, 'client');
-        // $mform->addRule('certifier', null, 'required', null, 'client');
+        $mform->addElement('select', 'auto_certifier', get_string('certifier', 'mod_ilddigitalcert'), $certifiers);
+        $mform->addHelpButton('auto_certifier', 'auto_certifier', 'mod_ilddigitalcert');
+        $mform->setDefault('auto_certifier', 'a');
+
+        // Sets the private key for the set certifier.
+        $mform->addElement('passwordunmask', 'auto_pk', get_string('auto_pk', 'mod_ilddigitalcert'));
+        $mform->addHelpButton('auto_pk', 'auto_pk', 'mod_ilddigitalcert');
 
         // Add standard elements.
         $this->standard_coursemodule_elements();
@@ -221,6 +225,7 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         // Add standard buttons.
         $this->add_action_buttons();
     }
+
     public function data_preprocessing(&$defaultvalues) {
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('image');
@@ -228,8 +233,14 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
             $defaultvalues['image'] = $draftitemid;
 
             $defaultvalues['template'] = array('text' => $defaultvalues['template'], 'format' => FORMAT_HTML);
+
+            // Decrypts the pk if already set to prevent double encryption on save.
+            if($defaultvalues['auto_pk']) {
+                $defaultvalues['auto_pk'] = \mod_ilddigitalcert\crypto_manager::decrypt($defaultvalues['auto_pk']);
+            }
         }
     }
+
     public function get_data() {
         $data = parent::get_data();
 
@@ -241,16 +252,20 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
                    0, array('maxfiles' => 1));
 
         // Make sure only valid userids are stored in db.
-        if(!is_int($data->certifier)) {
-            $data->certifier = null;
+        if(!is_int($data->auto_certifier)) {
+            $data->auto_certifier = null;
         }
 
-        // if checkbox has'nt been checked set value to 0
-        // if(!$data->automation) {
-        //     $data->automation = 0;
-        // } else {
-        //     $data->automation = 1;
-        // }
+
+        // If automation is disabled, unset pk.
+        if(!$data->automation) {
+            $data->auto_pk = null;
+        }
+
+        // If pk is set, encrypt it to protect from non trustworthy db user.
+        if(!empty($data->auto_pk)) {
+            $data->auto_pk = \mod_ilddigitalcert\crypto_manager::encrypt($data->auto_pk);
+        }
 
         return $data;
     }

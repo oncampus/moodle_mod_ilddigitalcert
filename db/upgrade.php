@@ -352,17 +352,21 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
 
     if ($oldversion < 2021091900) {
 
-        // Define field institution_token to be added to ilddigitalcert_issued.
+        // Define field auto_pk, auto_certifier and automation to be added to ilddigitalcert.
         $table = new xmldb_table('ilddigitalcert');
-        $field1 = new xmldb_field('certifier', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'examination_regulations_date');
-        $field2 = new xmldb_field('automation', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'examination_regulations_date');
+        $field1 = new xmldb_field('auto_pk', XMLDB_TYPE_CHAR, '256', null, null, null, null, 'examination_regulations_date');
+        $field2 = new xmldb_field('auto_certifier', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'examination_regulations_date');
+        $field3 = new xmldb_field('automation', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'examination_regulations_date');
 
-        // Conditionally launch add field institution_token.
+        // Conditionally add fields.
         if (!$dbman->field_exists($table, $field1)) {
             $dbman->add_field($table, $field1);
         }
         if (!$dbman->field_exists($table, $field2)) {
             $dbman->add_field($table, $field2);
+        }
+        if (!$dbman->field_exists($table, $field3)) {
+            $dbman->add_field($table, $field3);
         }
 
         // Ilddigitalcert savepoint reached.
