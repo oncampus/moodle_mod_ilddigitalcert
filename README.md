@@ -24,7 +24,8 @@ The file composer.json is already included in this repository. So simply:
 PHP-Encrypt is needed to allow an automated singing process for issued certificates.
 To enable the automated process a key has to be generated and stored in moodles filesystem.
   * To generate a key open a command prompt in your moodle directory and run folowing command
-`$ vendor/bin/generate-defuse-key`
+	
+	`$ vendor/bin/generate-defuse-key`
   * Copy the generated key and save it in .txt file in moodledata/filedir/ilddigitalcert-secret_key.txt.
 
 
