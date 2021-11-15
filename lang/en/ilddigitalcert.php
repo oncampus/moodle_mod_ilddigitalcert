@@ -33,8 +33,15 @@ $string['pluginadministration'] = 'Plugin Administration';
 $string['ilddigitalcertname'] = 'Name';
 
 $string['add_certifier'] = 'Add certifier';
+
 $string['automation'] = 'Automation';
 $string['automation_help'] = 'If automation is active, certificats will be signed and written to the blockchain automatically by the selected certifier.';
+$string['automation_report:subject'] = 'Automatically signed certificats';
+$string['automation_report:intro'] = '<p>Hello {$a},</p>
+<p>following certificats were recently signed automatically and written to the blockchain successfully:</p>';
+$string['automation_report:other_certs'] = 'Other certificats';
+$string['automation_report:end'] = '';
+
 $string['auto_certifier'] = 'Automatic certifier';
 $string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificats will be automatically signed.';
 $string['auto_pk'] = 'Private key of certifier';
@@ -101,6 +108,12 @@ $string['institution_pk'] = 'Private key of the issuer';
 $string['invalid'] = 'Invalid certificate';
 $string['invalid_format'] = 'Invalid file format';
 
+$string['issuedcerts_report:subject'] = 'Issued certificats waiting to be signed';
+$string['issuedcerts_report:intro'] = '<p>Hello {$a},</p>
+<p>following certificats were recently issued, but still need to be signed:</p>';
+$string['issuedcerts_report:other_certs'] = 'Other certificats';
+$string['issuedcerts_report:end'] = '';
+
 $string['issuer'] = 'Issuer';
 $string['issueraddress'] = 'Blockchainadresse der Zertifizierungsstelle';
 $string['issuername_label'] = 'Name';
@@ -113,6 +126,7 @@ $string['issuerlocation'] = 'City';
 $string['issuerurl'] = 'URL';
 $string['issueremail'] = 'E-Mail';
 $string['issuerdescription'] = 'Description';
+
 
 $string['json'] = 'Metadata';
 $string['subject_new_certificate'] = 'Neues digitales Zertifikat';
@@ -217,6 +231,8 @@ $string['recipient'] = 'Recipient';
 $string['registered_and_signed'] = 'Das Zertifikat ist in der Blockchain registriert und signiert';
 $string['scan_qr_code'] = 'To send your digital certificate to your wallet, you have to establish a connection first. To do this, open the app and scan the qr-code. Afterwards follow the instructions in the App.';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
+$string['send_automation_report'] = 'Reports recently and automatically signed certs.';
+$string['send_issuedcerts_report'] = 'Reports issued certs waiting to be signed.';
 $string['send_to_wallet'] = 'Send to wallet';
 $string['send_certificate_to_wallet'] = 'Send the digital certificate to your wallet. Afterwards you can find it in your app on your smartphone and share it with other institutions.';
 $string['send_certificate_to_wallet_success'] = 'The certificate has been sent to your wallet. You can find it in your app on your smartphone.';

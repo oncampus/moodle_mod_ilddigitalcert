@@ -15,17 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Scheduled task definitions for the ilddigitalcert module
  *
- * @package     mod_ilddigitalcert
- * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_ilddigitalcert
+ * @copyright  2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_ilddigitalcert';
-$plugin->release = '0.1.0';
-$plugin->version = 2021111511;
-$plugin->requires = 2018051701;
-$plugin->maturity = MATURITY_BETA;
+$tasks = [
+    [
+        'classname' => 'mod_ilddigitalcert\task\send_automation_report',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => '18',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+    [
+        'classname' => 'mod_ilddigitalcert\task\send_issuedcerts_report',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '18',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+];

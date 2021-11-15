@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once('locallib.php');
 
 /**
  * Module instance settings form.
@@ -175,43 +176,18 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $mform->addHelpButton('automation', 'automation', 'mod_ilddigitalcert');
 
         // Get Certifiers that are enroled in the course.
-        $certifiers = $DB->get_records('user_preferences', array('name' => 'mod_ilddigitalcert_certifier'));
-        if(!empty($certifiers)) {
-            $certifierids = [];
-            foreach ($certifiers as $certifier) {
-                $certifierids[] = $certifier->userid;
-            }
-            list($insql, $inparams) = $DB->get_in_or_equal($certifierids, SQL_PARAMS_NAMED, 'ctx');
-            $sql = "SELECT u.id as id, u.firstname, u.lastname
-                FROM mdl_role_assignments ra
-                JOIN mdl_user u ON u.id = ra.userid
-                JOIN mdl_role r ON r.id = ra.roleid
-                JOIN mdl_context cxt ON cxt.id = ra.contextid
-                JOIN mdl_course c ON c.id = cxt.instanceid
-                WHERE ra.userid = u.id
-                AND ra.contextid = cxt.id
-                AND cxt.contextlevel = 50
-                AND cxt.instanceid = c.id
-                AND  roleid < 5
-                AND c.id = :course";
-            $conditions = array('course' => $this->get_course()->id);
-            if(!empty($certifierids)) {
-                $sql .= " AND u.id $insql";
-                $conditions = array_merge($conditions, $inparams);
-            }
-            $records = $DB->get_records_sql($sql, $conditions);
-            $certifiers = array('a' => get_string('choose', 'mod_ilddigitalcert'));
-            foreach ($records as $record) {
-                $certifiers[$record->id] = $record->firstname . ' ' . $record->lastname;
-            }
+        $certifiers = get_certifiers($this->get_course()->id);
+        $auto_certifiers = array('a' => get_string('choose', 'mod_ilddigitalcert'));
+        foreach ($certifiers as $certifier) {
+            $auto_certifiers[$certifier->id] = $certifier->firstname . ' ' . $certifier->lastname;
         }
 
-        if(!$certifiers) {
-            $certifiers = array('a' => get_string('no_certifier', 'mod_ilddigitalcert'));
+        if(!$auto_certifiers) {
+            $auto_certifiers = array('a' => get_string('no_certifier', 'mod_ilddigitalcert'));
         }
 
         // Choose moodle-user that is responsible for certification.
-        $mform->addElement('select', 'auto_certifier', get_string('certifier', 'mod_ilddigitalcert'), $certifiers);
+        $mform->addElement('select', 'auto_certifier', get_string('certifier', 'mod_ilddigitalcert'), $auto_certifiers);
         $mform->addHelpButton('auto_certifier', 'auto_certifier', 'mod_ilddigitalcert');
         $mform->setDefault('auto_certifier', 'a');
 

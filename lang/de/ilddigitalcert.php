@@ -35,6 +35,12 @@ $string['ilddigitalcertname'] = 'Name';
 $string['add_certifier'] = 'Zertifizierer hinzufügen';
 $string['automation'] = 'Automatisierung';
 $string['automation_help'] = 'Wenn die Automatisierung aktiviert ist, werden die Zertifikate automatisch von dem angegebenen Zertifizierer signiert und in die Blockchain geschrieben. ';
+$string['automation_report:subject'] = 'Automatisch signierte Zertifikate';
+$string['automation_report:intro'] = '<p>Hi {$a},</p>
+<p>folgende Zertifikate wurden kürzlich automatisch signiert und erfolgreich in die Blockchain geschrieben:</p>';
+$string['automation_report:other_certs'] = 'Other certificats';
+$string['automation_report:end'] = '';
+
 $string['auto_certifier'] = 'Automatischer Zertifizierer';
 $string['auto_certifier_help'] = 'Geben sie hier eine oder einen Zertifizierer*in an, in dessen/dessem Namen die Zertifikate automatisiert signiert werden sollen. Geeignete Zertifizierer müssen in diesem Kurs eingeschrieben sein und bereits eine gültige Blockchain-Adresse haben.';
 $string['auto_pk'] = 'Privater Schlüssel des Zertifizierers';
@@ -100,6 +106,12 @@ $string['image'] = 'Bild';
 $string['institution_pk'] = 'Private Key der Zertifizierungsstelle';
 $string['invalid'] = 'Das Zertifikat ist ungültig';
 $string['invalid_format'] = 'Ungültiges Dateiformat';
+
+$string['issuedcerts_report:subject'] = 'Zertifikate benötigen Ihre Signatur';
+$string['issuedcerts_report:intro'] = '<p>Hallo {$a},</p>
+<p>folgende Zertifikate wurden kürzlich ausgestellt. Bitte signieren Sie diese über die folgenden Schaltflächen:</p>';
+$string['issuedcerts_report:other_certs'] = 'Weitere Zertifikate';
+$string['issuedcerts_report:end'] = '';
 
 $string['issuer'] = 'Zertifizierungsstelle';
 $string['issueraddress'] = 'Blockchainadresse der Zertifizierungsstelle';
@@ -228,6 +240,8 @@ $string['recipient'] = 'Empfänger';
 $string['registered_and_signed'] = 'Das Zertifikat ist in der Blockchain registriert und signiert';
 $string['scan_qr_code'] = 'Um Ihr digitales Zertifikat an die Wallet zu senden, müssen Sie erst eine Verbindung zu dieser herstellen. Öffnen Sie dazu die App und scannen Sie den QR-Code. Folgen Sie anschließend den Anweisungen in der App.';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
+$string['send_automation_report'] = 'Erstattet Bericht über kürzlich automatisch signierte Zertifikate';
+$string['send_issuedcerts_report'] = 'Erstattet Bericht über ausgestellte Zertifikate, die noch signiert werden müssen.';
 $string['send_to_wallet'] = 'An Wallet senden';
 $string['send_certificate_to_wallet'] = 'Senden Sie ihr digitales Zertifikat jetzt an Ihre Wallet. Anschließend können Sie es in der App auf dem Smartphone verwenden und mit anderen Institutionen teilen.';
 $string['send_certificate_to_wallet_success'] = 'Das Zertifikat wurde an Ihre Wallet gesendet. Sie können es nun in der App auf Ihrem Smartphone verwenden.';

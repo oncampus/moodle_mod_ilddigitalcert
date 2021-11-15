@@ -184,6 +184,7 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
 
         $json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         // Save hashes in db issued.
+        $issuedcertificate->inblockchain = true;
         $issuedcertificate->certhash = $hashes->certhash;
         $issuedcertificate->txhash = $hashes->txhash;
         $issuedcertificate->metadata = $json;
@@ -1109,4 +1110,51 @@ function debug_email($to, $message, $debugobject = null) {
         ob_end_clean();
     }
     email_to_user($to, $from, $subject, $message, $message);
+}
+
+/**
+ * Gets all the registered certifiers and if $course is set only those
+ * that are also enroled in the specified course.
+ *
+ * @param int $course Id of a course.
+ * @return array Moodle users that are registered certifiers.
+ */
+function get_certifiers($course = false) {
+    global $DB;
+
+    $certifiers = $DB->get_records('user_preferences', array('name' => 'mod_ilddigitalcert_certifier'));
+
+    if(empty($certifiers)) {
+        return null;
+    }
+
+    $certifierids = [];
+    foreach ($certifiers as $certifier) {
+        $certifierids[] = $certifier->userid;
+    }
+
+    if(!$course) {
+        return $certifierids;
+    }
+
+    list($insql, $inparams) = $DB->get_in_or_equal($certifierids, SQL_PARAMS_NAMED, 'ctx');
+    $sql = "SELECT u.*
+        FROM mdl_role_assignments ra
+        JOIN mdl_user u ON u.id = ra.userid
+        JOIN mdl_role r ON r.id = ra.roleid
+        JOIN mdl_context cxt ON cxt.id = ra.contextid
+        JOIN mdl_course c ON c.id = cxt.instanceid
+        WHERE ra.contextid = cxt.id
+        AND cxt.contextlevel = 50
+        AND cxt.instanceid = c.id
+        AND roleid < 5
+        AND c.id = :course";
+    $conditions = array('course' => $this->get_course()->id);
+    if(!empty($certifierids)) {
+        $sql .= " AND u.id $insql";
+        $conditions = array_merge($conditions, $inparams);
+    }
+    $records = $DB->get_records_sql($sql, $conditions);
+    return $records;
+
 }
