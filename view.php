@@ -255,14 +255,14 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
     }
     $search = optional_param('search', '', PARAM_ALPHA);
     $checkonlybc = optional_param('check_only_bc', '', PARAM_RAW);
-    $$checkonlynonbc = optional_param('check_only_nonbc', '', PARAM_RAW);
+    $checkonlynonbc = optional_param('check_only_nonbc', '', PARAM_RAW);
     $and = '';
     if ($checkonlybc == 'check_only_bc') {
         $and = ' AND idci.certhash is not null ';
         if ($search == '') {
             $search = '%';
         }
-    } else if ($$checkonlynonbc == 'check_only_nonbc') {
+    } else if ($checkonlynonbc == 'check_only_nonbc') {
         $and = ' AND idci.certhash is null ';
         if ($search == '') {
             $search = '%';
