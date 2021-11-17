@@ -101,7 +101,7 @@ function ilddigitalcert_delete_instance($id) {
 function ilddigitalcert_cm_info_dynamic(cm_info $cm) {
     global $USER, $CFG, $DB;
     // User can access the activity.
-    if ($cm->uservisible) {
+    if ($cm->get_user_visible()) {
         if ($cm->available && !empty($cm->availability)) {
             $courseid = $cm->get_course()->id;
             $coursecontext = context_course::instance($courseid);

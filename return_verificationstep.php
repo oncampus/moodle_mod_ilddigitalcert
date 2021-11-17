@@ -110,12 +110,12 @@ if ($action == 'meta' and $meta != '') {
         echo json_encode($institution);
     } else {
         if ($meta != '') {
-            $$metaobj = json_decode($meta);
+            $metaobj = json_decode($meta);
             $institution = new stdClass();
-            $institution->url = $$metaobj->badge->issuer->url;
-            $institution->name = $$metaobj->badge->issuer->name;
-            $institution->description = $$metaobj->badge->issuer->description;
-            $institution->image = $$metaobj->badge->issuer->image;
+            $institution->url = $metaobj->badge->issuer->url;
+            $institution->name = $metaobj->badge->issuer->name;
+            $institution->description = $metaobj->badge->issuer->description;
+            $institution->image = $metaobj->badge->issuer->image;
             echo json_encode($institution);
         } else {
             echo null;
