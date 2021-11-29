@@ -22,9 +22,12 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__.'/../../config.php');
-require_once(__DIR__.'/lib.php');
-require_once($CFG->libdir.'/tablelib.php');
+require_once(__DIR__ . '/../../config.php');
+require_once('locallib.php');
+require_once(__DIR__ . '/search_certificates_form.php');
+require_once(__DIR__ . '/to_blockchain_form.php');
+require_once(__DIR__ . '/reissue_form.php');
+
 
 $context = context_system::instance();
 
@@ -37,107 +40,69 @@ $PAGE->set_heading(get_string('pluginname', 'mod_ilddigitalcert'));
 require_login();
 
 if (isguestuser()) {
-    redirect($CFG->wwwroot.'/login/');
+    redirect($CFG->wwwroot . '/login/');
 }
-$PAGE->requires->js(new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/js/pk_form.js'));
 
-$id = optional_param('id', 0, PARAM_INT);
-$ueid = optional_param('ueid', 0, PARAM_INT);
-$search = optional_param('search', '', PARAM_ALPHA);
-$checkonlybc = optional_param('check_only_bc', '', PARAM_RAW);
-$checkonlynonbc = optional_param('check_only_nonbc', '', PARAM_RAW);
-$and = '';
-if ($checkonlybc == 'check_only_bc') {
-    $and = ' AND idci.certhash is not null ';
-    if ($search == '') {
-        $search = '%';
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_form.js'));
+
+
+// Instantiate search form.
+$search_form = new mod_ilddigialcert_search_certificates_form();
+
+// Get search results.
+$issuedcertificates = array();
+if ($search_form_data = $search_form->get_data()) {
+    if ($search_form_data->search_query || $search_form_data->search_filter) {
+        $sql = 'SELECT idci.*, c.fullname, c.shortname
+            FROM {ilddigitalcert_issued} idci, {course} c
+            WHERE idci.courseid = c.id
+            AND idci.userid = :userid';
+
+        $params = array('userid' => $USER->id);
+
+        if ($search_form_data->search_query !== '') {
+            $sql .= ' AND (' . $DB->sql_like('c.fullname', ':search1', false, false) . '
+                OR ' . $DB->sql_like('c.shortname', ':search2', false, false) . '
+                OR ' . $DB->sql_like('idci.name', ':search3', false, false) . ')';
+            $params['search1'] = '%' . $search_form_data->search_query . '%';
+            $params['search2'] = '%' . $search_form_data->search_query . '%';
+            $params['search3'] = '%' . $search_form_data->search_query . '%';
+        }
+
+        if ($search_form_data->search_filter === 'only_bc') {
+            $sql .= ' AND idci.certhash is not null ';
+        } else if ($search_form_data->search_filter === 'only_nonbc') {
+            $sql .= ' AND idci.certhash is null ';
+        }
+
+        $issuedcertificates = $DB->get_records_sql($sql, $params);
+    } else {
+        $issuedcertificates = $DB->get_records('ilddigitalcert_issued', array('userid' => $USER->id));
     }
-} else if ($checkonlynonbc == 'check_only_nonbc') {
-    $and = ' AND idci.certhash is null ';
-    if ($search == '') {
-        $search = '%';
-    }
-}
-if ($search != '') {
-    $sql = 'SELECT idci.*
-                FROM {ilddigitalcert_issued} idci, {course} c
-                WHERE idci.userid = :userid
-                AND c.id = idci.courseid
-                AND ('.$DB->sql_like('c.fullname', ':search1', false, false).'
-                OR '.$DB->sql_like('idci.name', ':search2', false, false).')
-                '.$and;
-    $params = array('userid' => $USER->id,
-                    'search1' => '%'.$search.'%',
-                    'search2' => '%'.$search.'%');
-    $issuedcertificates = $DB->get_records_sql($sql, $params);
-    $search = '';
 } else {
     $issuedcertificates = $DB->get_records('ilddigitalcert_issued', array('userid' => $USER->id));
+
+    $search_form_data = (object) [
+        'search_query' => '',
+        'search_filter' => ''
+    ];
 }
 
+// Set default data (if any).
+$search_form->set_data($search_form_data);
+
+
+
+// Build page.
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('overview', 'mod_ilddigitalcert'));
 
-$intro = get_string('overview_intro', 'mod_ilddigitalcert');
+$template_data = array(
+    'search_form' => $search_form->render(),
+    'search_count' => count($issuedcertificates),
+    'certs_table' => mod_ilddigitalcerts_render_certs_table($issuedcertificates),
+);
 
-echo html_writer::tag('p', $intro, null);
-
-$table = new flexible_table('MODULE_TABLE');
-$table->define_columns(array('icon',
-                                'name',
-                                'issuedon',
-                                'course'));
-$table->define_headers(array(get_string('status'),
-                                get_string('title', 'mod_ilddigitalcert'),
-                                get_string('startdate', 'mod_ilddigitalcert'),
-                                get_string('course')));
-$table->define_baseurl($CFG->wwwroot.'/mod/ilddigitalcert/overview.php');
-$table->set_attribute('class', 'admintable generaltable');
-$table->sortable(false, 'name', SORT_ASC);
-$table->setup();
-
-foreach ($issuedcertificates as $issuedcertificate) {
-    $data = array();
-    $icon = '<img height="32px" title="'.
-               get_string('pluginname', 'mod_ilddigitalcert').
-               '" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
-    if (isset($issuedcertificate->txhash)) {
-        $icon = '<img height="32px" title="'.
-                   get_string('registered_and_signed', 'mod_ilddigitalcert').
-                   '" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain-block.svg">';
-    }
-    $data[] = $icon;
-
-    // Zertifikat anzeigen.
-    $data[] = html_writer::link(
-                new moodle_url('/mod/ilddigitalcert/view.php?id='.
-                  $issuedcertificate->cmid.'&ueid='.$issuedcertificate->enrolmentid),
-                $issuedcertificate->name);
-    $data[] = date('d.m.Y - H:i', $issuedcertificate->timecreated);
-    $course = '';
-    if ($course = $DB->get_record('course', array('id' => $issuedcertificate->courseid))) {
-        $coursename = $course->fullname;
-    }
-    $data[] = html_writer::link(new moodle_url('/course/view.php?id='.$issuedcertificate->courseid), $coursename);
-
-    $table->add_data($data);
-}
-// Suchfeld.
-echo '<p>';
-echo '<form action="'.new moodle_url('/mod/ilddigitalcert/overview.php?id='.$id.'&ueid='.$ueid).'" class="searchform">';
-echo '<div>';
-echo '<input type="hidden" name="id" value="'.$id.'" />';
-echo '<input type="checkbox" id="check_only_bc" name="check_only_bc" value="check_only_bc">'.
-     get_string('only_blockchain', 'mod_ilddigitalcert').'<br />';
-echo '<input type="checkbox" id="check_only_nonbc" name="check_only_nonbc" value="check_only_nonbc">'.
-     get_string('only_nonblockchain', 'mod_ilddigitalcert').'<br />';
-echo '<input type="text" id="search" name="search" value="'.s($search).'" />&nbsp;';
-echo '<input type="submit" value="'.get_string('search').'" style="margin-top: 9px;height: 27px;padding-top: 2px;"/>';
-echo '&nbsp;'.html_writer::link(new moodle_url('/mod/ilddigitalcert/overview.php?id='.$id.'&ueid='.$ueid), get_string('cancel'));
-echo '</div>';
-echo '</form>';
-echo '</p>';
-
-$table->print_html();
+echo $OUTPUT->render_from_template('mod_ilddigitalcert/overview', $template_data);
 
 echo $OUTPUT->footer();
