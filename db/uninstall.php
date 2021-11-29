@@ -15,30 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * post installation hook for adding entry in customusermenu.
+ * Post installation hook for removing an entry in custom user menu.
  *
- * @package    mod_ilddigitalcert
- * @copyright  2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_ilddigitalcert
+ * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Post installation procedure
+ * Post installation procedure.
+ *
+ * Remove the digital certificate menu item from the custom user menu.
  */
-function xmldb_ilddigitalcert_install() {
+function xmldb_ilddigitalcert_uninstall() {
     global $CFG;
     $result = true;
 
-    $new_item = "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
+    $menu_item = "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
     $menu = $CFG->customusermenuitems;
-
-    // Remove any old motbot menu items, if there are any.
-    $menu = str_replace($new_item, "", $menu);
-
-    // Add the motbot menu item.
-    $menu = $menu .= $new_item;
+    $menu = str_replace($menu_item, "", $menu);
     set_config('customusermenuitems', $menu);
 
     return $result;

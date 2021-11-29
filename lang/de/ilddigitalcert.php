@@ -106,6 +106,7 @@ $string['image'] = 'Bild';
 $string['institution_pk'] = 'Private Key der Zertifizierungsstelle';
 $string['invalid'] = 'Das Zertifikat ist ungültig';
 $string['invalid_format'] = 'Ungültiges Dateiformat';
+$string['invalid_pk_format'] = 'Der gegebene Private Key ist ungültig.';
 
 $string['issuedcerts_report:subject'] = 'Zertifikate benötigen Ihre Signatur';
 $string['issuedcerts_report:intro'] = '<p>Hallo {$a},</p>
@@ -230,13 +231,15 @@ Kontrollieren Sie bitte ob Sie korrekt angemeldet sind.';
 $string['not_installed_correctly'] = 'Das Plugin "Digitale Zertifikate" wurde nicht vollständig installiert.
 Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
 $string['not_logged_in'] = 'Sie sind nicht im System angemeldet.';
-$string['only_blockchain'] = 'Nur Zertifikate, die in der Blockchain registriert sind';
-$string['only_nonblockchain'] = 'Nur Zertifikate, die nicht in der Blockchain registriert sind';
+$string['only_blockchain'] = 'Registrierte Zertifikate';
+$string['only_nonblockchain'] = 'Unregistrierte Zertifikate';
 $string['overview'] = 'Übersicht';
 $string['overview_intro'] = 'Hier sehen Sie eine Übersicht über alle erworbenen Zertifikate aus allen Kursen, in die Sie eingeschrieben sind oder waren.';
 $string['pdf'] = 'PDF';
 $string['preview'] = 'Vorschau für das Zertifikat';
 $string['recipient'] = 'Empfänger';
+$string['reissue'] = 'Reissue certificate';
+$string['reissue_confirmation'] = 'Wollen Sie folgende Zertifikate neuausstellen?';
 $string['registered_and_signed'] = 'Das Zertifikat ist in der Blockchain registriert und signiert';
 $string['scan_qr_code'] = 'Um Ihr digitales Zertifikat an die Wallet zu senden, müssen Sie erst eine Verbindung zu dieser herstellen. Öffnen Sie dazu die App und scannen Sie den QR-Code. Folgen Sie anschließend den Anweisungen in der App.';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
@@ -252,14 +255,15 @@ um die Smart Contracts auszuführen, die verwendet werden um Zertifikate und Zer
 $string['settings_headerconfig'] = 'Blockchain Einstellungen';
 $string['settings_headerconfig_general'] = 'Allgemeine Einstellungen';
 $string['sign_cert'] = 'Zertifikat in Blockchain registrieren und signieren';
+$string['sign_confirmation'] = 'Wollen Sie folgende Zertifikate signieren und registrieren?';
 $string['sign_delete_certifier_with_pk'] = 'Um den Zertifizierer aus der Blockchain zu entfernen, muss dieser Vorgang mit dem Private Key einer Zertifizierungsstelle signiert werden.';
 $string['sign_add_certifier_with_pk'] = 'Hinzufügen eines neuen Zertifizierers mit Private Key signieren';
-$string['sign_with_pk'] = 'Um das Zertifikat in der Blockchain zu registrieren, muss dieser Vorgang mit dem dazugehörigen Private Key signiert werden.';
+$string['sign_with_pk'] = 'Um ein Zertifikat in der Blockchain zu registrieren, muss dieser Vorgang mit dem dazugehörigen Private Key signiert werden.';
 $string['startdate'] = 'Ausstellungsdatum';
 $string['subject_generate_pk'] = 'Generieren Sie Ihren Private Key als Zertifizierer';
 $string['template'] = 'HTML Template';
 $string['title'] = 'Zertifikat';
-$string['toblockchain'] = 'In Blockchain registrieren und signieren';
+$string['toblockchain'] = 'Registrieren und signieren';
 $string['to_many_enrolments'] = 'Das Zertifikat kann aufgrund mehrerer paralleler Einschreibungen in diesen Kurs nicht ausgestellt werden.';
 $string['unknown'] = 'Das Zertifikat ist in der Blockchain unbekannt';
 $string['upload'] = 'Zertifikat hier hochladen';

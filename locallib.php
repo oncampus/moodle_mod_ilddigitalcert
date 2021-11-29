@@ -30,12 +30,14 @@ function download_json($modulecontextid, $icid, $download) {
     global $DB, $CFG;
 
     $fs = get_file_storage();
-    $storedfile = $fs->get_file($modulecontextid,
-                                              'mod_ilddigitalcert',
-                                              'metadata',
-                                              $icid,
-                                              '/',
-                                              'certificate.bcrt');
+    $storedfile = $fs->get_file(
+        $modulecontextid,
+        'mod_ilddigitalcert',
+        'metadata',
+        $icid,
+        '/',
+        'certificate.bcrt'
+    );
 
     if ($download == 'json') {
         send_stored_file($storedfile, null, 0, true);
@@ -52,26 +54,32 @@ function download_json($modulecontextid, $icid, $download) {
 
             $hash = calculate_hash($metadatajson);
 
-            $certificatename = str_replace(array(' ',
-                                                 '(',
-                                                 ')'),
-                                           '_',
-                                           $issuedcertificate->name);
-            $filename = $certificatename.'_'.
-                    $metadata->{'extensions:recipientB4E'}->givenname.'_'.
-                    $metadata->{'extensions:recipientB4E'}->surname.'_'.
-                    strtotime($metadata->issuedOn);
+            $certificatename = str_replace(
+                array(
+                    ' ',
+                    '(',
+                    ')'
+                ),
+                '_',
+                $issuedcertificate->name
+            );
+            $filename = $certificatename . '_' .
+                $metadata->{'extensions:recipientB4E'}->givenname . '_' .
+                $metadata->{'extensions:recipientB4E'}->surname . '_' .
+                strtotime($metadata->issuedOn);
         }
         $content = $storedfile->get_content();
 
         require_once(__DIR__ . '/vendor/autoload.php');
 
-        $certificate = new \Mpdf\Mpdf(['mode' => 'utf-8',
-                                      'margin_top' => 0,
-                                      'margin_left' => 0,
-                                      'margin_right' => 0,
-                                      'margin_bottom' => 0,
-                                      'format' => [210, 297]]);
+        $certificate = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'margin_top' => 0,
+            'margin_left' => 0,
+            'margin_right' => 0,
+            'margin_bottom' => 0,
+            'format' => [210, 297]
+        ]);
         $certificate->showImageErrors = true;
 
         $html = '<h1>Error</h1>';
@@ -88,14 +96,14 @@ function download_json($modulecontextid, $icid, $download) {
         $fileid = $storedfile->get_id(); // Get fileid.
 
         $certificate->SetAssociatedFiles([[
-            'name' => $filename.'.bcrt',
+            'name' => $filename . '.bcrt',
             'mime' => 'application/json',
             'description' => 'some description',
             'AFRelationship' => 'Alternative',
-            'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$fileid
+            'path' => $CFG->wwwroot . '/mod/ilddigitalcert/download_pdf.php?id=' . $fileid
         ]]);
 
-        $certificate->Output($filename.'.pdf', 'I');
+        $certificate->Output($filename . '.pdf', 'I');
 
         return;
     }
@@ -104,23 +112,23 @@ function download_json($modulecontextid, $icid, $download) {
 function get_pdf_footerhtml($hash) {
     global $CFG;
 
-    $verifyurl = $CFG->wwwroot.'/mod/ilddigitalcert/verify.php';
+    $verifyurl = $CFG->wwwroot . '/mod/ilddigitalcert/verify.php';
 
     $html = '
         <div style="border: 0px solid #000;padding-top: 15px;padding-left: 8px;position:absolute;top:975px;left:0px;">
         <table class="items" width="50%" cellpadding="3" border="0">
                 <tr>
                     <td class="barcodecell" width="100px">
-                        <a href="'.$verifyurl.'?hash='.$hash.'" style="color: rgb(0,0,0) !important;">
+                        <a href="' . $verifyurl . '?hash=' . $hash . '" style="color: rgb(0,0,0) !important;">
                             <div>
-                                <barcode code="'.$CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.
-                                  $hash.'" type="QR" class="barcode" size="1" error="M" disableborder="1" />
+                                <barcode code="' . $CFG->wwwroot . '/mod/ilddigitalcert/verify.php?hash=' .
+        $hash . '" type="QR" class="barcode" size="1" error="M" disableborder="1" />
                             </div>
                         </a>
                     </td>
-                    <td style="font-family: verdana;font-size: 7pt;">'.
-                        '<b>'.get_string('verify_authenticity', 'mod_ilddigitalcert').'</b><br/><br/>'.
-                        get_string('verify_authenticity_descr', 'mod_ilddigitalcert', array('url' => $verifyurl, 'hash' => $hash)).'
+                    <td style="font-family: verdana;font-size: 7pt;">' .
+        '<b>' . get_string('verify_authenticity', 'mod_ilddigitalcert') . '</b><br/><br/>' .
+        get_string('verify_authenticity_descr', 'mod_ilddigitalcert', array('url' => $verifyurl, 'hash' => $hash)) . '
                     </td>
                 </tr>
         </table>
@@ -199,8 +207,8 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
             $fromuser->lastname = $fullname[1];
             $subject = get_string('subject_new_digital_certificate', 'mod_ilddigitalcert');
             $a = new stdClass();
-            $a->fullname = $receiver->firstname.' '.$receiver->lastname;
-            $a->url = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$issuedcertificate->cmid;
+            $a->fullname = $receiver->firstname . ' ' . $receiver->lastname;
+            $a->url = $CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $issuedcertificate->cmid;
             $a->from = $SITE->fullname;
             $message = get_string('message_new_digital_certificate', 'mod_ilddigitalcert', $a);
             $messagehtml = get_string('message_new_digital_certificate_html', 'mod_ilddigitalcert', $a);
@@ -214,16 +222,16 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
 function save_token() {
     global $CFG;
     try {
-        if (!is_dir($CFG->dataroot.'/ilddigitalcert_data')) {
-            if (!mkdir($CFG->dataroot.'/ilddigitalcert_data', 0775)) {
+        if (!is_dir($CFG->dataroot . '/ilddigitalcert_data')) {
+            if (!mkdir($CFG->dataroot . '/ilddigitalcert_data', 0775)) {
                 return false;
             }
         }
         $id = uniqid();
-        $filename = $CFG->dataroot.'/ilddigitalcert_data/'.$id;
+        $filename = $CFG->dataroot . '/ilddigitalcert_data/' . $id;
         while (file_exists($filename)) {
             $id = uniqid();
-            $filename = $CFG->dataroot.'/ilddigitalcert_data/'.$id;
+            $filename = $CFG->dataroot . '/ilddigitalcert_data/' . $id;
         }
         $token = bin2hex(random_bytes(32));
         if (!file_put_contents($filename, $token)) {
@@ -237,7 +245,7 @@ function save_token() {
 
 function get_token($tokenid) {
     global $CFG;
-    $filename = $CFG->dataroot.'/ilddigitalcert_data/'.$tokenid;
+    $filename = $CFG->dataroot . '/ilddigitalcert_data/' . $tokenid;
     if (file_exists($filename)) {
         return file_get_contents($filename);
     } else {
@@ -281,7 +289,7 @@ function calculate_hash($metadatajson) {
     unset($metadatajson->{'extensions:verifyB4E'});
     unset($metadatajson->{'verification'}); // For downward compatibility.
     $metadatajson = json_encode($metadatajson, JSON_UNESCAPED_SLASHES);
-    $hash = '0x'.hash('sha256', $metadatajson);
+    $hash = '0x' . hash('sha256', $metadatajson);
     return $hash;
 }
 
@@ -337,7 +345,7 @@ function get_certificatehtml($id, $certmetadatajson) {
                     if (is_array($value)) {
                         $jsonobj = '<ul>';
                         foreach ($value as $val) {
-                            $jsonobj .= '<li>'.$val.'</li>';
+                            $jsonobj .= '<li>' . $val . '</li>';
                         }
                         $jsonobj .= '</ul>';
                     } else {
@@ -351,7 +359,7 @@ function get_certificatehtml($id, $certmetadatajson) {
             }
         }
         try {
-            $html = str_replace('{'.$match.'}', $jsonobj, $html);
+            $html = str_replace('{' . $match . '}', $jsonobj, $html);
         } catch (Exception $e) {
             echo 'error'; // TODO: print error.
         }
@@ -382,7 +390,7 @@ function generate_certmetadata($cm, $user) {
 
 function get_issued_certificate($userid, $cmid, $ueid) {
     global $DB;
-    if ($issued = $DB->get_record('ilddigitalcert_issued', array ('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $ueid))) {
+    if ($issued = $DB->get_record('ilddigitalcert_issued', array('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $ueid))) {
         return $issued->metadata;
     }
     return false;
@@ -408,35 +416,49 @@ function reissue_certificate($certmetadata, $userid, $cmid) {
     $enrolmentid = 0;
     if ($enrolment = $DB->get_records_sql($sql, $params)) {
         if (count($enrolment) > 1) {
-            print_error('to_many_enrolments',
-                        'mod_ilddigitalcert',
-                        new moodle_url('/mod/ilddigitalcert/course/view.php',
-                        array('id' => $courseid)));
+            print_error(
+                'to_many_enrolments',
+                'mod_ilddigitalcert',
+                new moodle_url(
+                    '/mod/ilddigitalcert/course/view.php',
+                    array('id' => $courseid)
+                )
+            );
         } else {
             foreach ($enrolment as $em) {
                 $enrolmentid = $em->id;
             }
         }
     } else {
-        print_error('not_enrolled',
-                    'mod_ilddigitalcert',
-                    new moodle_url('/mod/ilddigitalcert/course/view.php',
-                    array('id' => $courseid)));
+        print_error(
+            'not_enrolled',
+            'mod_ilddigitalcert',
+            new moodle_url(
+                '/mod/ilddigitalcert/course/view.php',
+                array('id' => $courseid)
+            )
+        );
     }
-    if ($issued = $DB->get_record('ilddigitalcert_issued',
-                                  array ('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $enrolmentid))) {
+    if ($issued = $DB->get_record(
+        'ilddigitalcert_issued',
+        array('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $enrolmentid)
+    )) {
         // Check if cert is already in blockchain. if so, print error.
         if (isset($issued->certhash)) {
-            print_error('already_in_blockchain',
-                        'mod_ilddigitalcert',
-                        new moodle_url('/mod/ilddigitalcert/course/view.php',
-                        array('id' => $courseid)));
+            print_error(
+                'already_in_blockchain',
+                'mod_ilddigitalcert',
+                new moodle_url(
+                    '/mod/ilddigitalcert/course/view.php',
+                    array('id' => $courseid)
+                )
+            );
         }
 
         $issued->name = $certmetadata->badge->name;
         $issued->timemodified = time();
 
-        $certmetadata->id = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?issuedid='.$issued->id;
+        $certmetadata->id = $CFG->wwwroot . '/mod/ilddigitalcert/view.php?issuedid=' . $issued->id;
         $certmetadata->issuedOn = date('c', $issued->timemodified);
         $certmetadata->{'extensions:assertionreferenceB4E'} = get_extension_assertionreference_b4e($issued->id);
 
@@ -451,9 +473,11 @@ function reissue_certificate($certmetadata, $userid, $cmid) {
         $DB->update_record('ilddigitalcert_issued', $issued);
         return true;
     } else {
-        print_error('certificate_not_found',
-                    'mod_ilddigitalcert',
-                    new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid)));
+        print_error(
+            'certificate_not_found',
+            'mod_ilddigitalcert',
+            new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid))
+        );
     }
 }
 
@@ -472,21 +496,27 @@ function issue_certificate($certmetadata, $userid, $cmid) {
     $enrolmentid = 0;
     if ($enrolment = $DB->get_records_sql($sql, $params)) {
         if (count($enrolment) > 1) {
-            print_error('to_many_enrolments',
-                        'mod_ilddigitalcert',
-                        new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid)));
+            print_error(
+                'to_many_enrolments',
+                'mod_ilddigitalcert',
+                new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid))
+            );
         } else {
             foreach ($enrolment as $em) {
                 $enrolmentid = $em->id;
             }
         }
     } else {
-        print_error('not_enrolled',
-                    'mod_ilddigitalcert',
-                    new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid)));
+        print_error(
+            'not_enrolled',
+            'mod_ilddigitalcert',
+            new moodle_url('/mod/ilddigitalcert/course/view.php', array('id' => $courseid))
+        );
     }
-    if ($issued = $DB->get_record('ilddigitalcert_issued',
-                                  array ('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $enrolmentid))) {
+    if ($issued = $DB->get_record(
+        'ilddigitalcert_issued',
+        array('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $enrolmentid)
+    )) {
         return $issued->metadata;
     }
 
@@ -504,7 +534,7 @@ function issue_certificate($certmetadata, $userid, $cmid) {
     $issuedid = $DB->insert_record('ilddigitalcert_issued', $issued);
     $issued->id = $issuedid;
 
-    $certmetadata->id = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?issuedid='.$issuedid;
+    $certmetadata->id = $CFG->wwwroot . '/mod/ilddigitalcert/view.php?issuedid=' . $issuedid;
     $certmetadata->issuedOn = date('c', $issued->timemodified);
     $certmetadata->{'extensions:assertionreferenceB4E'} = get_extension_assertionreference_b4e($issuedid);
 
@@ -523,9 +553,9 @@ function issue_certificate($certmetadata, $userid, $cmid) {
     // If automation is enabled, issued certificate will be signed and written
     // to the blockchain using the pk of the selected certifier.
     $in_blockchain = false;
-    if($cert_settings->automation && $cert_settings->auto_certifier && $cert_settings->auto_pk) {
-        if($certifier = $DB->get_record('user', array('id' => $cert_settings->auto_certifier), '*', IGNORE_MISSING)) {
-            if($pk = \mod_ilddigitalcert\crypto_manager::decrypt($cert_settings->auto_pk)) {
+    if ($cert_settings->automation && $cert_settings->auto_certifier && $cert_settings->auto_pk) {
+        if ($certifier = $DB->get_record('user', array('id' => $cert_settings->auto_certifier), '*', IGNORE_MISSING)) {
+            if ($pk = \mod_ilddigitalcert\crypto_manager::decrypt($cert_settings->auto_pk)) {
                 $in_blockchain = to_blockchain($issued, $certifier, $pk);
             }
         }
@@ -539,8 +569,8 @@ function issue_certificate($certmetadata, $userid, $cmid) {
         $fromuser->lastname = $fullname[1];
         $subject = get_string('subject_new_certificate', 'mod_ilddigitalcert');
         $a = new stdClass();
-        $a->fullname = $user->firstname.' '.$user->lastname;
-        $a->url = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$cmid;
+        $a->fullname = $user->firstname . ' ' . $user->lastname;
+        $a->url = $CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $cmid;
         $a->from = $SITE->fullname;
         $message = get_string('message_new_certificate', 'mod_ilddigitalcert', $a);
         $messagehtml = get_string('message_new_certificate_html', 'mod_ilddigitalcert', $a);
@@ -555,7 +585,7 @@ function get_extension_assertionreference_b4e($issuedid) {
     global $CFG, $contexturl;
     $extension = new stdClass();
 
-    $extension->assertionreference = $CFG->wwwroot.'/mod/ilddigitalcert/view.php?issuedid='.$issuedid;
+    $extension->assertionreference = $CFG->wwwroot . '/mod/ilddigitalcert/view.php?issuedid=' . $issuedid;
     $extension->{'@context'} = $contexturl->assertionreferenceB4E;
     $extension->type = array('Extension', 'AssertionReferenceB4E');
 
@@ -642,7 +672,7 @@ function get_digitalcert($cm) {
     global $DB;
     $digitalcert = $DB->get_record('ilddigitalcert', array('id' => $cm->instance), '*', MUST_EXIST);
     // Expertise.
-    $lines = preg_split( "/[\r\n]+/", $digitalcert->expertise);
+    $lines = preg_split("/[\r\n]+/", $digitalcert->expertise);
     $digitalcert->expertise = $lines;
     // Tags.
     $sql = 'select t.rawname
@@ -665,9 +695,9 @@ function get_extension_verify_b4e($hash) {
     global $CFG, $contexturl;
     $verification = new stdClass();
     // TODO get alternative url from settings.
-    $verification->verifyaddress = $CFG->wwwroot.'/mod/ilddigitalcert/verify.php?hash='.$hash;
+    $verification->verifyaddress = $CFG->wwwroot . '/mod/ilddigitalcert/verify.php?hash=' . $hash;
     $verification->type = array('Extension', 'VerifyB4E');
-    $verification->assertionhash = 'sha256$'.substr($hash, 2);
+    $verification->assertionhash = 'sha256$' . substr($hash, 2);
     $verification->{'@context'} = $contexturl->verifyB4E;
     return $verification;
 }
@@ -696,12 +726,14 @@ function get_badgeimage_base64($cm) {
     $fs = get_file_storage();
     $files = $fs->get_area_files($context->id, 'mod_ilddigitalcert', 'content', 0);
     foreach ($files as $file) {
-        $storedfile = $fs->get_file($context->id,
-                                              'mod_ilddigitalcert',
-                                              'content',
-                                              0,
-                                              $file->get_filepath(),
-                                              $file->get_filename());
+        $storedfile = $fs->get_file(
+            $context->id,
+            'mod_ilddigitalcert',
+            'content',
+            0,
+            $file->get_filepath(),
+            $file->get_filename()
+        );
         if ($file->get_filename() != '.') {
             break;
         }
@@ -712,7 +744,7 @@ function get_badgeimage_base64($cm) {
         return '';
     }
     // TODO: Image is not saved while adding a new certificate ti the course. you have to edit the activity again.
-    $imgbase64 = 'data:'.$storedfile->get_mimetype().';base64,'.base64_encode($content);
+    $imgbase64 = 'data:' . $storedfile->get_mimetype() . ';base64,' . base64_encode($content);
     return $imgbase64;
 }
 
@@ -723,17 +755,19 @@ function get_issuerimage_base64($issuerid) {
     $files = $fs->get_area_files($context->id, 'mod_ilddigitalcert', 'issuer', $issuerid);
     foreach ($files as $file) {
         if ($file->get_filename() != '.') {
-            $storedfile = $fs->get_file($context->id,
-                                        'mod_ilddigitalcert',
-                                        'issuer',
-                                        $issuerid,
-                                        $file->get_filepath(),
-                                        $file->get_filename());
+            $storedfile = $fs->get_file(
+                $context->id,
+                'mod_ilddigitalcert',
+                'issuer',
+                $issuerid,
+                $file->get_filepath(),
+                $file->get_filename()
+            );
             break;
         }
     }
     $content = $file->get_content();
-    $imgbase64 = 'data:'.$storedfile->get_mimetype().';base64,'.base64_encode($content);
+    $imgbase64 = 'data:' . $storedfile->get_mimetype() . ';base64,' . base64_encode($content);
     return $imgbase64;
 }
 
@@ -782,7 +816,7 @@ function get_issuer($issuerid) {
     $issuer->url = $issuerrecord->url;
     $issuer->{'@context'} = $contexturl->openbadges;
     $issuer->type = 'Issuer';
-    $issuer->id = $CFG->wwwroot.'/mod/ilddigitalcert/edit_issuers.php?action=edit&id='.$issuerrecord->id;
+    $issuer->id = $CFG->wwwroot . '/mod/ilddigitalcert/edit_issuers.php?action=edit&id=' . $issuerrecord->id;
     $issuer->image = get_issuerimage_base64($issuerid);
 
     return $issuer;
@@ -825,9 +859,9 @@ function get_extension_address_b4e($issuerrecord) {
 
 function get_ipfs_hash($institutionprofile) {
     global $CFG;
-    $institutionprofile = '1220'.substr($institutionprofile, 2);
+    $institutionprofile = '1220' . substr($institutionprofile, 2);
     // TODO path to perl into settings.
-    $file = '/usr/bin/perl '.$CFG->dirroot.'/mod/ilddigitalcert/perl/base58_encode.pl '.$institutionprofile;
+    $file = '/usr/bin/perl ' . $CFG->dirroot . '/mod/ilddigitalcert/perl/base58_encode.pl ' . $institutionprofile;
     ob_start();
     passthru($file);
     $ipfshash = ob_get_contents();
@@ -838,7 +872,7 @@ function get_ipfs_hash($institutionprofile) {
 function get_institution($ipfshash) {
     $institution = new stdClass();
 
-    $ipfsurl = 'https://ipfs.io/ipfs/'.$ipfshash;
+    $ipfsurl = 'https://ipfs.io/ipfs/' . $ipfshash;
 
     try {
         $ch = curl_init();
@@ -880,9 +914,11 @@ function add_certifier($userid, $useraddress, $adminpk) {
     // Check if user already exists in user_preferences.
     if ($userpref = $DB->get_record('user_preferences', array('name' => 'mod_ilddigitalcert_certifier', 'userid' => $userid))) {
         if (strpos($userpref->value, 'not_registered_pk') === false) {
-            print_error('user_is_already_certifier',
-            'mod_ilddigitalcert',
-            new moodle_url('/mod/ilddigitalcert/edit_certifiers.php'));
+            print_error(
+                'user_is_already_certifier',
+                'mod_ilddigitalcert',
+                new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
+            );
         }
     }
     // Check if $useraddress already exists in user_preferences.
@@ -908,9 +944,11 @@ function add_certifier($userid, $useraddress, $adminpk) {
         set_user_preference('mod_ilddigitalcert_certifier', $useraddress, $userid);
         return true;
     } else {
-        print_error('error_while_adding_certifier_to_blockchain',
-                    'mod_ilddigitalcert',
-                    new moodle_url('/mod/ilddigitalcert/edit_certifiers.php'));
+        print_error(
+            'error_while_adding_certifier_to_blockchain',
+            'mod_ilddigitalcert',
+            new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
+        );
     }
 }
 
@@ -935,9 +973,11 @@ function remove_certifier($userprefid, $adminpk) {
                 }
             }
             if ($ac) {
-                print_error('error_while_removing_certifier_from_blockchain',
-                            'mod_ilddigitalcert',
-                            new moodle_url('/mod/ilddigitalcert/edit_certifiers.php'));
+                print_error(
+                    'error_while_removing_certifier_from_blockchain',
+                    'mod_ilddigitalcert',
+                    new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
+                );
             } else {
                 // If success, delete from userpref.
                 unset_user_preference('mod_ilddigitalcert_certifier', $userpref->userid);
@@ -946,14 +986,18 @@ function remove_certifier($userprefid, $adminpk) {
             }
         } else {
             unset_user_preference('mod_ilddigitalcert_certifier', $userpref->userid);
-            print_error('certifier_already_removed_from_blockchain',
-                        'mod_ilddigitalcert',
-                        new moodle_url('/mod/ilddigitalcert/edit_certifiers.php'));
+            print_error(
+                'certifier_already_removed_from_blockchain',
+                'mod_ilddigitalcert',
+                new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
+            );
         }
     } else {
-        print_error('certifier_already_removed_from_blockchain',
-                    'mod_ilddigitalcert',
-                    new moodle_url('/mod/ilddigitalcert/edit_certifiers.php'));
+        print_error(
+            'certifier_already_removed_from_blockchain',
+            'mod_ilddigitalcert',
+            new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
+        );
     }
 }
 
@@ -989,22 +1033,26 @@ function reset_user($courseid, $userid) {
         return;
     }
 
-    $DB->delete_records_select('course_modules_completion',
+    $DB->delete_records_select(
+        'course_modules_completion',
         'coursemoduleid IN (SELECT id
                                 FROM mdl_course_modules
                                 WHERE course=?)
             AND userid=?',
-        array($courseid, $userid));
+        array($courseid, $userid)
+    );
     $DB->delete_records('course_completions', array('course' => $courseid, 'userid' => $userid));
     $DB->delete_records('course_completion_crit_compl', array('course' => $courseid, 'userid' => $userid));
 
     $dbman = $DB->get_manager();
 
     if ($dbman->table_exists('scorm_scoes_track')) {
-        $DB->delete_records_select('scorm_scoes_track',
+        $DB->delete_records_select(
+            'scorm_scoes_track',
             'scormid IN (SELECT id FROM mdl_scorm WHERE course=?)
                 AND userid=?',
-            array($courseid, $userid));
+            array($courseid, $userid)
+        );
     }
 
     if ($dbman->table_exists('quiz')) {
@@ -1037,12 +1085,14 @@ function display_metadata($metadata) {
     } else if (is_object($metadata)) {
         echo '<ul>';
         foreach ($metadata as $key => $value) {
-            if ($key != 'abi' and $key != '@context'
-              and $key != 'type' and $value != ''
-              and $key != 'extensions:assertionpageB4E') {
+            if (
+                $key != 'abi' and $key != '@context'
+                and $key != 'type' and $value != ''
+                and $key != 'extensions:assertionpageB4E'
+            ) {
                 if ($key == 'image') {
                     echo '<br />';
-                    echo '<img src="'.$value.'" style="max-width:150px; max-height:150px;">';
+                    echo '<img src="' . $value . '" style="max-width:150px; max-height:150px;">';
                 } else {
                     if ($key == 'issuedOn' or $key == 'date' or $key == 'expires' or $key == 'certificationdate') {
                         $value = date('d.m.Y', strtotime($value));
@@ -1055,7 +1105,7 @@ function display_metadata($metadata) {
                     }
                     if (has_content($value)) {
                         echo '<li>';
-                        echo '<b>'.$key.'</b>: ';
+                        echo '<b>' . $key . '</b>: ';
                         display_metadata($value);
                         echo '</li>';
                     }
@@ -1087,16 +1137,17 @@ function download_file($fileid) {
 
         $filestorage = get_file_storage();
 
-        $storedfile = $filestorage->get_file($file->contextid,
-                                              $file->component,
-                                              $file->filearea,
-                                              $file->itemid,
-                                              $file->filepath,
-                                              $file->filename);
+        $storedfile = $filestorage->get_file(
+            $file->contextid,
+            $file->component,
+            $file->filearea,
+            $file->itemid,
+            $file->filepath,
+            $file->filename
+        );
 
         send_stored_file($storedfile, null, 0, false);
     }
-
 }
 
 function debug_email($to, $message, $debugobject = null) {
@@ -1124,7 +1175,7 @@ function get_certifiers($course = false) {
 
     $certifiers = $DB->get_records('user_preferences', array('name' => 'mod_ilddigitalcert_certifier'));
 
-    if(empty($certifiers)) {
+    if (empty($certifiers)) {
         return null;
     }
 
@@ -1133,7 +1184,7 @@ function get_certifiers($course = false) {
         $certifierids[] = $certifier->userid;
     }
 
-    if(!$course) {
+    if (!$course) {
         return $certifierids;
     }
 
@@ -1149,12 +1200,138 @@ function get_certifiers($course = false) {
         AND cxt.instanceid = c.id
         AND roleid < 5
         AND c.id = :course";
-    $conditions = array('course' => $this->get_course()->id);
-    if(!empty($certifierids)) {
+    $conditions = array('course' => $course);
+    if (!empty($certifierids)) {
         $sql .= " AND u.id $insql";
         $conditions = array_merge($conditions, $inparams);
     }
     $records = $DB->get_records_sql($sql, $conditions);
     return $records;
+}
 
+
+/**
+ * Renders the given certificates array as a html array.
+ *
+ * @param array $certificates Certificates to be listed in the table.
+ * @param int $course
+ * @param int $ueid
+ * @return string HTML representation of a certificates table.
+ */
+function mod_ilddigitalcerts_render_certs_table($certificates, $courseid = null, $ueid = 0) {
+    global $CFG, $DB;
+
+    if (!$certificates || empty($certificates)) {
+        return '';
+    }
+
+    // Create certificates table.
+    $table = new html_table();
+    $table->attributes['class'] = 'generaltable m-element-certs-table';
+
+
+    if ($courseid === null) {
+        $head = array(
+            get_string('status'),
+            get_string('title', 'mod_ilddigitalcert'),
+            get_string('course'),
+            get_string('startdate', 'mod_ilddigitalcert')
+        );
+        $align = array('center', 'left', 'left', 'left');
+    } else {
+        $bulk_options = array(
+            '' => get_string('selectanaction'),
+            'toblockchain' => get_string('toblockchain', 'mod_ilddigitalcert'),
+            'reissue' => get_string('reissue', 'mod_ilddigitalcert'),
+        );
+        $bulk_actions = \html_writer::select($bulk_options, 'bulk_actions', 'selectanaction', null, array('id' => 'm-element-bulk-actions', 'class' => 'form-control'));
+        $bulk_actions .= \html_writer::empty_tag('input', array('id' => 'm-element-bulk-actions__button', 'class' => ' btn btn-secondary', 'type' => 'button', 'value' => get_string('go')));
+        $head = array(
+            \html_writer::checkbox('check-all', null, false, null, array('id' => 'm-element-select-all-certs')),
+            get_string('status'),
+            get_string('title', 'mod_ilddigitalcert'),
+            get_string('recipient', 'mod_ilddigitalcert'),
+            get_string('startdate', 'mod_ilddigitalcert'),
+            $bulk_actions
+        );
+
+        $align = array('left ', 'center', 'left', 'left', 'left', 'left');
+    }
+
+    $table->head  = $head;
+    $table->align = $align;
+
+    // Fill table.
+    foreach ($certificates as $certificate) {
+        $row = array();
+        if ($courseid !== null) {
+            $row[] = \html_writer::checkbox('select-cert' . $certificate->id, $certificate->id, false, null, array('class' => 'm-element-select-cert'));
+        }
+        $icon = '<img height="32px" title="' . get_string('pluginname', 'mod_ilddigitalcert') . '"
+        src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
+        if (isset($certificate->txhash)) {
+            $icon = '<img height="32px" title="' . get_string('registered_and_signed', 'mod_ilddigitalcert') . '"
+            src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-block.svg">';
+        }
+        $row[] = $icon;
+
+
+        // TODO Zertifikat anzeigen.
+        $row[] = html_writer::link(
+            $CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' .
+                $certificate->cmid . '&issuedid=' . $certificate->id . '&ueid=' . $ueid,
+            $certificate->name
+        );
+
+        if ($courseid === null) {
+            $course = $DB->get_record('course', array('id' => $certificate->courseid), 'id, shortname', IGNORE_MISSING);
+            $row[] = html_writer::link(
+                new moodle_url('/course/view.php?id=' . $course->id),
+                $course->shortname
+            );
+            $row[] = date('d.m.Y - H:i', $certificate->timecreated);
+        } else {
+            $user = $DB->get_record_sql(
+                'select id, firstname, lastname from {user} where id = :id ',
+                array('id' => $certificate->userid)
+            );
+            $row[] = html_writer::link(
+                new moodle_url('/user/view.php?id=' .
+                    $user->id  . ($courseid ? ('&course=' . $courseid) : '') . '&ueid=' . $ueid),
+                $user->firstname . ' ' . $user->lastname
+            );
+            $row[] = date('d.m.Y - H:i', $certificate->timecreated);
+            // TODO Zertifikat neu ausstellen.
+            // Zertifikat in Blockchain speichern.
+            if (!isset($certificate->txhash)) {
+                // To-Blockchain Action
+                $actions = '<div class="m-element-action-row">';
+                $actions .= '<button class="m-element-sign-cert btn btn-secondary" value="' . $certificate->id . '">
+                <img title="' . get_string('reissue', 'mod_ilddigitalcert') .
+                    '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/sign_black_24dp.svg"> ' .
+                    get_string('toblockchain', 'mod_ilddigitalcert') . '</button>';
+                // Reissue action
+                // $actions .= html_writer::link(
+                //     new moodle_url('/mod/ilddigitalcert/teacher_view.php?id=' .
+                //         $certificate->cmid . '&reissueid=' . $certificate->id . '&action=reissue'),
+                //     '<img alt="' . get_string('reissue', 'mod_ilddigitalcert') . '" title="' . get_string('reissue', 'mod_ilddigitalcert') . '"
+                //     src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/refresh_grey_24x24.png">'
+                // );
+                $actions .= '<button class="m-element-reissue btn btn-secondary" value="' . $certificate->id . '">
+                <img title="' . get_string('reissue', 'mod_ilddigitalcert') .
+                    '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/reissue_black_24dp.svg"> Reissue
+            </button>';
+                $actions .= '</div>';
+                $row[] = $actions;
+            } else {
+                // TODO check revoked.
+                // TODO if not revoked: revoke certificate.
+                $row[] = '';
+                // TODO if revoked: unrevoke certificate.
+            }
+        }
+        $table->data[] = $row;
+    }
+
+    return html_writer::table($table);
 }
