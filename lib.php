@@ -100,8 +100,16 @@ function ilddigitalcert_delete_instance($id) {
 
 function ilddigitalcert_cm_info_dynamic(cm_info $cm) {
     global $USER, $CFG, $DB;
+    // Try to get $cm->get_user_visible() wich might throw errors in moodle versions prior to 3.9.10.
+    // $uservisible is set to true as a default.
+    $uservisible = true;
+    try {
+        $uservisible = $cm->get_user_visible();
+    } catch (\Exception $e) {
+    }
+
     // User can access the activity.
-    if ($cm->get_user_visible()) {
+    if ($uservisible) {
         if ($cm->available && !empty($cm->availability)) {
             $courseid = $cm->get_course()->id;
             $coursecontext = context_course::instance($courseid);
@@ -121,7 +129,7 @@ function ilddigitalcert_cm_info_dynamic(cm_info $cm) {
                 }
             }
             // Issue certificate.
-            require_once($CFG->dirroot.'/mod/ilddigitalcert/locallib.php');
+            require_once($CFG->dirroot . '/mod/ilddigitalcert/locallib.php');
             $certmetadata = generate_certmetadata($cm, $USER);
             // Certificate will not be issued, if user is enrolled with more than 1 enrolments.
             issue_certificate($certmetadata, $USER->id, $cm->id);
