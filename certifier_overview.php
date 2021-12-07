@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page allows a teacher to view all certificats or search for specific certificats.
- * The teacher can also view a single certificate, or sign and register them in the blockchain or to reissue them in bulk or indiviually.
+ * Prints an overview of all certificates a student has reached.
  *
  * @package     mod_ilddigitalcert
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 
 require_once(__DIR__ . '/../../config.php');
 require_once('locallib.php');
@@ -29,28 +29,31 @@ require_once(__DIR__ . '/search_certificates_form.php');
 require_once(__DIR__ . '/to_blockchain_form.php');
 require_once(__DIR__ . '/reissue_form.php');
 
-$id = required_param('id', PARAM_INT);
-$ueid = optional_param('ueid', 0, PARAM_INT);
-$view = optional_param('view', 'html', PARAM_RAW);
+$cert_json = optional_param('cert_json', null, PARAM_NOTAGS);
 
-list($course, $cm) = get_course_and_cm_from_cmid($id, 'ilddigitalcert');
+$context = context_system::instance();
 
-require_login($course, true, $cm);
+$PAGE->set_context($context);
+$PAGE->set_url('/mod/ilddigitalcert/overview.php');
+$PAGE->set_pagelayout('admin');
+$PAGE->set_title(format_string(get_string('pluginname', 'mod_ilddigitalcert')));
+$PAGE->set_heading(get_string('pluginname', 'mod_ilddigitalcert'));
 
+require_login();
 
-if (!has_capability('moodle/grade:viewall', context_course::instance($course->id))) {
-    redirect($CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $cm->id . '&ueid=' . $ueid);
+if (isguestuser()) {
+    redirect($CFG->wwwroot . '/login/');
 }
 
-$moduleinstance = $DB->get_record('ilddigitalcert', array('id' => $cm->instance), '*', MUST_EXIST);
-$context = context_module::instance($cm->id);
-
-$PAGE->set_url($CFG->wwwroot . '/mod/ilddigitalcert/teacher_view.php', array('id' => $cm->id, 'ueid' => 0));
-$PAGE->set_title(format_string($moduleinstance->name));
-$PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_context($context);
+if (!get_user_preferences('mod_ilddigitalcert_certifier', false, $USER)) {
+    redirect($CFG->wwwroot . '/mod/ilddigitalcert/overview.php');
+}
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_form.js'));
+
+// Build page.
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('overview', 'mod_ilddigitalcert'));
 
 // Reissue selected certificats.
 
@@ -68,6 +71,8 @@ if ($reissue_form_data = $reissue_form->get_data()) {
             $message = '';
             foreach ($certificates as $certificate) {
                 if ($reissueuser = $DB->get_record('user', array('id' => $certificate->userid, 'confirmed' => 1, 'deleted' => 0))) {
+
+                    list($course, $cm) = get_course_and_cm_from_cmid($certificate->cmid, 'ilddigitalcert');
                     $certmetadata = generate_certmetadata($cm, $reissueuser);
                     reissue_certificate($certmetadata, $certificate->userid, $cm->id);
 
@@ -86,14 +91,9 @@ if ($reissue_form_data = $reissue_form->get_data()) {
                 \core\notification::warning("Couldn't reissue $invalid_count certificat(s), because they where already signed and registered in the blockchain.");
             }
         }
-    } else {
-        print_r('empty slected');
     }
 } else {
-    print_r('no reissue form data');
     $reissue_form_data = (object) [
-        'id' => $id,
-        'ueid' => $ueid,
         'action' => 'reissue',
         'selected' => '[]',
     ];
@@ -148,8 +148,6 @@ if ($to_bc_form_data = $to_bc_form->get_data()) {
     }
 } else {
     $to_bc_form_data = (object) [
-        'id' => $id,
-        'ueid' => $ueid,
         'action' => 'toblockchain',
         'selected' => '[]',
         'pk' => '',
@@ -169,18 +167,22 @@ $issuedcertificates = array();
 if ($search_form_data = $search_form->get_data()) {
     if ($search_form_data->search_query || $search_form_data->search_filter) {
         $sql = 'SELECT idci.*
-            FROM {ilddigitalcert_issued} idci, {user} u
-            WHERE idci.courseid = :courseid
-            AND u.id = idci.userid';
+            FROM {ilddigitalcert_issued} idci, {user} u, {course} c
+            WHERE u.id = idci.userid
+            AND  c.id = idci.courseid';
 
-        $params = array('courseid' => $course->id);
+        $params = array();
 
         if ($search_form_data->search_query !== '') {
             $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
             $sql .= ' AND (' . $DB->sql_like($fullname, ':search1', false, false) . '
-                OR ' . $DB->sql_like('idci.name', ':search2', false, false) . ')';
+            OR ' . $DB->sql_like('c.shortname', ':search2', false, false) . '
+            OR ' . $DB->sql_like('c.fullname', ':search3', false, false) . '
+                OR ' . $DB->sql_like('idci.name', ':search4', false, false) . ')';
             $params['search1'] = '%' . $search_form_data->search_query . '%';
             $params['search2'] = '%' . $search_form_data->search_query . '%';
+            $params['search3'] = '%' . $search_form_data->search_query . '%';
+            $params['search4'] = '%' . $search_form_data->search_query . '%';
         }
 
         if ($search_form_data->search_filter === 'only_bc') {
@@ -191,14 +193,28 @@ if ($search_form_data = $search_form->get_data()) {
 
         $issuedcertificates = $DB->get_records_sql($sql, $params);
     } else {
-        $issuedcertificates = $DB->get_records('ilddigitalcert_issued', array('courseid' => $course->id));
+        if ($cert_json) {
+            $cert_list = json_decode($cert_json);
+
+            list($insql, $inparams) = $DB->get_in_or_equal($cert_list);
+            $sql = "SELECT * FROM {ilddigitalcert_issued} WHERE id $insql";
+            $issuedcertificates = $DB->get_records_sql($sql, $inparams);
+        } else {
+            $issuedcertificates = $DB->get_records('ilddigitalcert_issued');
+        }
     }
 } else {
-    $issuedcertificates = $DB->get_records('ilddigitalcert_issued', array('courseid' => $course->id));
+    if ($cert_json) {
+        $cert_list = json_decode($cert_json);
+
+        list($insql, $inparams) = $DB->get_in_or_equal($cert_list);
+        $sql = "SELECT * FROM {ilddigitalcert_issued} WHERE id $insql";
+        $issuedcertificates = $DB->get_records_sql($sql, $inparams);
+    } else {
+        $issuedcertificates = $DB->get_records('ilddigitalcert_issued');
+    }
 
     $search_form_data = (object) [
-        'id' => $id,
-        'ueid' => $ueid,
         'search_query' => '',
         'search_filter' => ''
     ];
@@ -207,20 +223,12 @@ if ($search_form_data = $search_form->get_data()) {
 // Set default data (if any).
 $search_form->set_data($search_form_data);
 
-
-
-// Build page.
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('pluginname', 'mod_ilddigitalcert'));
-
 $template_data = array(
-    'certificate_name' => $moduleinstance->name,
-    'course_name' => $course->fullname,
     'to_bc_form' => $to_bc_form->render(),
     'reissue_form' => $reissue_form->render(),
     'search_form' => $search_form->render(),
     'search_count' => count($issuedcertificates),
-    'certs_table' => \mod_ilddigitalcert\manager::render_certs_table($issuedcertificates, true, $course->id),
+    'certs_table' => \mod_ilddigitalcert\manager::render_certs_table($issuedcertificates, true),
 );
 
 echo $OUTPUT->render_from_template('mod_ilddigitalcert/teacher_view', $template_data);

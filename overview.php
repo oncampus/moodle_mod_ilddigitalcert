@@ -22,6 +22,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 require_once(__DIR__ . '/../../config.php');
 require_once('locallib.php');
 require_once(__DIR__ . '/search_certificates_form.php');
@@ -43,7 +44,11 @@ if (isguestuser()) {
     redirect($CFG->wwwroot . '/login/');
 }
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_form.js'));
+if (get_user_preferences('mod_ilddigitalcert_certifier', false, $USER)) {
+    redirect($CFG->wwwroot . '/mod/ilddigitalcert/certifier_overview.php');
+}
+
+// $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_form.js'));
 
 
 // Instantiate search form.
@@ -100,7 +105,7 @@ echo $OUTPUT->heading(get_string('overview', 'mod_ilddigitalcert'));
 $template_data = array(
     'search_form' => $search_form->render(),
     'search_count' => count($issuedcertificates),
-    'certs_table' => mod_ilddigitalcerts_render_certs_table($issuedcertificates),
+    'certs_table' => \mod_ilddigitalcert\manager::render_certs_table($issuedcertificates, false, null, $USER->id),
 );
 
 echo $OUTPUT->render_from_template('mod_ilddigitalcert/overview', $template_data);

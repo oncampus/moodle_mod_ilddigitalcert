@@ -36,86 +36,146 @@ require_once($CFG->dirroot . '/mod/ilddigitalcert/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-    /**
-     * Returns a html table listing all the given certificates.
-     *
-     * @param array $certs Certifiactes.
-     * @param bool $show_actions Enables column with action buttons/links.
-     * @return string Html table.
-     */
-    public static function get_certs_table($certs, $show_actions = true) {
-        global $DB, $CFG;
 
-        // Setup table structure.
+    /**
+     * Renders the given certificates array as a html table.
+     *
+     * @param array $certificates Certificates to be listed in the table.
+     * @param int $course
+     * @return string HTML representation of a certificates table.
+     */
+    static function render_certs_table($certificates, $show_actions = false, $courseid = null, $userid = null) {
+        global $CFG, $DB;
+
+        if (!$certificates || empty($certificates)) {
+            return '';
+        }
+
+        // Create certificates table.
         $table = new \html_table();
-        $table->head = array(get_string('status'),
-            get_string('title', 'mod_ilddigitalcert'),
-            get_string('recipient', 'mod_ilddigitalcert'),
-            get_string('startdate', 'mod_ilddigitalcert'),
-        );
-        $align = array('left ', 'left', 'left', 'left');
-        if($show_actions) {
-            $table->head[] = get_string('actions');
+        $table->attributes['class'] = 'generaltable m-element-certs-table';
+
+
+        if ($show_actions === true) {
+            $head[] = \html_writer::checkbox('check-all', null, false, null, array('id' => 'm-element-select-all-certs'));
             $align[] = 'left';
         }
-        $table->attributes['class'] = 'generaltable';
 
+        $head[] = get_string('status');
+        $align[] = 'center';
+        $head[] = get_string('title', 'mod_ilddigitalcert');
+        $align[] = 'left';
 
-        // Format and add data to table.
-        foreach ($certs as $cert) {
-            if(!isset($cert->enrolmentid)) {
-                $ueid = 0;
-            } else {
-                $ueid = $cert->enrolmentid;
+        if (!\is_scalar($userid)) {
+            $head[] = get_string('recipient', 'mod_ilddigitalcert');
+            $align[] = 'left';
+        }
+        if (!\is_scalar($courseid)) {
+            $head[] = get_string('course');
+            $align[] = 'left';
+        }
+
+        $head[] = get_string('startdate', 'mod_ilddigitalcert');
+        $align[] = 'left';
+
+        if ($show_actions === true) {
+            $bulk_options = array(
+                '' => get_string('selectanaction'),
+                'toblockchain' => get_string('toblockchain', 'mod_ilddigitalcert'),
+                'reissue' => get_string('reissue', 'mod_ilddigitalcert'),
+            );
+            $bulk_actions = \html_writer::select($bulk_options, 'bulk_actions', 'selectanaction', null, array('id' => 'm-element-bulk-actions', 'class' => 'form-control'));
+            $bulk_actions .= \html_writer::empty_tag('input', array('id' => 'm-element-bulk-actions__button', 'class' => ' btn btn-secondary', 'type' => 'button', 'value' => get_string('go')));
+
+            $head[] = $bulk_actions;
+            $align[] = 'left';
+        }
+
+        $table->head  = $head;
+        $table->align = $align;
+
+        // Fill table.
+        foreach ($certificates as $certificate) {
+            $row = array();
+            if ($show_actions === true) {
+                $row[] = \html_writer::checkbox('select-cert' . $certificate->id, $certificate->id, false, null, array('class' => 'm-element-select-cert'));
             }
-            $course = $cert->courseid;
-
-            $data = array();
-            $icon = '<img height="32px" title="'.get_string('pluginname', 'mod_ilddigitalcert').'"
-              src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
-            if (isset($cert->txhash)) {
-                $icon = '<img height="32px" title="'.get_string('registered_and_signed', 'mod_ilddigitalcert').'"
-                  src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain-block.svg">';
+            $icon = '<img height="32px" title="' . get_string('pluginname', 'mod_ilddigitalcert') . '"
+        src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
+            if (isset($certificate->txhash)) {
+                $icon = '<img height="32px" title="' . get_string('registered_and_signed', 'mod_ilddigitalcert') . '"
+            src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-block.svg">';
             }
-            $data[] = $icon;
-            $user = $DB->get_record_sql('select id, firstname, lastname from {user} where id = :id ',
-              array('id' => $cert->userid));
+            $row[] = $icon;
+
 
             // TODO Zertifikat anzeigen.
-            $data[] = \html_writer::link(
-                $CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.
-                  $cert->cmid.'&issuedid='.$cert->id.'&ueid='.$ueid,
-                $cert->name);
+            $row[] = \html_writer::link(
+                $CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' .
+                    $certificate->cmid . '&issuedid=' . $certificate->id . '&ueid=' . ($certificate->enrolmentid ?? 0),
+                $certificate->name
+            );
 
-            $data[] = \html_writer::link(
-                new \moodle_url('/user/view.php?id='.
-                $user->id.'&course='.$course.'&ueid='.$ueid), $user->firstname.' '.$user->lastname);
-            $data[] = date('d.m.Y - H:i', $cert->timecreated);
 
-            if($show_actions) {
+            if (!\is_scalar($userid)) {
+                $user = $DB->get_record_sql(
+                    'select id, firstname, lastname from {user} where id = :id ',
+                    array('id' => $certificate->userid)
+                );
+                $row[] = \html_writer::link(
+                    new \moodle_url('/user/view.php?id=' .
+                        $user->id  . ($courseid ? ('&course=' . $courseid) : '') . '&ueid=' . ($certificate->enrolmentid ?? 0)),
+                    $user->firstname . ' ' . $user->lastname
+                );
+            }
+
+            if (!\is_scalar($courseid)) {
+                $course = $DB->get_record('course', array('id' => $certificate->courseid), 'id, shortname', IGNORE_MISSING);
+                $row[] = \html_writer::link(
+                    new \moodle_url('/course/view.php?id=' . $course->id),
+                    $course->shortname
+                );
+            }
+
+            $row[] = date('d.m.Y - H:i', $certificate->timecreated);
+
+            if ($show_actions === true) {
                 // TODO Zertifikat neu ausstellen.
                 // Zertifikat in Blockchain speichern.
-                if (!isset($cert->txhash)) {
-                    $data[] = '<a class="myBtn" href="'. new \moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$cert->id.'&ueid='.$ueid) . '">'.
-                    get_string('toblockchain', 'mod_ilddigitalcert').'</a> '.
-                    \html_writer::link(
-                        new \moodle_url('/mod/ilddigitalcert/view.php?id='.
-                        $cert->cmid.'&reissueid='.$cert->id.'&action=reissue'),
-                        '<img alt="reissue certificate" title="reissue certificate"
-                        src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/refresh_grey_24x24.png">');
+                if (!isset($certificate->txhash)) {
+                    // To-Blockchain Action
+                    $actions = '<div class="m-element-action-row">';
+                    $actions .= '<button class="m-element-sign-cert btn btn-secondary" value="' . $certificate->id . '">
+                <img title="' . get_string('reissue', 'mod_ilddigitalcert') .
+                        '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/sign_black_24dp.svg"> ' .
+                        get_string('toblockchain', 'mod_ilddigitalcert') . '</button>';
+                    // Reissue action
+                    // $actions .= html_writer::link(
+                    //     new moodle_url('/mod/ilddigitalcert/teacher_view.php?id=' .
+                    //         $certificate->cmid . '&reissueid=' . $certificate->id . '&action=reissue'),
+                    //     '<img alt="' . get_string('reissue', 'mod_ilddigitalcert') . '" title="' . get_string('reissue', 'mod_ilddigitalcert') . '"
+                    //     src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/refresh_grey_24x24.png">'
+                    // );
+                    $actions .= '<button class="m-element-reissue btn btn-secondary" value="' . $certificate->id . '">
+                <img title="' . get_string('reissue', 'mod_ilddigitalcert') .
+                        '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/reissue_black_24dp.svg"> Reissue
+            </button>';
+                    $actions .= '</div>';
+                    $row[] = $actions;
                 } else {
                     // TODO check revoked.
                     // TODO if not revoked: revoke certificate.
-                    $data[] = '';
+                    $row[] = '';
                     // TODO if revoked: unrevoke certificate.
                 }
             }
 
-            $table->data[] = $data;
+            $table->data[] = $row;
         }
 
         return \html_writer::table($table);
     }
+
 
     /**
      * Returns an object containing all relevant data to send a moodle notification.
@@ -127,8 +187,7 @@ class manager {
      * @param string $text
      * @return object Message object.
      */
-    public static function get_message($name, $to_user, $subject, $html, $text) {
-        global $DB, $OUTPUT, $CFG;
+    public static function get_message($name, $to_user, $subject, $html, $text, $contexturl = null, $contexturlname = null) {
 
         $message = new \core\message\message();
         $message->component = 'mod_ilddigitalcert'; // Your plugin's name
@@ -144,8 +203,12 @@ class manager {
 
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message
 
-        // $message->contexturl = (new \moodle_url('/course/view.php?id=' . $this->get_context()->instanceid))->out(false); // A relevant URL for the notification
-        // $message->contexturlname = 'To Course';
+        if ($contexturl) {
+            $message->contexturl = $contexturl; // A relevant URL for the notification
+        }
+        if ($contexturlname) {
+            $message->contexturlname = $contexturlname;
+        }
 
         return $message;
     }

@@ -39,13 +39,17 @@ Example context (json):
 }}
 
 {{> mod_ilddigitalcert/styles}}
+{{#certificate_name}}
 <p>
     <a href="{{ preview_url }}">{{#str}} preview, mod_ilddigitalcert {{/str}} "{{ certificate_name }}"</a>
 </p>
+{{/certificate_name}}
 
+{{#course_name}}
 <h1>
     {{#str}} certificate_overview, mod_ilddigitalcert {{/str}} {{ course_name }}
 </h1>
+{{/course_name}}
 
 {{{ search_form }}}
 

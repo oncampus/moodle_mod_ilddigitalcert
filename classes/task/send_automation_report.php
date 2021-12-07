@@ -56,14 +56,14 @@ class send_automation_report extends \core\task\scheduled_task {
         global $DB;
 
         // Get courses where automation is enabled.
-        $auto_courses = $DB->get_record("ilddigitalcert", array("automation" => 1), "course", IGNORE_MISSING);
+        if (!$auto_courses = $DB->get_record("ilddigitalcert", array("automation" => 1), "course", IGNORE_MISSING)) {
+            return;
+        }
+
         print_r("        auto_courses: ");
         print_r($auto_courses);
-        $courses = [];
-        foreach ($auto_courses as $c) {
-            $courses[] = $c;
-        }
-        list($insql, $inparams) = $DB->get_in_or_equal($courses);
+
+        list($insql, $inparams) = $DB->get_in_or_equal($auto_courses);
 
         // Get certificats that have been automatically written to the blockchain in the last 24 hours.
         $time = new \DateTime("now", \core_date::get_user_timezone_object());
@@ -78,7 +78,7 @@ class send_automation_report extends \core\task\scheduled_task {
         $issued_certificats = $DB->get_records_sql($issued_certificats_sql, array_merge(array($since), $inparams), IGNORE_MISSING);
         print_r("        issued_certificats: ");
         print_r($issued_certificats);
-        if(empty($issued_certificats)) {
+        if (empty($issued_certificats)) {
             // No need to send messages if there aren't any certificats to sign.
             return;
         }
@@ -90,7 +90,7 @@ class send_automation_report extends \core\task\scheduled_task {
         $subject = \get_string('automation_report:subject', 'mod_ilddigitalcert');
 
         // Send message to every certifier.
-        foreach($certifiers as $certifier) {
+        foreach ($certifiers as $certifier) {
             $last_message_sql = "SELECT MAX(timecreated)
                 FROM mdl_notifications
                 WHERE useridto = :userid
@@ -116,58 +116,63 @@ class send_automation_report extends \core\task\scheduled_task {
             print_r($courses_responsible_for);
 
             // Sort certs into categorys for every individual course.
-            foreach($courses_responsible_for as $course) {
-                if(!$course->cert_name) {
+            foreach ($courses_responsible_for as $course) {
+                if (!$course->cert_name) {
                     continue;
                 }
 
                 // Map certs to course.
                 $certs_of_course = array();
-                foreach($issued_certificats as $key => $cert) {
-                    if($cert->courseid == $course->id) {
+                $certids = array();
+                foreach ($issued_certificats as $id => $cert) {
+                    if ($cert->courseid == $course->id) {
                         $certs_of_course[] = $cert;
+                        $certids[] = $id;
                         // Unset certs that fit into a category. So there are only certs left in $other_certs
                         // that didn't fit into another category.
-                        unset($other_certs[$key]);
+                        unset($other_certs[$id]);
                     }
                 }
 
-                if(!empty($certs_of_course)) {
+                if (!empty($certs_of_course)) {
                     $certs_responsible_for[$course->id] = $certs_of_course;
                 }
             }
 
             // Create tables for cert categories and add them to $message_html.
-            if(!empty($certs_responsible_for)) {
-                foreach($certs_responsible_for as $course => $certs) {
-                    foreach($courses_responsible_for as $c) {
-                        if($c->id == $course) {
+            if (!empty($certs_responsible_for)) {
+                foreach ($certs_responsible_for as $course => $certs) {
+                    foreach ($courses_responsible_for as $c) {
+                        if ($c->id == $course) {
                             $message_html .= '</br>';
                             $message_html .= '<h3>' . $c->fullname . ':</h3>';
                             break;
                         }
                     }
-                    $message_html .= \mod_ilddigitalcert\manager::get_certs_table($certs, false);
+                    $message_html .= \mod_ilddigitalcert\manager::render_certs_table($certs);
                     $message_html .= '</br>';
                 }
             }
-            if(!empty($other_certs)) {
+            if (!empty($other_certs)) {
                 $message_html .= '<h3>' . \get_string('automation_report:other_certs', 'mod_ilddigitalcert') . '</h3>';
-                $message_html .= \mod_ilddigitalcert\manager::get_certs_table($other_certs, false);
+                $message_html .= \mod_ilddigitalcert\manager::render_certs_table($other_certs);
                 $message_html .= '</br>';
             }
             $message_html .= \get_string('automation_report:end', 'mod_ilddigitalcert');
 
             $message_text = \html_to_text($message_html);
 
-            // Create and send message.
-            $message = \mod_ilddigitalcert\manager::get_message(self::MESSAGE_NAME, $to_user, $subject, $message_html, $message_text);
-            try{
+            // Create contexturl.
+            $contexturl = (new \moodle_url('/mod/ilddigitalcert/certifier_overview.php?cert_json=' . \json_encode($certids)))->out(false);
+            $contexturlname = 'Manage signed certificats';
+
+            $message = \mod_ilddigitalcert\manager::get_message(self::MESSAGE_NAME, $to_user, $subject, $message_html, $message_text, $contexturl, $contexturlname);
+            try {
                 $messageid = message_send($message);
             } catch (\moodle_exception $e) {
                 print_r($e->getMessage());
             }
-            if($messageid) {
+            if ($messageid) {
                 print_r("       sent successfull: ");
                 print_r($message_text);
             } else {
