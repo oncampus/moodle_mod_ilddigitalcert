@@ -35,18 +35,18 @@ $string['ilddigitalcertname'] = 'Name';
 $string['add_certifier'] = 'Add certifier';
 
 $string['automation'] = 'Automation';
-$string['automation_help'] = 'If automation is active, certificats will be signed and written to the blockchain automatically by the selected certifier.';
-$string['automation_report:subject'] = 'Automatically signed certificats';
+$string['automation_help'] = 'If automation is active, certificates will be signed and written to the blockchain automatically by the selected certifier.';
+$string['automation_report:subject'] = 'Automatically signed certificates';
 $string['automation_report:intro'] = '<p>Hello {$a},</p>
-<p>following certificats were recently signed automatically and written to the blockchain successfully:</p>';
-$string['automation_report:other_certs'] = 'Other certificats';
+<p>following certificates were recently signed automatically and written to the blockchain successfully:</p>';
+$string['automation_report:other_certs'] = 'Other certificates';
 $string['automation_report:end'] = '';
 
 $string['auto_certifier'] = 'Automatic certifier';
-$string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificats will be automatically signed.';
+$string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificates will be automatically signed.';
 $string['auto_pk'] = 'Private key of certifier';
 $string['auto_pk_help'] = 'Set the private key of the selected certifier here.';
-$string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificats will be automatically signed.';
+$string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificates will be automatically signed.';
 $string['block_heading'] = 'Digital certificates in the blockchain';
 $string['block_summary'] = '<p>Verify the authenticity of your digital certificates here.</ p>
 <p>Simply drag and drop your certificate (PDF or BCRT file) into the field.</ p>
@@ -109,10 +109,10 @@ $string['invalid'] = 'Invalid certificate';
 $string['invalid_format'] = 'Invalid file format';
 $string['invalid_pk_format'] = 'The given private key is invalid';
 
-$string['issuedcerts_report:subject'] = 'Issued certificats waiting to be signed';
+$string['issuedcerts_report:subject'] = 'Issued certificates waiting to be signed';
 $string['issuedcerts_report:intro'] = '<p>Hello {$a},</p>
-<p>following certificats were recently issued, but still need to be signed:</p>';
-$string['issuedcerts_report:other_certs'] = 'Other certificats';
+<p>following certificates were recently issued, but still need to be signed:</p>';
+$string['issuedcerts_report:other_certs'] = 'Other certificates';
 $string['issuedcerts_report:end'] = '';
 
 $string['issuer'] = 'Issuer';
@@ -132,6 +132,8 @@ $string['issuerdescription'] = 'Description';
 $string['json'] = 'Metadata';
 $string['subject_new_certificate'] = 'Neues digitales Zertifikat';
 $string['subject_new_digital_certificate'] = 'Neues digitales Zertifikat in der Blockchain';
+$string['messageprovider:ilddigitalcert_issuedcerts_report'] = 'Recently issued certificates';
+$string['messageprovider:ilddigitalcert_automation_report'] = 'Automatically signed certificates';
 $string['message_new_certificate'] = 'Hallo {$a->fullname},
 
 Sie haben ein digitales Zertifikat erhalten.
@@ -222,15 +224,15 @@ Please check if you are logged in correctly.';
 $string['not_installed_correctly'] = 'Das Plugin "Digitale Zertifikate" wurde nicht vollständig installiert.
 Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
 $string['not_logged_in'] = 'You are not logged in.';
-$string['only_blockchain'] = 'Registered certificats';
-$string['only_nonblockchain'] = 'Unregistered certificats';
+$string['only_blockchain'] = 'Registered certificates';
+$string['only_nonblockchain'] = 'Unregistered certificates';
 $string['overview'] = 'Overview';
 $string['overview_intro'] = 'Hier sehen Sie eine Übersicht über alle erworbenen Zertifikate aus allen Kursen, in die Sie eingeschrieben sind oder waren.';
 $string['pdf'] = 'PDF';
 $string['preview'] = 'Vorschau für das Zertifikat';
 $string['recipient'] = 'Recipient';
 $string['reissue'] = 'Reissue certificate';
-$string['reissue_confirmation'] = 'Do you want to reissue following certificats?';
+$string['reissue_confirmation'] = 'Do you want to reissue following certificates?';
 $string['registered_and_signed'] = 'Das Zertifikat ist in der Blockchain registriert und signiert';
 $string['scan_qr_code'] = 'To send your digital certificate to your wallet, you have to establish a connection first. To do this, open the app and scan the qr-code. Afterwards follow the instructions in the App.';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
@@ -246,7 +248,7 @@ um die Smart Contracts auszuführen, die verwendet werden um Zertifikate und Zer
 $string['settings_headerconfig'] = 'Blockchain Einstellungen';
 $string['settings_headerconfig_general'] = 'Allgemeine Einstellungen';
 $string['sign_cert'] = 'Sign and register certificate in the blockchain';
-$string['sign_confirmation'] = 'Do you want to sing and register following certificats?';
+$string['sign_confirmation'] = 'Do you want to sing and register following certificates?';
 $string['sign_delete_certifier_with_pk'] = 'Um den Zertifizierer aus der Blockchain zu entfernen, muss dieser Vorgang mit dem Private Key einer Zertifizierungsstelle signiert werden.';
 $string['sign_add_certifier_with_pk'] = 'Hinzufügen eines neuen Zertifizierers mit Private Key signieren';
 $string['sign_with_pk'] = 'To register a certificate in the blockchain the certificate has to be signed with the private key of a qualified certifier.';

@@ -15,13 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prints an overview of all certificates a student has reached.
+ * Prints an overview of all certificates a student has received.
  *
  * @package     mod_ilddigitalcert
- * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
+ * @copyright   2023, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 require_once(__DIR__ . '/../../config.php');
 require_once('locallib.php');
@@ -55,7 +54,7 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_fo
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('overview', 'mod_ilddigitalcert'));
 
-// Reissue selected certificats.
+// Reissue selected certificates.
 
 // Instantiate reissue form.
 $reissue_form = new mod_ilddigialcert_reissue_form();
@@ -103,7 +102,7 @@ if ($reissue_form_data = $reissue_form->get_data()) {
 $reissue_form->set_data($reissue_form_data);
 
 
-// Sign and register selected certificats in the blockchain.
+// Sign and register selected certificates in the blockchain.
 // Instantiate to_blockchain form.
 $to_bc_form = new mod_ilddigialcert_to_blockchain_form();
 

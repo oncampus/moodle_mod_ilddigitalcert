@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page allows a teacher to view all certificats or search for specific certificats.
+ * This page allows a teacher to view all certificates or search for specific certificates.
  * The teacher can also view a single certificate, or sign and register them in the blockchain or to reissue them in bulk or indiviually.
  *
  * @package     mod_ilddigitalcert
@@ -52,7 +52,7 @@ $PAGE->set_context($context);
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_form.js'));
 
-// Reissue selected certificats.
+// Reissue selected certificates.
 
 // Instantiate reissue form.
 $reissue_form = new mod_ilddigialcert_reissue_form();
@@ -103,7 +103,7 @@ if ($reissue_form_data = $reissue_form->get_data()) {
 $reissue_form->set_data($reissue_form_data);
 
 
-// Sign and register selected certificats in the blockchain.
+// Sign and register selected certificates in the blockchain.
 // Instantiate to_blockchain form.
 $to_bc_form = new mod_ilddigialcert_to_blockchain_form();
 

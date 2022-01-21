@@ -38,7 +38,7 @@ $string['automation_help'] = 'Wenn die Automatisierung aktiviert ist, werden die
 $string['automation_report:subject'] = 'Automatisch signierte Zertifikate';
 $string['automation_report:intro'] = '<p>Hi {$a},</p>
 <p>folgende Zertifikate wurden kürzlich automatisch signiert und erfolgreich in die Blockchain geschrieben:</p>';
-$string['automation_report:other_certs'] = 'Other certificats';
+$string['automation_report:other_certs'] = 'Other certificates';
 $string['automation_report:end'] = '';
 
 $string['auto_certifier'] = 'Automatischer Zertifizierer';
@@ -130,6 +130,8 @@ $string['issuerdescription'] = 'Beschreibung';
 $string['json'] = 'Metadaten';
 $string['subject_new_certificate'] = 'Neues digitales Zertifikat';
 $string['subject_new_digital_certificate'] = 'Neues digitales Zertifikat in der Blockchain';
+$string['messageprovider:ilddigitalcert_issuedcerts_report'] = 'Kürzlich ausgestellte Zertifikate';
+$string['messageprovider:ilddigitalcert_automation_report'] = 'Automatisch signierte Zertifikate';
 $string['message_new_certificate'] = 'Hallo {$a->fullname},
 
 Sie haben ein digitales Zertifikat erhalten.

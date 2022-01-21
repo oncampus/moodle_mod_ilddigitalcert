@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Sends a report that informs certifiers about certificats that have been signed and
+ * Sends a report that informs certifiers about certificates that have been signed and
  * written to  the blockchain automatically since the last report.
  *
  * @package    mod_ilddigitalcert
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/ilddigitalcert/locallib.php');
 
 /**
- * Sends a report that informs certifiers about certificats that have been signed and
+ * Sends a report that informs certifiers about certificates that have been signed and
  * written to  the blockchain automatically since the last report.
  *
  * @package   mod_ilddigitalcert
@@ -65,21 +65,21 @@ class send_automation_report extends \core\task\scheduled_task {
 
         list($insql, $inparams) = $DB->get_in_or_equal($auto_courses);
 
-        // Get certificats that have been automatically written to the blockchain in the last 24 hours.
+        // Get certificates that have been automatically written to the blockchain in the last 24 hours.
         $time = new \DateTime("now", \core_date::get_user_timezone_object());
         $time->sub(new \DateInterval("P1D"));
         $since = $time->getTimestamp();
 
-        $issued_certificats_sql = "SELECT *
+        $issued_certificates_sql = "SELECT *
             FROM mdl_ilddigitalcert_issued
             WHERE txhash IS NOT NULL
             AND timemodified > ?
             AND courseid $insql;";
-        $issued_certificats = $DB->get_records_sql($issued_certificats_sql, array_merge(array($since), $inparams), IGNORE_MISSING);
-        print_r("        issued_certificats: ");
-        print_r($issued_certificats);
-        if (empty($issued_certificats)) {
-            // No need to send messages if there aren't any certificats to sign.
+        $issued_certificates = $DB->get_records_sql($issued_certificates_sql, array_merge(array($since), $inparams), IGNORE_MISSING);
+        print_r("        issued_certificates: ");
+        print_r($issued_certificates);
+        if (empty($issued_certificates)) {
+            // No need to send messages if there aren't any certificates to sign.
             return;
         }
 
@@ -102,7 +102,7 @@ class send_automation_report extends \core\task\scheduled_task {
 
             // Set categorys for certs.
             $certs_responsible_for = array();
-            $other_certs = $issued_certificats;
+            $other_certs = $issued_certificates;
 
             // Get courses, for whom they are responsible.
             // Meaning ourses, they are enroled to and that have ilddigitalcert activities.
@@ -124,7 +124,7 @@ class send_automation_report extends \core\task\scheduled_task {
                 // Map certs to course.
                 $certs_of_course = array();
                 $certids = array();
-                foreach ($issued_certificats as $id => $cert) {
+                foreach ($issued_certificates as $id => $cert) {
                     if ($cert->courseid == $course->id) {
                         $certs_of_course[] = $cert;
                         $certids[] = $id;
@@ -164,7 +164,7 @@ class send_automation_report extends \core\task\scheduled_task {
 
             // Create contexturl.
             $contexturl = (new \moodle_url('/mod/ilddigitalcert/certifier_overview.php?cert_json=' . \json_encode($certids)))->out(false);
-            $contexturlname = 'Manage signed certificats';
+            $contexturlname = 'Manage signed certificates';
 
             $message = \mod_ilddigitalcert\manager::get_message(self::MESSAGE_NAME, $to_user, $subject, $message_html, $message_text, $contexturl, $contexturlname);
             try {

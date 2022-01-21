@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Sends a report that should remind certifiers about recently issued certificats,
+ * Sends a report that should remind certifiers about recently issued certificates,
  * that are waiting to be signed and written to the blockchain.
  *
  * @package    mod_ilddigitalcert
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/ilddigitalcert/locallib.php');
 
 /**
- * Sends a report that should remind certifiers about recently issued certificats,
+ * Sends a report that should remind certifiers about recently issued certificates,
  * taht are waiting to be signed and written to the blockchain.
  *
  * @package   mod_ilddigitalcert
@@ -56,11 +56,11 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
         global $DB;
 
         // Get issued certificates waiting to be signed.
-        $issued_certificats = $DB->get_records('ilddigitalcert_issued', array('inblockchain' => false));
-        print_r("        issued_certificats: ");
-        print_r($issued_certificats);
-        if (empty($issued_certificats)) {
-            // No need to send messages if there aren't any certificats to sign.
+        $issued_certificates = $DB->get_records('ilddigitalcert_issued', array('inblockchain' => false));
+        print_r("        issued_certificates: ");
+        print_r($issued_certificates);
+        if (empty($issued_certificates)) {
+            // No need to send messages if there aren't any certificates to sign.
             return;
         }
 
@@ -78,7 +78,7 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
 
             // Set categorys for certs.
             $certs_responsible_for = array();
-            $other_certs = $issued_certificats;
+            $other_certs = $issued_certificates;
 
             // Get courses, for whom they are responsible.
             // Meaning ourses, they are enroled to and that have ilddigitalcert activities.
@@ -100,7 +100,7 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
                 // Map certs to course.
                 $certs_of_course = array();
                 $certids = array();
-                foreach ($issued_certificats as $id => $cert) {
+                foreach ($issued_certificates as $id => $cert) {
                     if ($cert->courseid == $course->id) {
                         $certs_of_course[] = $cert;
                         $certids[] = $id;
@@ -143,7 +143,7 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
 
             // Create contexturl.
             $contexturl = (new \moodle_url('/mod/ilddigitalcert/certifier_overview.php?cert_json=' . \json_encode($certids)))->out(false);
-            $contexturlname = 'Sign issued certificats';
+            $contexturlname = 'Sign issued certificates';
 
             $message = \mod_ilddigitalcert\manager::get_message(self::MESSAGE_NAME, $to_user, $subject, $message_html, $message_text, $contexturl, $contexturlname);
             try {
