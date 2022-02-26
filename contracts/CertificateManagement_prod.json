@@ -1,0 +1,395 @@
+{
+	"contract_name": "CertificateManagement",
+	"contract_address": "0x8a7e3622D3f200aBb1B00D25126f86256c7368dB",
+	"contract_abi": [
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "isActive",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "certificateHash",
+					"type": "bytes32"
+				},
+				{
+					"name": "newInstitution",
+					"type": "address"
+				}
+			],
+			"name": "transferCertificate",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "certificateHash",
+					"type": "bytes32"
+				}
+			],
+			"name": "isValid",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+			],
+			"name": "renounceOwnership",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "owner",
+			"outputs": [
+				{
+					"name": "",
+					"type": "address"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "isOwner",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+			],
+			"name": "retire",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "certificateHash",
+					"type": "bytes32"
+				}
+			],
+			"name": "revokeCertificate",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "certificateHash",
+					"type": "bytes32"
+				},
+				{
+					"name": "startingDate",
+					"type": "uint256"
+				},
+				{
+					"name": "endingDate",
+					"type": "uint256"
+				}
+			],
+			"name": "storeCertificate",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "im",
+					"type": "address"
+				}
+			],
+			"name": "updateIdentityManagement",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "transferOwnership",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "certificateHash",
+					"type": "bytes32"
+				}
+			],
+			"name": "getCertificate",
+			"outputs": [
+				{
+					"name": "",
+					"type": "address"
+				},
+				{
+					"name": "",
+					"type": "bytes32"
+				},
+				{
+					"name": "",
+					"type": "address"
+				},
+				{
+					"name": "",
+					"type": "bytes32"
+				},
+				{
+					"name": "",
+					"type": "uint256[2]"
+				},
+				{
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "certificateHash",
+					"type": "bytes32"
+				}
+			],
+			"name": "reactivateCertificate",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"name": "es",
+					"type": "address"
+				},
+				{
+					"name": "im",
+					"type": "address"
+				}
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "certifier",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "certificate",
+					"type": "bytes32"
+				},
+				{
+					"indexed": false,
+					"name": "startingDate",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"name": "endingDate",
+					"type": "uint256"
+				}
+			],
+			"name": "CertificateStored",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "certifier",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "certificate",
+					"type": "bytes32"
+				},
+				{
+					"indexed": false,
+					"name": "revocationDate",
+					"type": "uint256"
+				}
+			],
+			"name": "CertificateRevoked",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "certifier",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "certificate",
+					"type": "bytes32"
+				}
+			],
+			"name": "CertificateReactivated",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "certifier",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "certificate",
+					"type": "bytes32"
+				},
+				{
+					"indexed": false,
+					"name": "receivingInstitution",
+					"type": "address"
+				}
+			],
+			"name": "CertificateTransferred",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"name": "subject",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "object",
+					"type": "address"
+				}
+			],
+			"name": "Retired",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "previousOwner",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "OwnershipTransferred",
+			"type": "event"
+		}
+	],
+	"transaction_hash": "0x9d362752dbcb8f5af258d58cc634af6ace9a5aceeecd1943c1e473dccfc0ac48"
+}
