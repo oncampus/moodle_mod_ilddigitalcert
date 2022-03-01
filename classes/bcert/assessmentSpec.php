@@ -14,23 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('mySimpleXMLElement.php');
-
 /**
- * A AssessmentSpec object represents data that is essential for both
+ * A assessmentSpec object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
  *
  * @package     mod_ilddigitalcert
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class AssessmentSpec
+class assessmentSpec
 {
     /**
-     * @var  int counter that gets incremented with every AssessmentSpec object that gets created, used to generate a unique id.
+     * @var  int counter that gets incremented with every assessmentSpec object that gets created, used to generate a unique id.
      */
     private static $count = 0;
 
@@ -59,7 +58,7 @@ class AssessmentSpec
      */
     private $date = "";
 
-     /**
+    /**
      * Returns id.
      *
      * @return string
@@ -76,15 +75,15 @@ class AssessmentSpec
     {
     }
 
-     /**
-     * Creates a AssessmentSpec Object based on an edci certificate.
+    /**
+     * Creates a assessmentSpec Object based on an edci certificate.
      *
-     * @param MySimpleXMLElement $xml Contains the assessment specification information in edci format.
-     * @return AssessmentSpec
+     * @param mySimpleXMLElement $xml Contains the assessment specification information in edci format.
+     * @return assessmentSpec
      */
     public static function from_edci($xml)
     {
-        $new = new AssessmentSpec();
+        $new = new assessmentSpec();
         $spec_xml = $xml->assessmentSpecificationReferences->assessmentSpecification;
         $new->id = $spec_xml['id'];
         $new->title = (string) $spec_xml->title->text;
@@ -95,20 +94,20 @@ class AssessmentSpec
     }
 
     /**
-     * Creates a AssessmentSpec Object based on an openBadge certificate.
+     * Creates a assessmentSpec Object based on an openBadge certificate.
      *
-     * @param MySimpleXMLElement $json Contains the assessment specification information in openBadge format.
-     * @return AssessmentSpec
+     * @param mySimpleXMLElement $json Contains the assessment specification information in openBadge format.
+     * @return assessmentSpec
      */
     public static function from_ob($json)
     {
-        $new = new AssessmentSpec();
+        $new = new assessmentSpec();
         self::$count += 1;
         $new->id = 'urn:bcert:asssessmentspec:' . self::$count;
         $new->title = $json->{'extensions:examinationRegulationsB4E'}->title;
         $new->homepage = $json->{'extensions:examinationRegulationsB4E'}->url;
         $new->identifier = $json->{'extensions:examinationRegulationsB4E'}->regulationsid;
-        $new->date = get_if_object_key_exists($json->{'extensions:examinationRegulationsB4E'}, 'date');
+        $new->date = manager::get_if_object_key_exists($json->{'extensions:examinationRegulationsB4E'}, 'date');
         return $new;
     }
 
@@ -120,7 +119,7 @@ class AssessmentSpec
      */
     public function get_ob()
     {
-        $spec = new stdClass();
+        $spec = new \stdClass();
         $spec->title = $this->title;
         $spec->regulationsid = $this->identifier;
         $spec->url = $this->homepage;
@@ -131,13 +130,13 @@ class AssessmentSpec
     }
 
     /**
-     * Returns a MySimpleXMLElement containing assessment specification data in edci format.
+     * Returns a mySimpleXMLElement containing assessment specification data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('assessmentSpecification');
+        $root = mySimpleXMLElement::create_empty('assessmentSpecification');
         $root->addAttribute('id', $this->id);
         $root->addChild('identifier', $this->identifier);
         $root->addTextNode('title', $this->title);

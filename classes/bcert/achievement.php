@@ -14,23 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('mySimpleXMLElement.php');
-
 /**
- * A Achievement object represents data that is essential for both
+ * A achievement object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards
  *
  * @package     mod_ilddigitalcert
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Achievement
+class achievement
 {
     /**
-     * @var  int counter that gets incremented with every Achievement object that gets created, used to generate a unique id.
+     * @var  int counter that gets incremented with every achievement object that gets created, used to generate a unique id.
      */
     private static $count = 0;
 
@@ -45,12 +44,12 @@ class Achievement
     private $title = "";
 
     /**
-     * @var string Assessment.
+     * @var assessment assessment.
      */
     private $assessment;
 
     /**
-     * @var string Qualification.
+     * @var qualification qualification.
      */
     private $qualification;
 
@@ -72,16 +71,16 @@ class Achievement
     }
 
 
-     /**
-     * Creates an Achievement Object based on an edci certificate.
+    /**
+     * Creates an achievement Object based on an edci certificate.
      *
-     * @param BCert $bcert BCert object that references this achievement.
-     * @param MySimpleXMLElement $xml Contains the achievement information in edci format.
-     * @return Achievement
+     * @param certificate $bcert certificate object that references this achievement.
+     * @param mySimpleXMLElement $xml Contains the achievement information in edci format.
+     * @return achievement
      */
     public static function from_edci($bcert, $xml)
     {
-        $new = new Achievement();
+        $new = new achievement();
         $new->id = $xml['id'];
         $new->title = (string) $xml->title->text;
         $new->assessment = $bcert->get_assessment();
@@ -90,15 +89,15 @@ class Achievement
     }
 
     /**
-     * Creates an Achievement Object based on an openBadge certificate.
+     * Creates an achievement Object based on an openBadge certificate.
      *
-     * @param BCert $bcert BCert object that references this achievement.
-     * @param MySimpleXMLElement $json Contains the achievement information in openBadge format.
-     * @return Assessment
+     * @param certificate $bcert certificate object that references this achievement.
+     * @param mySimpleXMLElement $json Contains the achievement information in openBadge format.
+     * @return assessment
      */
     public static function from_ob($bcert, $title)
     {
-        $new = new Achievement();
+        $new = new achievement();
         self::$count += 1;
         $new->id = 'urn:bcert:learningAchievement:' . self::$count;
         $new->title = $title;
@@ -108,13 +107,13 @@ class Achievement
     }
 
     /**
-     * Returns a MySimpleXMLElement containing achievement data in edci format.
+     * Returns a mySimpleXMLElement containing achievement data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('learningAchievement');
+        $root = mySimpleXMLElement::create_empty('learningAchievement');
         $root->addAttribute('id', $this->id);
         $root->addTextNode('title', $this->title);
 

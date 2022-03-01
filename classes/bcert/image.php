@@ -14,18 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
-require_once('mySimpleXMLElement.php');
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * A Image object represents data that is essential for both
+ * A image object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
  *
  * @package     mod_ilddigitalcert
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Image
+class image
 {
 
     /**
@@ -49,27 +50,25 @@ class Image
     private $content = "";
 
     /**
-     * @var string regex that is used to look for teh file
-     * type info and content info inside a base64 encoded image string.
-     */
-    private $type_content_regex = "/data:image\/(.*);base64,(.*)/";
-
-    /**
      * Constructor.
      */
     private function __construct()
     {
     }
 
-     /**
-     * Creates an Image Object based on an edci certificate.
+    /**
+     * Creates an image Object based on an edci certificate.
      *
-     * @param MySimpleXMLElement $xml Contains the certificate image in edci format.
-     * @return Image
+     * @param mySimpleXMLElement $xml Contains the certificate image in edci format.
+     * @return image
      */
     public static function from_edci($xml)
     {
-        $image = new Image();
+        if(empty($xml)) {
+            return null;
+        }
+        
+        $image = new image();
 
         $image->name = $xml->getName();
         $image->type_uri = $xml->contentType['uri'];
@@ -80,24 +79,28 @@ class Image
     }
 
     /**
-     * Creates an Image Object based on an openBadge certificate.
+     * Creates an image Object based on an openBadge certificate.
      *
      * @param string $name string that is ment to be used as the root node name in the edci xml.
      * @param string $image_data base64 encoded image data.
-     * @return Image
+     * @return image
      */
     public static function from_ob($name, $image_data)
     {
-        $image = new Image();
+        if(empty($image_data)) {
+            return null;
+        }
+
+        $image = new image();
 
         // searching for file type and content of the image data
-        $matchs = [];
-        preg_match($type_content_regex, $image_data, $matchs);
+        $match = [];
+        preg_match('/data:image\/(.+);base64,(.+)/', $image_data, $match);
 
         $image->name = $name;
-        $image->type_name = strtoupper($matchs[1]);
+        $image->type_name = strtoupper($match[1]);
         $image->type_uri .= $image->type_name;
-        $image->content .= $matchs[2];
+        $image->content .= $match[2];
         return $image;
     }
 
@@ -114,13 +117,13 @@ class Image
 
 
     /**
-     * Returns a MySimpleXMLElement containing image data in edci format.
+     * Returns a mySimpleXMLElement containing image data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty($this->name);
+        $root = mySimpleXMLElement::create_empty($this->name);
 
         $content_type = $root->addChild('contentType');
         $content_type->addAttribute('targetFrameworkUrl', 'http://publications.europa.eu/resource/authority/file-type');

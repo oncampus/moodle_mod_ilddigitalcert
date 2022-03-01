@@ -14,20 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('mySimpleXMLElement.php');
-
 /**
- * A Signature object represents data that is essential for both
+ * A signature object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
  *
  * @package     mod_ilddigitalcert
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Signature
+class signature
 {
 
     /**
@@ -68,14 +67,14 @@ class Signature
     }
 
     /**
-     * Creates a Signature Object based on an edci certificate.
+     * Creates a signature Object based on an edci certificate.
      *
-     * @param MySimpleXMLElement $xml Contains the signature information in edci format.
-     * @return Signature
+     * @param mySimpleXMLElement $xml Contains the signature information in edci format.
+     * @return signature
      */
     public static function from_edci($xml)
     {
-        $new = new Signature();
+        $new = new signature();
         $new->address = (string) $xml->signature->address;
         $new->email = (string)  $xml->signature->email;
         $new->givenname = (string) $xml->signature->givenname;
@@ -86,14 +85,14 @@ class Signature
     }
 
     /**
-     * Creates a Signature Object based on an openBadge certificate.
+     * Creates a signature Object based on an openBadge certificate.
      *
-     * @param MySimpleXMLElement $json Contains the signature information in openBadge format.
-     * @return Signature
+     * @param mySimpleXMLElement $json Contains the signature information in openBadge format.
+     * @return signature
      */
     public static function from_ob($json)
     {
-        $new = new Signature();
+        $new = new signature();
         $new->address = $json->{'extensions:signatureB4E'}->address;
         $new->email = $json->{'extensions:signatureB4E'}->email;
         $new->givenname = $json->{'extensions:signatureB4E'}->givenname;
@@ -110,7 +109,7 @@ class Signature
      */
     public function get_ob()
     {
-        $signature = new stdClass();
+        $signature = new \stdClass();
         $signature->address = $this->address;
         $signature->email = $this->email;
         $signature->surname = $this->surname;
@@ -123,13 +122,13 @@ class Signature
     }
 
     /**
-     * Returns a MySimpleXMLElement containing signature data in edci format.
+     * Returns a mySimpleXMLElement containing signature data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('signature');
+        $root = mySimpleXMLElement::create_empty('signature');
 
         $root->addChild('address', $this->address);
         $root->addChild('email', $this->email);

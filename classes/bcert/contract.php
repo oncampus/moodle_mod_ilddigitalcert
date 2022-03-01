@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once('mySimpleXMLElement.php');
 
 /**
  * A verification object represents data that is essential for both
@@ -27,7 +26,7 @@ require_once('mySimpleXMLElement.php');
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Contract
+class contract
 {
 
     /**
@@ -52,15 +51,15 @@ class Contract
     {
     }
 
-     /**
-     * Creates a Contract Object based on an edci certificate.
+    /**
+     * Creates a contract Object based on an edci certificate.
      *
-     * @param MySimpleXMLElement $xml Contains the contract information in edci format.
-     * @return Contract
+     * @param mySimpleXMLElement $xml Contains the contract information in edci format.
+     * @return contract
      */
     public static function from_edci($xml)
     {
-        $new = new Contract();
+        $new = new contract();
         $new->abi = (string) $xml->contract->abi;
         $new->address = (string) $xml->contract->address;
         $new->node = (string) $xml->contract->node;
@@ -68,14 +67,14 @@ class Contract
     }
 
     /**
-     * Creates a Contract Object based on an openBadge certificate.
+     * Creates a contract Object based on an openBadge certificate.
      *
-     * @param MySimpleXMLElement $json Contains the contract information in openBadge format.
-     * @return Contract
+     * @param mySimpleXMLElement $json Contains the contract information in openBadge format.
+     * @return contract
      */
     public static function from_ob($json)
     {
-        $new = new Contract();
+        $new = new contract();
         $new->abi = $json->{'extensions:contractB4E'}->abi;
         $new->address = $json->{'extensions:contractB4E'}->address;
         $new->node = $json->{'extensions:contractB4E'}->node;
@@ -90,7 +89,7 @@ class Contract
      */
     public function get_ob()
     {
-        $cobtract = new stdClass();
+        $cobtract = new \stdClass();
         $cobtract->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ContractB4E/context.json';
         $cobtract->type = ["Extension", "ContractB4E"];
         $cobtract->abi = $this->abi;
@@ -101,17 +100,17 @@ class Contract
 
 
     /**
-     * Returns a MySimpleXMLElement containing contract data in edci format.
+     * Returns a mySimpleXMLElement containing contract data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('contract');
+        $root = mySimpleXMLElement::create_empty('contract');
 
-        $root->addChild('abi', xml_escape($this->abi));
-        $root->addChild('address', xml_escape($this->address));
-        $root->addChild('node', xml_escape($this->node));
+        $root->addChild('abi', manager::xml_escape($this->abi));
+        $root->addChild('address', manager::xml_escape($this->address));
+        $root->addChild('node', manager::xml_escape($this->node));
 
         return $root;
     }

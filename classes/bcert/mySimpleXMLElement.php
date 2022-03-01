@@ -14,24 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
 
+use SimpleXMLElement;
+
 /**
- * MySimpleXMLElement extends the SimpleXMLElement with new convenience functionality.
+ * mySimpleXMLElement extends the SimpleXMLElement with new convenience functionality.
  *
  *
  * @package     mod_ilddigitalcert
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class MySimpleXMLElement extends SimpleXMLElement
+class mySimpleXMLElement extends SimpleXMLElement
 {
     /**
-     * Creates a MySimpleXMLElement including only a root tag of name $name.
+     * Creates a mySimpleXMLElement including only a root tag of name $name.
      *
      * @param string $name name of xml root tag.
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public static function create_empty(string $name)
     {
@@ -39,7 +42,7 @@ class MySimpleXMLElement extends SimpleXMLElement
     }
 
     /**
-     * Add SimpleXMLElement code into a MySimpleXMLElement
+     * Add SimpleXMLElement code into a mySimpleXMLElement
      *
      * @param SimpleXMLElement $append SimpleXMLElement that is supposed to be
      * appended to the current element as a child.
@@ -53,7 +56,7 @@ class MySimpleXMLElement extends SimpleXMLElement
             }
             // else create node cotaining the text content.
             else {
-                $xml = $this->addChild($append->getName(), xml_escape((string)$append));
+                $xml = $this->addChild($append->getName(), manager::xml_escape((string)$append));
             }
 
             foreach ($append->attributes() as $n => $v) {

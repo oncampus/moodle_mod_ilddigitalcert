@@ -14,24 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('mySimpleXMLElement.php');
-require_once('image.php');
-
 /**
- * A Organization object represents data that is essential for both
+ * A organization object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
  *
  * @package     mod_ilddigitalcert
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Organization
+class organization
 {
     /**
-     * @var  int counter that gets incremented with every Organization object that gets created, used to generate a unique id.
+     * @var  int counter that gets incremented with every organization object that gets created, used to generate a unique id.
      */
     private static $count = 0;
 
@@ -86,7 +84,7 @@ class Organization
     private $full_address = "";
 
     /**
-     * @var  Image Logo.
+     * @var  image Logo.
      */
     private $logo;
 
@@ -110,15 +108,15 @@ class Organization
     {
     }
 
-     /**
-     * Creates a Organization Object based on an edci certificate.
+    /**
+     * Creates a organization Object based on an edci certificate.
      *
-     * @param MySimpleXMLElement $xml Contains the organization information in edci format.
-     * @return Organization
+     * @param mySimpleXMLElement $xml Contains the organization information in edci format.
+     * @return organization
      */
     public static function from_edci($xml)
     {
-        $org = new Organization();
+        $org = new organization();
         $org_xml = $xml->agentReferences->organization[0];
         $org->id = $org_xml['id'];
         $org->identifier = (string) $org_xml->identifier;
@@ -130,19 +128,19 @@ class Organization
         $org->zip = (string) $org_xml->hasLocation->hasAddress->zip;
         $org->street = (string) $org_xml->hasLocation->hasAddress->street;
         $org->full_address = $org_xml->hasLocation->hasAddress->fullAddress->text;
-        $org->logo = Image::from_edci($org_xml->logo);
+        $org->logo = image::from_edci($org_xml->logo);
         return $org;
     }
 
     /**
-     * Creates a Organization Object based on an openBadge certificate.
+     * Creates a organization Object based on an openBadge certificate.
      *
-     * @param MySimpleXMLElement $json Contains the organization information in openBadge format.
-     * @return Organization
+     * @param mySimpleXMLElement $json Contains the organization information in openBadge format.
+     * @return organization
      */
     public static function from_ob($data)
     {
-        $org = new Organization();
+        $org = new organization();
         self::$count += 1;
         $org->id = 'urn:bcert:org:' . self::$count;
         $org->identifier = $data->badge->issuer->id;
@@ -154,7 +152,7 @@ class Organization
         $org->zip = $data->badge->issuer->{'extensions:addressB4E'}->zip;
         $org->street = $data->badge->issuer->{'extensions:addressB4E'}->street;
         $org->full_address = $org->street . ', ' . $org->zip . ' ' . $org->location;
-        $org->logo = Image::from_ob('logo', $data->badge->issuer->image);
+        $org->logo = image::from_ob('logo', $data->badge->issuer->image);
         return $org;
     }
 
@@ -165,7 +163,7 @@ class Organization
      */
     public function get_ob()
     {
-        $issuer = new stdClass();
+        $issuer = new \stdClass();
         $issuer->description = $this->alt_label;
         $issuer->{'extensions:addressB4E'} = (object) [
             'location' => $this->location,
@@ -186,15 +184,15 @@ class Organization
     }
 
     /**
-     * Returns a MySimpleXMLElement containing organization data in edci format.
+     * Returns a mySimpleXMLElement containing organization data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('organization');
+        $root = mySimpleXMLElement::create_empty('organization');
         $root->addAttribute('id', $this->id);
-        $root->addChild('identifier', xml_escape($this->identifier));
+        $root->addChild('identifier', manager::xml_escape($this->identifier));
         $root->addChild('registration', $this->registration);
         $root->addTextNode('prefLabel', $this->pref_label);
         $root->addTextNode('altLabel', $this->alt_label);

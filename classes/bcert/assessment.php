@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_ilddigitalcert\bcert;
 
-require_once('mySimpleXMLElement.php');
-require_once('assessmentSpec.php');
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * An assessment object represents data that is essential for both
@@ -27,10 +26,10 @@ require_once('assessmentSpec.php');
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Assessment
+class assessment
 {
     /**
-     * @var  int counter that gets incremented with every Assessment object that gets created, used to generate a unique id.
+     * @var  int counter that gets incremented with every assessment object that gets created, used to generate a unique id.
      */
     private static $count = 0;
 
@@ -70,14 +69,14 @@ class Assessment
     private $assessed_by = "";
 
     /**
-     * @var AssessmentSpec Further specifications.
+     * @var assessmentSpec Further specifications.
      */
     private $spec;
 
     /**
-     * Returns Assessment Specification.
+     * Returns assessment Specification.
      *
-     * @return AssessmentSpec
+     * @return assessmentSpec
      */
     public function get_spec()
     {
@@ -91,15 +90,15 @@ class Assessment
     {
     }
 
-     /**
-     * Creates an Assessment Object based on an edci certificate.
+    /**
+     * Creates an assessment Object based on an edci certificate.
      *
-     * @param MySimpleXMLElement $xml Contains the assessment information in edci format.
-     * @return Assessment
+     * @param mySimpleXMLElement $xml Contains the assessment information in edci format.
+     * @return assessment
      */
     public static function from_edci($xml)
     {
-        $assessment = new Assessment();
+        $assessment = new assessment();
         $ass_xml = $xml->credentialSubject->achievements->learningAchievement[0]->wasDerivedFrom;
         $assessment->id = $ass_xml['id'];
 
@@ -112,20 +111,20 @@ class Assessment
         $assessment->place = (string) $ass_xml->place;
         $assessment->assessed_by = $ass_xml->assessedBy['idref'];
 
-        $assessment->spec = AssessmentSpec::from_edci($xml);
+        $assessment->spec = assessmentSpec::from_edci($xml);
         return $assessment;
     }
 
     /**
-     * Creates an Assessment Object based on an openBadge certificate.
+     * Creates an assessment Object based on an openBadge certificate.
      *
-     * @param BCert $bcert BCert object that references this assessment.
-     * @param MySimpleXMLElement $json Contains the assessment information in openBadge format.
-     * @return Assessment
+     * @param certificate $bcert certificate object that references this assessment.
+     * @param mySimpleXMLElement $json Contains the assessment information in openBadge format.
+     * @return assessment
      */
     public static function from_ob($bcert, $json)
     {
-        $assessment = new Assessment();
+        $assessment = new assessment();
         self::$count += 1;
         $assessment->id = 'urn:bcert:assessment:' . self::$count;
         if (isset($json->{'extensions:examinationB4E'}->title)) {
@@ -135,12 +134,12 @@ class Assessment
         }
 
         // TODO: get grade
-        $assessment->startdate = get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'startdate');
-        $assessment->enddate = get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'endate');
-        $assessment->place = get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'place');
+        $assessment->startdate = manager::get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'startdate');
+        $assessment->enddate = manager::get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'endate');
+        $assessment->place = manager::get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'place');
         $assessment->assessed_by = $bcert->get_issuer()->get_id();
 
-        $assessment->spec = AssessmentSpec::from_ob($json);
+        $assessment->spec = assessmentSpec::from_ob($json);
         return $assessment;
     }
 
@@ -151,7 +150,7 @@ class Assessment
      */
     public function get_ob()
     {
-        $assessment = new stdClass();
+        $assessment = new \stdClass();
         $assessment->title = $this->title;
         $assessment->startdate = $this->startdate;
         $assessment->enddate = $this->enddate;
@@ -162,13 +161,13 @@ class Assessment
     }
 
     /**
-     * Returns a MySimpleXMLElement containing verification data in edci format.
+     * Returns a mySimpleXMLElement containing verification data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('wasDerivedFrom');
+        $root = mySimpleXMLElement::create_empty('wasDerivedFrom');
         $root->addAttribute('id', $this->id);
         $root->addTextNode('title', $this->title);
         $root->addChild('grade', $this->grade);

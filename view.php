@@ -104,27 +104,28 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 
         $fs->create_file_from_string($fileinfo, $certmetadatajson);
 
+        if(isset($issuedcertificate->edci)) {
+            // Create .xml file
+            $fileinfo_xml = array(
+            'contextid' => $modulecontext->id,     // ID of context.
+            'component' => 'mod_ilddigitalcert',   // Usually = table name.
+            'filearea' => 'metadata',              // Usually = table name.
+            'itemid' => $issuedcertificate->id,   // Usually = ID of row in table.
+            'filepath' => '/',                     // Any path beginning and ending in /.
+            'filename' => 'certificate.xml');              // Any filename.
+            $file = $fs->get_file($fileinfo_xml['contextid'], $fileinfo_xml['component'], $fileinfo_xml['filearea'],
+                $fileinfo_xml['itemid'], $fileinfo_xml['filepath'], $fileinfo_xml['filename']);
+            if ($file) {
+                $file->delete();
+            }
 
-        // Create .xml file
-         $fileinfo_xml = array(
-        'contextid' => $modulecontext->id,     // ID of context.
-        'component' => 'mod_ilddigitalcert',   // Usually = table name.
-        'filearea' => 'metadata',              // Usually = table name.
-        'itemid' => $issuedcertificate->id,   // Usually = ID of row in table.
-        'filepath' => '/',                     // Any path beginning and ending in /.
-        'filename' => 'certificate.xml');              // Any filename.
-        $file = $fs->get_file($fileinfo_xml['contextid'], $fileinfo_xml['component'], $fileinfo_xml['filearea'],
-            $fileinfo_xml['itemid'], $fileinfo_xml['filepath'], $fileinfo_xml['filename']);
-        if ($file) {
-            $file->delete();
+            // Add institution token to edci.
+            $bcert = mod_ilddigitalcert\bcert\certificate::from_edci($issuedcertificate->edci);
+            $bcert->add_institution_token($token);
+            $issuedcertificate->edci = $bcert->get_edci();
+
+            $fs->create_file_from_string($fileinfo_xml, $issuedcertificate->edci);
         }
-
-        // Add institution token to edci.
-        $bcert = BCert::from_edci($issuedcertificate->edci);
-        $bcert->add_institution_token($token);
-        $issuedcertificate->edci = $bcert->get_edci();
-
-        $fs->create_file_from_string($fileinfo_xml, $issuedcertificate->edci);
 
         $url = $CFG->wwwroot.'/mod/ilddigitalcert/download.php?id='.$modulecontext->id.
             '&icid='.$issuedcertificate->id.'&cmid='.$cm->id.'&download='.$download;
@@ -146,6 +147,15 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         echo html_writer::link(
             new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&issuedid='.$issuedid.'&view=download&ueid='.$ueid),
             get_string('json', 'mod_ilddigitalcert'));
+        
+        if(isset($issuedcertificate->edci)) {
+            echo ' | ';
+            echo html_writer::link(
+                new moodle_url(
+                    '/mod/ilddigitalcert/view.php?id='.$id.'&issuedid='.$issuedid.'&view=download&download=edci&ueid='.$ueid),
+                get_string('edci', 'mod_ilddigitalcert'));
+        }
+        
         $pdf = true; // TODO in die Settings!
         if ($pdf) {
             echo ' | ';
@@ -263,7 +273,11 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
             $message .= '<p>Recipient: <b>'.$recipientname.'</b><br/>';
             $message .= 'Hash: <b>'.$issuedcertificate->certhash.'</b><br/>';
             $message .= 'Startdate: <b>'.json_decode($issuedcertificate->metadata)->issuedOn.'</b><br/>';
-            $message .= 'Enddate: <b>'.json_decode($issuedcertificate->metadata)->expires.'</b></p>';
+            if (isset(json_decode($issuedcertificate->$metadata)->expires)) {
+                $message .= 'Enddate: <b>'.json_decode($issuedcertificate->metadata)->expires.'</b></p>';
+            } else {
+                $message .= 'Enddate: <b></b></p>';
+            }
             \core\notification::success($message);
         } else {
             print_error('error_register_cert', 'mod_ilddigitalcert',
@@ -451,26 +465,28 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         $fs->create_file_from_string($fileinfo, $certmetadatajson);
 
 
-        // Create .xml file
-        $fileinfo_xml = array(
-            'contextid' => $modulecontext->id,     // ID of context.
-            'component' => 'mod_ilddigitalcert',   // Usually = table name.
-            'filearea' => 'metadata',              // Usually = table name.
-            'itemid' => $issuedcertificate->id,   // Usually = ID of row in table.
-            'filepath' => '/',                     // Any path beginning and ending in /.
-            'filename' => 'certificate.xml');              // Any filename.
-        $file = $fs->get_file($fileinfo_xml['contextid'], $fileinfo_xml['component'], $fileinfo_xml['filearea'],
-            $fileinfo_xml['itemid'], $fileinfo_xml['filepath'], $fileinfo_xml['filename']);
-        if ($file) {
-            $file->delete();
+        if(isset($issuedcertificate->edci)) {
+            // Create .xml file
+            $fileinfo_xml = array(
+                'contextid' => $modulecontext->id,     // ID of context.
+                'component' => 'mod_ilddigitalcert',   // Usually = table name.
+                'filearea' => 'metadata',              // Usually = table name.
+                'itemid' => $issuedcertificate->id,   // Usually = ID of row in table.
+                'filepath' => '/',                     // Any path beginning and ending in /.
+                'filename' => 'certificate.xml');              // Any filename.
+            $file = $fs->get_file($fileinfo_xml['contextid'], $fileinfo_xml['component'], $fileinfo_xml['filearea'],
+                $fileinfo_xml['itemid'], $fileinfo_xml['filepath'], $fileinfo_xml['filename']);
+            if ($file) {
+                $file->delete();
+            }
+
+            // Add institution token to edci.
+            $bcert = mod_ilddigitalcert\bcert\certificate::from_edci($issuedcertificate->edci);
+            $bcert->add_institution_token($token);
+            $issuedcertificate->edci = $bcert->get_edci();
+            
+            $fs->create_file_from_string($fileinfo_xml, $issuedcertificate->edci);
         }
-
-        // Add institution token to edci.
-        $bcert = BCert::from_edci($issuedcertificate->edci);
-        $bcert->add_institution_token($token);
-        $issuedcertificate->edci = $bcert->get_edci();
-
-        $fs->create_file_from_string($fileinfo_xml, $issuedcertificate->edci);
 
         // TODO check what happens when content is changing.
         $url = $CFG->wwwroot.'/mod/ilddigitalcert/download.php?id='.

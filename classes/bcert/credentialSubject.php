@@ -14,14 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('achievement.php');
-require_once('mySimpleXMLElement.php');
-
 /**
- * A CredentialSubject object represents data about the the certificate holder
+ * A credentialSubject object represents data about the the certificate holder
  * that is essential for both openbadge and edci certificats
  * and helps convert beween the two standards.
  *
@@ -29,7 +27,7 @@ require_once('mySimpleXMLElement.php');
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class CredentialSubject
+class credentialSubject
 {
     /**
      * @var string Unique identifier for use in edci.
@@ -52,7 +50,7 @@ class CredentialSubject
     private $family_name = "";
 
     /**
-     * @var string Achievements.
+     * @var array Achievements.
      */
     private $achievements = [];
 
@@ -63,16 +61,16 @@ class CredentialSubject
     {
     }
 
-     /**
-     * Creates a CredentialSubject Object based on an edci certificate.
+    /**
+     * Creates a credentialSubject Object based on an edci certificate.
      *
-     * @param BCert $bcert BCert that references this object.
-     * @param MySimpleXMLElement $xml Contains the credential subject information in edci format.
-     * @return CredentialSubject
+     * @param certificate $bcert certificate that references this object.
+     * @param mySimpleXMLElement $xml Contains the credential subject information in edci format.
+     * @return credentialSubject
      */
     public static function from_edci($bcert, $xml)
     {
-        $new = new CredentialSubject();
+        $new = new credentialSubject();
         $data = $xml->credentialSubject;
         $new->identifier = (string) $data->identifier;
         $new->email = str_replace('mailto:', '', $data->contactPoint->mailBox['uri']);
@@ -80,22 +78,22 @@ class CredentialSubject
         $new->family_name = (string) $data->familyName->text;
 
         foreach ($data->achievements->learningAchievement as $learningAchievement) {
-            array_push($new->achievements, Achievement::from_edci($bcert, $learningAchievement));
+            array_push($new->achievements, achievement::from_edci($bcert, $learningAchievement));
         }
 
         return $new;
     }
 
     /**
-     * Creates a CredentialSubject Object based on an openBadge certificate.
+     * Creates a credentialSubject Object based on an openBadge certificate.
      *
-     * @param BCert $bcert BCert that references this object.
-     * @param MySimpleXMLElement $json Contains the credential subject information in openBadge format.
-     * @return CredentialSubject
+     * @param certificate $bcert certificate that references this object.
+     * @param mySimpleXMLElement $json Contains the credential subject information in openBadge format.
+     * @return credentialSubject
      */
     public static function from_ob($bcert, $json)
     {
-        $new = new CredentialSubject();
+        $new = new credentialSubject();
         $new->identifier = $json->{'extensions:recipientB4E'}->reference;
         $new->email = $json->{'extensions:recipientB4E'}->email;
         $new->given_names = $json->{'extensions:recipientB4E'}->givenname;
@@ -103,7 +101,7 @@ class CredentialSubject
 
         $expertises = $json->badge->{'extensions:badgeexpertiseB4E'}->expertise;
         foreach ($expertises as $expertise) {
-            array_push($new->achievements, Achievement::from_ob($bcert, $expertise));
+            array_push($new->achievements, achievement::from_ob($bcert, $expertise));
         }
         return $new;
     }
@@ -136,7 +134,7 @@ class CredentialSubject
      */
     public function get_ob()
     {
-        $recipient = new stdClass();
+        $recipient = new \stdClass();
         $recipient->reference = $this->identifier;
         $recipient->email = $this->email;
         $recipient->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/RecipientB4E/context.json';
@@ -147,13 +145,13 @@ class CredentialSubject
     }
 
     /**
-     * Returns a MySimpleXMLElement containing credential subject data in edci format.
+     * Returns a mySimpleXMLElement containing credential subject data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('credentialSubject');
+        $root = mySimpleXMLElement::create_empty('credentialSubject');
         $root->addAttribute('id', 'urn:bcert:person:1');
         $root->addChild('identifier', $this->identifier);
         $contact_point = $root->addChild('contactPoint');

@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once('mySimpleXMLElement.php');
 
 /**
  * A verification object represents data that is essential for both
@@ -27,7 +26,7 @@ require_once('mySimpleXMLElement.php');
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Verification
+class verification
 {
     /**
      * @var string Url that a user can use to verify the validity of a certificate.
@@ -46,29 +45,29 @@ class Verification
     {
     }
 
-     /**
-     * Creates a Verification Object based on an edci certificate.
+    /**
+     * Creates a verification Object based on an edci certificate.
      *
-     * @param MySimpleXMLElement $xml Contains the certificate information in edci format.
-     * @return Verification
+     * @param mySimpleXMLElement $xml Contains the certificate information in edci format.
+     * @return verification
      */
     public static function from_edci($xml)
     {
-        $new = new Verification();
+        $new = new verification();
         $new->verifyaddress = (string) $xml->verification->verifyaddress;
         $new->assertionhash = (string) $xml->verification->assertionhash;
         return $new;
     }
 
     /**
-     * Creates a Verification Object based on an openBadge certificate.
+     * Creates a verification Object based on an openBadge certificate.
      *
-     * @param MySimpleXMLElement $json Contains the certificate information in openBadge format.
-     * @return Verification
+     * @param mySimpleXMLElement $json Contains the certificate information in openBadge format.
+     * @return verification
      */
     public static function from_ob($json)
     {
-        $new = new Verification();
+        $new = new verification();
         $new->verifyaddress = $json->verification->{'extensions:verifyB4E'}->verifyaddress;
         $new->assertionhash = $json->verification->{'extensions:verifyB4E'}->assertionhash;
         return $new;
@@ -81,8 +80,8 @@ class Verification
      */
     public function get_ob()
     {
-        $verification = new stdClass();
-        $verification->{'extensions:verifyB4E'} = new stdClass();
+        $verification = new \stdClass();
+        $verification->{'extensions:verifyB4E'} = new \stdClass();
         $verification->{'extensions:verifyB4E'}->verifyaddress = $this->verifyaddress;
         $verification->{'extensions:verifyB4E'}->type = ["Extension", "VerifyB4E"];
         $verification->{'extensions:verifyB4E'}->assertionhash = $this->assertionhash;
@@ -91,16 +90,16 @@ class Verification
     }
 
     /**
-     * Returns a MySimpleXMLElement containing verification data in edci format.
+     * Returns a mySimpleXMLElement containing verification data in edci format.
      *
-     * @return MySimpleXMLElement
+     * @return mySimpleXMLElement
      */
     public function get_edci()
     {
-        $root = MySimpleXMLElement::create_empty('verification');
+        $root = mySimpleXMLElement::create_empty('verification');
 
-        $root->addChild('verifyaddress', xml_escape($this->verifyaddress));
-        $root->addChild('assertionhash', xml_escape($this->assertionhash));
+        $root->addChild('verifyaddress', manager::xml_escape($this->verifyaddress));
+        $root->addChild('assertionhash', manager::xml_escape($this->assertionhash));
 
         return $root;
     }

@@ -25,15 +25,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once('schema.php');
-require_once('/bcert/bcert.php');
 
 /**
  * Initiates and controls the download of the certificate in the requested format.
- * The certificate can be downloaded as .bcrt file in obenBadge format, .xml file  in edci or as a pdf.
+ * The certificate can be downloaded as .bcrt file in obenBadge format, .xml file in edci format or as a pdf.
  *
  * @param int $modulecontextid needed to locate the srored certificates in file storage.
  * @param string $icid itemid usually corresponding row id of database table.
- * @param string $download Controls waht kind of file gets sent to the user. Expected values are 'json', 'edci' and 'pdf'.
+ * @param string $download Controls what kind of file gets sent to the user. Expected values are 'json', 'edci' and 'pdf'.
  */
 function download_json($modulecontextid, $icid, $download) {
     global $DB, $CFG;
@@ -63,6 +62,7 @@ function download_json($modulecontextid, $icid, $download) {
         $filename = 'certificate';
         // Retrieve issued certificate from database.
         if ($issuedcertificate = $DB->get_record('ilddigitalcert_issued', array('id' => $icid))) {
+
             $metadatajson = $issuedcertificate->metadata;
 
             // Add salt to openBadge cert.
@@ -71,10 +71,12 @@ function download_json($modulecontextid, $icid, $download) {
             $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($salt);
             $metadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-            // Add salt to edci.
-            $bcert = BCert::from_edci($issuedcertificate->edci);
-            $bcert->add_institution_token($salt);
-            $issuedcertificate->edci = $bcert->get_edci();
+            if(isset($issuedcertificate->edci)) {
+                // Add salt to edci.
+                $bcert = mod_ilddigitalcert\bcert\certificate::from_edci($issuedcertificate->edci);
+                $bcert->add_institution_token($salt);
+                $issuedcertificate->edci = $bcert->get_edci();
+            }
 
             // Now that the salt is added a hash can be created.
             $hash = calculate_hash($metadatajson);
@@ -119,22 +121,27 @@ function download_json($modulecontextid, $icid, $download) {
         $fileid = $storedfile->get_id(); // Get fileid.
 
         // add openBadge and edci files as attachements to the pdf
-        $certificate->SetAssociatedFiles([
+        $associatedFiles = [
             [
-                'name' => $filename.'.bcrt',
-                'mime' => 'application/json',
-                'description' => 'some description',
-                'AFRelationship' => 'Alternative',
-                'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$fileid
-            ],
-            [
+            'name' => $filename.'.bcrt',
+            'mime' => 'application/json',
+            'description' => 'some description',
+            'AFRelationship' => 'Alternative',
+            'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$fileid
+            ]
+        ];
+    
+        if($storededci) {
+            array_push($associatedFiles, [
                 'name' => $filename.'.xml',
                 'mime' => 'application/xml',
                 'description' => 'some description',
                 'AFRelationship' => 'Alternative',
                 'path' => $CFG->wwwroot.'/mod/ilddigitalcert/download_pdf.php?id='.$storededci->get_id()
-            ],
-        ]);
+            ]);
+        }
+    
+        $certificate->SetAssociatedFiles($associatedFiles);
 
         // Start download of the pdf file.
         $certificate->Output($filename.'.pdf', 'I');
@@ -246,10 +253,10 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
         $issuedcertificate->metadata = $json;
         $issuedcertificate->institution_token = $tokenid;
 
-
+        
         // Create edci-Certificate.
         // Convert openBadge metadata to edci.
-        $edci = BCert::from_ob($metadata)->get_edci();
+        $edci = \mod_ilddigitalcert\bcert\certificate::from_ob($json)->get_edci();
         // Add edci to $issuedcertificate.
         $issuedcertificate->edci = $edci;
 
@@ -715,7 +722,7 @@ function get_extension_examinationregulations_b4e($digitalcert) {
     $extension = new stdClass();
     $extension->title = $digitalcert->examination_regulations;
     $extension->regulationsid = $digitalcert->examination_regulations_id;
-    $extension->url = validate_url($digitalcert->examination_regulations_url);
+    $extension->url = $digitalcert->examination_regulations_url;
     $extension->{'@context'} = $contexturl->examinationRegulationsB4E;
     $extension->type = array('Extension', 'ExaminationRegulationsB4E');
     if ($digitalcert->examination_regulations_date != 0) {
@@ -875,7 +882,7 @@ function get_issuer($issuerid) {
     $issuer->{'extensions:addressB4E'} = get_extension_address_b4e($issuerrecord);
     $issuer->email = $issuerrecord->email;
     $issuer->name = $issuerrecord->name;
-    $issuer->url = validate_url($issuerrecord->url);
+    $issuer->url = $issuerrecord->url;
     $issuer->{'@context'} = $contexturl->openbadges;
     $issuer->type = 'Issuer';
     $issuer->id = $CFG->wwwroot.'/mod/ilddigitalcert/edit_issuers.php?action=edit&id='.$issuerrecord->id;
@@ -1206,20 +1213,4 @@ function debug_email($to, $message, $debugobject = null) {
         ob_end_clean();
     }
     email_to_user($to, $from, $subject, $message, $message);
-}
-
-/**
- * Makes sure that the given url includes the protocol.
- * If there is no Protocol, returns new string that includes an https protocol.
- *
- * @param string $url an Url.
- * @return string A Url including protocol info.
- */
-function validate_url($url) {
-    if(!str_starts_with($url, 'https://')) {
-        if(!str_starts_with($url, 'http://')) {
-            $url = 'https://'.$url;
-        }
-    }
-    return $url;
 }
