@@ -40,32 +40,24 @@ if ($id) {
     print_error(get_string('missingidandcmid', 'mod_ilddigitalcert'));
 }
 
-require_login();
+require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
-
-// Wenn parameter $ueid aus overview.php übergeben ist kein kurslogin nötig um alte zertifikate auch zu sehen.
-if ($ueid == 0) {
-    require_login($course, true, $cm);
-
-    $PAGE->set_url('/mod/ilddigitalcert/view.php', array('id' => $cm->id));
-    $PAGE->set_title(format_string($moduleinstance->name));
-    $PAGE->set_heading(format_string($course->fullname));
-    $PAGE->set_context($modulecontext);
-} else {
-    $context = context_system::instance();
-
-    $PAGE->set_url('/mod/ilddigitalcert/view.php', array('id' => $cm->id, 'ueid' => $ueid));
-    $PAGE->set_pagelayout('admin');
-    $PAGE->set_title(format_string($moduleinstance->name));
-    $PAGE->set_heading(format_string($course->fullname));
-    $PAGE->set_context($context);
-}
 
 if (isguestuser()) {
     redirect($CFG->wwwroot . '/login/');
 }
 
-$id = $cm->id;
+// Wenn parameter $ueid aus overview.php übergeben ist kein kurslogin nötig um alte zertifikate auch zu sehen.
+if ($ueid == 0) {
+    $PAGE->set_url('/mod/ilddigitalcert/view.php', array('id' => $cm->id));
+} else {
+    $PAGE->set_url('/mod/ilddigitalcert/view.php', array('id' => $cm->id, 'ueid' => $ueid));
+    $PAGE->set_pagelayout('admin');
+}
+
+$PAGE->set_title(format_string($moduleinstance->name));
+$PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_context($modulecontext);
 
 // Zertifikat ansehen als Teacher/certifier.
 if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::instance($course->id))) {
@@ -198,7 +190,7 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
     echo '</div>';
     echo '<p>' . html_writer::link($CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $id . '&ueid=' . $ueid, get_string('back')) . '</p>';
     echo $OUTPUT->footer();
-} else if (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view != 'download') {
+} else if (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view = 'html') {
     // TODO elseif (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view == 'issue_teacher')//!
     // Zertifikatsübersicht als Teacher/certifier.
     redirect($CFG->wwwroot . '/mod/ilddigitalcert/teacher_view.php?id=' . $cm->id . '&ueid=' . $ueid);

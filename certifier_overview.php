@@ -41,11 +41,11 @@ $PAGE->set_heading(get_string('pluginname', 'mod_ilddigitalcert'));
 require_login();
 
 if (isguestuser()) {
-    redirect($CFG->wwwroot . '/login/');
+    redirect(new moodle_url('/login/'));
 }
 
 if (!get_user_preferences('mod_ilddigitalcert_certifier', false, $USER)) {
-    redirect($CFG->wwwroot . '/mod/ilddigitalcert/overview.php');
+    redirect(new moodle_url('/mod/ilddigitalcert/overview.php'));
 }
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_form.js'));
@@ -77,7 +77,7 @@ if ($reissue_form_data = $reissue_form->get_data()) {
 
                     $recipient = $certmetadata->{'extensions:recipientB4E'};
                     $recipientname = $recipient->givenname . ' ' . $recipient->surname;
-                    $message .= '<p>Susscessfully reissued certificate for: <b>' . $recipientname . '</b></p><br/>';
+                    $message .= get_string('reissue_success', 'mod_ilddigitalcert', $recipientname);
                 }
             }
 
@@ -87,7 +87,7 @@ if ($reissue_form_data = $reissue_form->get_data()) {
 
             $invalid_count = count($selected_certs) - count($certificates);
             if ($invalid_count > 0) {
-                \core\notification::warning("Couldn't reissue $invalid_count certificat(s), because they where already signed and registered in the blockchain.");
+                \core\notification::warning(get_string('reissue_error_already_signed', 'mod_ilddigitalcert', $invalid_count));
             }
         }
     }
@@ -141,7 +141,7 @@ if ($to_bc_form_data = $to_bc_form->get_data()) {
 
             $invalid_count = count($selected_certs) - count($certificates);
             if ($invalid_count > 0) {
-                \core\notification::warning("Couldn't sign $invalid_count certificat(s), because they where already signed and registered in the blockchain.");
+                \core\notification::warning(get_string('sign_error_already_signed', 'mod_ilddigitalcert', $invalid_count));
             }
         }
     }

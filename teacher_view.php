@@ -39,23 +39,23 @@ require_login($course, true, $cm);
 
 
 if (!has_capability('moodle/grade:viewall', context_course::instance($course->id))) {
-    redirect($CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $cm->id . '&ueid=' . $ueid);
+    redirect(new moodle_url('/mod/ilddigitalcert/view.php', array("id" => $cm->id, 'ueid' => $ueid)));
 }
 
 $moduleinstance = $DB->get_record('ilddigitalcert', array('id' => $cm->instance), '*', MUST_EXIST);
 $context = context_module::instance($cm->id);
 
-$PAGE->set_url($CFG->wwwroot . '/mod/ilddigitalcert/teacher_view.php', array('id' => $cm->id, 'ueid' => 0));
+$PAGE->set_url(new moodle_url('/mod/ilddigitalcert/teacher_view.php', array('id' => $cm->id, 'ueid' => 0)));
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/ilddigitalcert/js/pk_form.js'));
+$PAGE->requires->js(new moodle_url('/mod/ilddigitalcert/js/pk_form.js'));
 
 // Reissue selected certificates.
 
 // Instantiate reissue form.
-$reissue_form = new mod_ilddigialcert_reissue_form();
+$reissue_form = new mod_ilddigialcert_reissue_form(qualified_me());
 if ($reissue_form_data = $reissue_form->get_data()) {
     $selected_certs = json_decode($reissue_form_data->selected);
     if (!empty($selected_certs)) {
@@ -73,7 +73,7 @@ if ($reissue_form_data = $reissue_form->get_data()) {
 
                     $recipient = $certmetadata->{'extensions:recipientB4E'};
                     $recipientname = $recipient->givenname . ' ' . $recipient->surname;
-                    $message .= '<p>Susscessfully reissued certificate for: <b>' . $recipientname . '</b></p><br/>';
+                    $message .= get_string('reissue_success', 'mod_ilddigitalcert', $recipientname);
                 }
             }
 
@@ -83,14 +83,11 @@ if ($reissue_form_data = $reissue_form->get_data()) {
 
             $invalid_count = count($selected_certs) - count($certificates);
             if ($invalid_count > 0) {
-                \core\notification::warning("Couldn't reissue $invalid_count certificat(s), because they where already signed and registered in the blockchain.");
+                \core\notification::warning(get_string('reissue_error_already_signed', 'mod_ilddigitalcert', $invalid_count));
             }
         }
-    } else {
-        print_r('empty slected');
     }
 } else {
-    print_r('no reissue form data');
     $reissue_form_data = (object) [
         'id' => $id,
         'ueid' => $ueid,
@@ -105,7 +102,7 @@ $reissue_form->set_data($reissue_form_data);
 
 // Sign and register selected certificates in the blockchain.
 // Instantiate to_blockchain form.
-$to_bc_form = new mod_ilddigialcert_to_blockchain_form();
+$to_bc_form = new mod_ilddigialcert_to_blockchain_form(qualified_me());
 
 if ($to_bc_form_data = $to_bc_form->get_data()) {
     $selected_certs = json_decode($to_bc_form_data->selected);
@@ -142,7 +139,7 @@ if ($to_bc_form_data = $to_bc_form->get_data()) {
 
             $invalid_count = count($selected_certs) - count($certificates);
             if ($invalid_count > 0) {
-                \core\notification::warning("Couldn't sign $invalid_count certificat(s), because they where already signed and registered in the blockchain.");
+                \core\notification::warning(get_string('sign_error_already_signed', 'mod_ilddigitalcert', $invalid_count));
             }
         }
     }
@@ -215,6 +212,7 @@ echo $OUTPUT->heading(get_string('pluginname', 'mod_ilddigitalcert'));
 
 $template_data = array(
     'certificate_name' => $moduleinstance->name,
+    'preview_url' => (new moodle_url('/mod/ilddigitalcert/view.php', array("id" => $id, 'view' => "preview")))->out(false),
     'course_name' => $course->fullname,
     'to_bc_form' => $to_bc_form->render(),
     'reissue_form' => $reissue_form->render(),
