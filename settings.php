@@ -42,6 +42,12 @@ if ($hassiteconfig) {
         get_string('settings_descconfig', 'mod_ilddigitalcert'), ''
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'ilddigitalcert/demo_mode',
+        get_string('configlabel_demo_mode', 'mod_ilddigitalcert'),
+        get_string('configdesc_demo_mode', 'mod_ilddigitalcert'),
+        1)
+    );
     $settings->add(new admin_setting_configtext(
         'ilddigitalcert/blockchain_url',
         get_string('configlabel_blockchain_url', 'mod_ilddigitalcert'),
@@ -64,6 +70,7 @@ if ($hassiteconfig) {
         get_string('configdesc_IdentityMgmt_address', 'mod_ilddigitalcert'),
         '' // TODO: // , '0xF40ec6b07009de471F3E2773b276F434F2c1c567'//.
     ));
+
 
     $settings->add(new admin_setting_heading(
         'settings_headerconfig_general',

@@ -98,7 +98,11 @@ class manager {
         foreach ($certificates as $certificate) {
             $row = array();
             if ($show_actions === true) {
-                $row[] = \html_writer::checkbox('select-cert' . $certificate->id, $certificate->id, false, null, array('class' => 'm-element-select-cert'));
+                $attributes = array('class' => 'm-element-select-cert');
+                if (isset($certificate->txhash)) {
+                    $attributes["disabled"] = 'true';
+                }
+                $row[] = \html_writer::checkbox('select-cert' . $certificate->id, $certificate->id, false, null, $attributes);
             }
             $icon = '<img height="32px" title="' . get_string('pluginname', 'mod_ilddigitalcert') . '"
         src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-certificate.svg">';

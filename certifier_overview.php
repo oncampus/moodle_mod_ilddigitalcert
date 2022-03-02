@@ -67,7 +67,6 @@ if ($reissue_form_data = $reissue_form->get_data()) {
         $certificates = $DB->get_records_sql($sql, $inparams);
 
         if ($reissue_form_data->action == 'reissue') { // Write selected certificates to blockchain
-            $message = '';
             foreach ($certificates as $certificate) {
                 if ($reissueuser = $DB->get_record('user', array('id' => $certificate->userid, 'confirmed' => 1, 'deleted' => 0))) {
 
@@ -77,12 +76,9 @@ if ($reissue_form_data = $reissue_form->get_data()) {
 
                     $recipient = $certmetadata->{'extensions:recipientB4E'};
                     $recipientname = $recipient->givenname . ' ' . $recipient->surname;
-                    $message .= get_string('reissue_success', 'mod_ilddigitalcert', $recipientname);
-                }
-            }
 
-            if ($message) {
-                \core\notification::success($message);
+                    \core\notification::success(get_string('reissue_success', 'mod_ilddigitalcert', $recipientname));
+                }
             }
 
             $invalid_count = count($selected_certs) - count($certificates);
@@ -115,17 +111,20 @@ if ($to_bc_form_data = $to_bc_form->get_data()) {
         $certificates = $DB->get_records_sql($sql, $inparams);
 
         if ($to_bc_form_data->action == 'toblockchain') { // Write selected certificates to blockchain
-            $message = '';
             // Write every cert to the blockchain with the given private key.
             foreach ($certificates as $issuedcertificate) {
                 if (to_blockchain($issuedcertificate, $USER, $to_bc_form_data->pk)) {
                     $recipient = json_decode($issuedcertificate->metadata)->{'extensions:recipientB4E'};
                     $recipientname = $recipient->givenname . ' ' . $recipient->surname;
-                    $message .= '<br/><div><p>' . get_string('registered_and_signed', 'mod_ilddigitalcert') . '</p>';
+                    $message = '<div><p>' . get_string('registered_and_signed', 'mod_ilddigitalcert') . '</p>';
                     $message .= '<p>Recipient: <b>' . $recipientname . '</b><br/>';
                     $message .= 'Hash: <b>' . $issuedcertificate->certhash . '</b><br/>';
                     $message .= 'Startdate: <b>' . json_decode($issuedcertificate->metadata)->issuedOn . '</b><br/>';
-                    $message .= 'Enddate: <b>' . json_decode($issuedcertificate->metadata)->expires . '</b></p></div><br/>';
+                    if(isset(json_decode($issuedcertificate->metadata)->expires)) {
+                        $message .= 'Enddate: <b>' . json_decode($issuedcertificate->metadata)->expires . '</b></p></div>';
+                    }
+
+                    \core\notification::success($message);
                 } else {
                     print_error(
                         'error_register_cert',
@@ -133,10 +132,6 @@ if ($to_bc_form_data = $to_bc_form->get_data()) {
                         new moodle_url('/mod/ilddigitalcert/view.php', array('id' => $id))
                     );
                 }
-            }
-
-            if ($message) {
-                \core\notification::success($message);
             }
 
             $invalid_count = count($selected_certs) - count($certificates);

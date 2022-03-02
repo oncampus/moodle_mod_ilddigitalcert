@@ -65,6 +65,7 @@ $string['configlabel_custom_menu_entry'] = 'Entry in custom menu';
 $string['configlabel_failover_url'] = 'Alternative Blockchain URL';
 $string['configlabel_IdentityMgmt_address'] = 'Smart-Contract-Adresse IdentityMgmt';
 $string['configlabel_max_token_age'] = 'Max token age';
+$string['configlabel_demo_mode'] = 'Enable demo mode';
 $string['configdesc_blockchain_url'] = 'Diese Adresse wird benötigt um die Verbindung zu einem geeigneten Blockchain-Knoten herzustellen.';
 $string['configdesc_CertMgmt_address'] = 'Address of the smart contract for the management of certificates in the blockchain.<br/>
 Address of the current (2020-09-28) contract: 0x8a7e3622D3f200aBb1B00D25126f86256c7368dB';
@@ -73,6 +74,7 @@ $string['configdesc_failover_url'] = 'Diese URL wird verwendet, wenn die primär
 $string['configdesc_IdentityMgmt_address'] = 'Address of the smart contract for the management of user roles in the blockchain.<br/>
 Address of the current (2020-09-28) contract: 0xF40ec6b07009de471F3E2773b276F434F2c1c567';
 $string['configdesc_max_token_age'] = 'Diese Dauer gibt an nach welcher Zeit der Link zum Generieren eines Privat Keys seine Gültigkeit verliert.';
+$string['configdesc_demo_mode'] = 'For demo or testing purposes enable this option. Certificates will be written to a demo blockchain that is not meant for production use. Please do not use personal data while this option is enabled.';
 $string['criteria'] = 'Criteria';
 $string['data'] = 'Certificate data';
 $string['dcxapikey'] = 'API key';
@@ -235,8 +237,8 @@ $string['recipient'] = 'Recipient';
 $string['reissue'] = 'Reissue certificate';
 $string['reissue_confirmation'] = 'Do you want to reissue following certificates?';
 $string['reissue_error_already_signed'] = 'Couldn\'t reissue {$a} certificat(s), because they where already signed and registered in the blockchain.';
-$string['reissue_success'] = '<p>Susscessfully reissued certificate for: <b>{$a}</b></p><br/>';
-$string['registered_and_signed'] = 'Das Zertifikat ist in der Blockchain registriert und signiert';
+$string['reissue_success'] = 'Susscessfully reissued certificate for: <b>{$a}</b>';
+$string['registered_and_signed'] = 'The certificate was successfully signed and registered in the blockchain.';
 $string['scan_qr_code'] = 'To send your digital certificate to your wallet, you have to establish a connection first. To do this, open the app and scan the qr-code. Afterwards follow the instructions in the App.';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
 $string['send_automation_report'] = 'Reports recently and automatically signed certs.';

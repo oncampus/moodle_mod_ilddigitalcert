@@ -52,9 +52,17 @@ use Web3\Contracts\Types\Bytes;
 use phpseclib\Math\BigInteger;
 
 global $account;
-global $contractnames;
-$contractnames = array('CertMgmt'       => 'CertificateManagement',
+
+function get_contract_name($contractname) {
+    $contractnames = array('CertMgmt'       => 'CertificateManagement',
                         'IdentityMgmt' => 'IdentityManagement');
+    if(!array_key_exists($contractname, $contractnames)) throw new \coding_exception("Array key $contractname does not exist in given array.");
+    $contractname = $contractnames[$contractname];
+    if(!get_config('ilddigitalcert', 'demo_mode')) {
+        $contractname .= '_prod';
+    }
+    return $contractname;
+}
 
 function check_node($url) {
     $web3 = new Web3(new HttpProvider(new HttpRequestManager($url, 30)));
@@ -72,23 +80,22 @@ function check_node($url) {
 }
 
 function get_contract_abi($contractname) {
-    global $CFG, $contractnames;
-    $contractname = $contractnames[$contractname];
+    global $CFG;
+    $contractname = get_contract_name($contractname);
     $filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
     $contract = json_decode(file_get_contents($filename));
     return json_encode($contract->contract_abi);
 }
 
 function get_contract_address($contractname) {
-    global  $contractnames;
-    $contractname = $contractnames[$contractname];
+    $contractname = get_contract_name($contractname);
 
-    if ($contractname == $contractnames['CertMgmt']) {
+    if ($contractname == get_contract_name('CertMgmt')) {
         $certmgmtaddress = get_config('ilddigitalcert', 'CertMgmt_address');
         if (isset($certmgmtaddress) and $certmgmtaddress != '') {
             return $certmgmtaddress;
         }
-    } else if ($contractname == $contractnames['IdentityMgmt']) {
+    } else if ($contractname == get_contract_name('IdentityMgmt')) {
         $identitymgmtaddress = get_config('ilddigitalcert', 'IdentityMgmt_address');
         if (isset($identitymgmtaddress) and $identitymgmtaddress != '') {
             return $identitymgmtaddress;
@@ -97,8 +104,7 @@ function get_contract_address($contractname) {
 }
 
 function get_contract_url($contractname) {
-    global $contractnames;
-    $contractname = $contractnames[$contractname];
+    $contractname = get_contract_name($contractname);
 
     $blockchainurl = get_config('ilddigitalcert', 'blockchain_url');
     $failoverurl = get_config('ilddigitalcert', 'failover_url');

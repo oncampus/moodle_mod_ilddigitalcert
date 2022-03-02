@@ -350,7 +350,7 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019101800, 'ilddigitalcert');
     }
 
-    if ($oldversion < 2021091900) {
+    if ($oldversion < 2022030217) {
 
         // Define field auto_pk, auto_certifier and automation to be added to ilddigitalcert.
         $table = new xmldb_table('ilddigitalcert');
@@ -370,10 +370,10 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         }
 
         // Ilddigitalcert savepoint reached.
-        upgrade_mod_savepoint(true, 2021091900, 'ilddigitalcert');
+        upgrade_mod_savepoint(true, 2022030217, 'ilddigitalcert');
     }
 
-    if ($oldversion < 2022022604) {
+    if ($oldversion < 2022030218) {
 
         // Define field edci to be added to ilddigitalcert_issued.
         $table = new xmldb_table('ilddigitalcert_issued');
@@ -385,7 +385,7 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         }
 
         // Ilddigitalcert savepoint reached.
-        upgrade_mod_savepoint(true, 2022022604, 'ilddigitalcert');
+        upgrade_mod_savepoint(true, 2022030218, 'ilddigitalcert');
     }
 
     return true;

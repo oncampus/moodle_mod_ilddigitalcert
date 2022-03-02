@@ -171,6 +171,7 @@ function updateSelected(checkbox) {
 
 function selectAll() {
   check_certs.forEach((checkbox) => {
+    if(checkbox.disabled === true) return;
     checkbox.checked = true;
     selected.add(checkbox.value);
   });

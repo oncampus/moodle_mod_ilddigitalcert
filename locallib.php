@@ -224,6 +224,7 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
     $salt = get_token($tokenid);
     $metadata = json_decode($metadata);
     $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($salt);
+
     // Contract parameter.
     $metadata->{'extensions:contractB4E'} = get_extension_contract_b4e();
 
@@ -239,11 +240,16 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
     if (isset(json_decode($metadata)->expires)) {
         $enddate = strtotime(json_decode($metadata)->expires);
     } else {
-        $enddate = 9999999999;//0; TODO Settings (if demo: 9999999999, if prod: 0)
+        if(get_config('ilddigitalcert', 'demo_mode')) {
+            $enddate = 9999999999;
+        } else {
+            $enddate = 0;
+        }
     }
     if ($enddate != 0 and $enddate <= $startdate) {
         return false; // TODO show Errormessage
     }
+
     $hashes = save_hash_in_blockchain($hash, $startdate, $enddate, $pk);
     if (isset($hashes->txhash)) {
         // Add verification.
@@ -397,7 +403,7 @@ function calculate_hash($metadatajson) {
  * @param int $startdate Start of certificate validity.
  * @param int $enddate End of certificate validity.
  * @param string $pk Private key of the certifier.
- * @return string|bool Returns a hash or false, if the hash couldn't be stored.
+ * @return object|bool Returns a hash or false, if the hash couldn't be stored.
  */
 function save_hash_in_blockchain($hash, $startdate, $enddate, $pk) {
     require_once('web3lib.php');
@@ -663,8 +669,11 @@ function issue_certificate($certmetadata, $userid, $cmid) {
 
     $DB->update_record('ilddigitalcert_issued', $issued);
 
-    $cert_settings = $DB->get_record('ilddigitalcert', array('id' => $cmid), 'automation, auto_certifier, auto_pk', IGNORE_MISSING);
-
+    // Get ilddigitalcert settings.
+    $cert_settings_sql = 'SELECT cm.instance, cert.automation, cert.auto_certifier, cert.auto_pk 
+        FROM {course_modules} as cm, {ilddigitalcert} as cert 
+        WHERE cm.instance = cert.id AND cm.id = :id;';
+    $cert_settings = $DB->get_record_sql($cert_settings_sql, array('id' => $cmid), IGNORE_MISSING);
     // If automation is enabled, issued certificate will be signed and written
     // to the blockchain using the pk of the selected certifier.
     $in_blockchain = false;
