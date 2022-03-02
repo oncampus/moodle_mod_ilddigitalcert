@@ -51,7 +51,13 @@ if ($action == 'meta' and $meta != '') {
     $file = $_FILES['file'];
     // TODO: validate.
     echo file_get_contents($file['tmp_name']);
+} else if ($action == 'validateEDCI' and !empty($_FILES['file']['name']) and
+    ($_FILES['file']['type'] == 'application/xml' or strpos($_FILES['file']['name'], '.xml') !== false)) {
+    $file = $_FILES['file'];
+    // TODO: validate.
+    echo file_get_contents($file['tmp_name']);
 } else if ($action == 'pdf' and !empty($_FILES['file']['name']) and $_FILES['file']['type'] == 'application/pdf') {
+    // Verifing validity of a pdf file
     $file = $_FILES['file'];
     $pdf = $file['tmp_name'];
     // Get Attachments.
@@ -59,45 +65,44 @@ if ($action == 'meta' and $meta != '') {
     $attachmentlist = explode("\n", $attachmentlistresult);
     $attachments = array();
     $n = 0;
-    foreach ($attachmentlist as $attachment) {
-        if ($n == 0) {
-            $n++;
-            continue;
-        }
 
-        if ($attachment == "") {
-            continue;
-        }
+    $bcrt_index = -1;
+    $xml_index = -1;
+    $error = '';
+
+    // Check if there is only one file per permitted file type, else generate error
+    foreach ($attachmentlist as $attachment) {
+        $n++;
 
         $entry = explode(': ', $attachment);
-        $key = $entry[0];
+        // $key = $entry[0];
         $value = $entry[1];
-        $attachments[$key] = $value;
+
+        $filename = basename($entry[1]);
+
+        // More than 1 attachment per allowed file type .bcrt and .xml? -> error.
+        if (str_ends_with($filename, '.bcrt')) {
+            if ($bcrt_index === -1) {
+                $bcrt_index = $n;
+            } else {
+                $error = 'error: too many .bcrt attachements detected';
+            }
+        } else if (str_ends_with($filename, '.xml')) {
+            if ($xml_index === -1) {
+                $xml_index = $n;
+            } else {
+                $error = 'error: too many .bcrt attachements detected';
+            }
+        }
     }
-    // More than 1 attachment? -> error.
-    if (count($attachments) != 1) {
-        echo 'error';
+    if ($error !== '') {
+        echo $error;
     } else {
-        $attachmentfile = array_pop($attachments);
-        $basenameattachmentfile = basename($attachmentfile);
-        if (!is_dir($CFG->dataroot.'/temp/ilddigitalcert')) {
-            mkdir($CFG->dataroot.'/temp/ilddigitalcert', 0775);
-        }
-        if (!is_dir($CFG->dataroot.'/temp/ilddigitalcert/attachments')) {
-            mkdir($CFG->dataroot.'/temp/ilddigitalcert/attachments', 0775);
-        }
-        $path = $CFG->dataroot.'/temp/ilddigitalcert/attachments/'.$basenameattachmentfile;
-        shell_exec('pdfdetach -save 1 -o '.$path.' '.$pdf.' 2>&1');
-        if (!isset($detachresult)) {
-            $filecontent = file_get_contents($path);
-            $json = $filecontent;
-            // Delete file.
-            unlink($path);
-            // Return metadata as json.
-            echo $json;
-        } else {
-            echo 'error';
-        }
+        // echo file contents of both .bcrt and edci .xml attachements as json
+        $result = new stdClass();
+        $result->metadata = get_attachement_content($bcrt_index);
+        $result->edci = get_attachement_content($xml_index);
+        echo json_encode($result);
     }
 } else if ($action == 'baseString' and $base64string != '') {
     echo base64_decode($base64string);
@@ -144,4 +149,24 @@ if ($action == 'meta' and $meta != '') {
          ', base64: '.$base64string.
          ', institution_profile: '.$institutionprofile.
          ', file: '.$_FILES['file']['name'];
+}
+
+function get_attachement_content($index) {
+    if (!is_dir($CFG->dataroot.'/temp/ilddigitalcert')) {
+        mkdir($CFG->dataroot.'/temp/ilddigitalcert', 0775);
+    }
+    if (!is_dir($CFG->dataroot.'/temp/ilddigitalcert/attachments')) {
+        mkdir($CFG->dataroot.'/temp/ilddigitalcert/attachments', 0775);
+    }
+    $path = $CFG->dataroot.'/temp/ilddigitalcert/attachments/temp'.$index;
+    shell_exec('pdfdetach -save ' . $index . ' -o '.$path.' '.$pdf.' 2>&1');
+    if (!isset($detachresult)) {
+        $filecontent = file_get_contents($path);
+        // Delete file.
+        unlink($path);
+        // Return attachements file content.
+        return $filecontent;
+    } else {
+        echo null;
+    }
 }

@@ -82,6 +82,7 @@ $string['delete_certifier'] = 'Aus Blockchain entfernen';
 $string['descconfig'] = 'Angaben zur Zertifizierungsstelle';
 $string['description'] = 'Beschreibung';
 $string['drag_n_drop'] = 'Hier klicken oder Dateien in dieses Feld ziehen (Drag & Drop) um sie hochzuladen';
+$string['edci'] = 'EDCI';
 $string['edit_certifiers'] = 'Zertifizierer verwalten';
 $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Wählen Sie eine Zertifizierungsstelle';

@@ -83,6 +83,7 @@ $string['delete_certifier'] = 'Aus Blockchain entfernen';
 $string['descconfig'] = 'Information about the issuer';
 $string['description'] = 'Description';
 $string['drag_n_drop'] = 'Click here or drag and drop to upload file';
+$string['edci'] = 'EDCI';
 $string['edit_certifiers'] = 'Manage certifiers';
 $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Choose issuer';
