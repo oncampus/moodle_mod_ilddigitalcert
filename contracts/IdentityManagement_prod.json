@@ -1,0 +1,511 @@
+{
+	"contract_name": "IdentityManagement",
+	"contract_address": "0xF40ec6b07009de471F3E2773b276F434F2c1c567",
+	"contract_abi": [
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "getCertifiers",
+			"outputs": [
+				{
+					"name": "",
+					"type": "address[]"
+				},
+				{
+					"name": "",
+					"type": "bool[]"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "isActive",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "isIdentityManagement",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"name": "profile",
+					"type": "bytes32"
+				}
+			],
+			"name": "registerInstitution",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "institution",
+					"type": "address"
+				}
+			],
+			"name": "getInstitutionProfile",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bytes32"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "institution",
+					"type": "address"
+				}
+			],
+			"name": "isActiveInstitution",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+			],
+			"name": "renounceOwnership",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"name": "newProfile",
+					"type": "bytes32"
+				}
+			],
+			"name": "updateInstitutionProfile",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "getInstitutions",
+			"outputs": [
+				{
+					"name": "",
+					"type": "address[]"
+				},
+				{
+					"name": "",
+					"type": "bytes32[]"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "certifier",
+					"type": "address"
+				}
+			],
+			"name": "isActiveCertifier",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "owner",
+			"outputs": [
+				{
+					"name": "",
+					"type": "address"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+			],
+			"name": "isOwner",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "institution",
+					"type": "address"
+				}
+			],
+			"name": "reactivateInstitution",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "certifier",
+					"type": "address"
+				}
+			],
+			"name": "blockCertifier",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+			],
+			"name": "retire",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "certifier",
+					"type": "address"
+				}
+			],
+			"name": "registerCertifier",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "certifier",
+					"type": "address"
+				}
+			],
+			"name": "isAccreditedCertifier",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "institution",
+					"type": "address"
+				}
+			],
+			"name": "deactivateInstitution",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "institution",
+					"type": "address"
+				}
+			],
+			"name": "isRegisteredInstitution",
+			"outputs": [
+				{
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "certifier",
+					"type": "address"
+				}
+			],
+			"name": "getInstitutionFromCertifier",
+			"outputs": [
+				{
+					"name": "",
+					"type": "address"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "transferOwnership",
+			"outputs": [
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"name": "es",
+					"type": "address"
+				}
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "caller",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "profile",
+					"type": "bytes32"
+				}
+			],
+			"name": "InstitutionRegistered",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "caller",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "institution",
+					"type": "address"
+				}
+			],
+			"name": "InstitutionDeactivated",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "caller",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "institution",
+					"type": "address"
+				}
+			],
+			"name": "InstitutionReactivated",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "caller",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "newProfile",
+					"type": "bytes32"
+				}
+			],
+			"name": "InstitutionProfileUpdated",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "certifier",
+					"type": "address"
+				}
+			],
+			"name": "CertifierRegistered",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "institution",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "certifier",
+					"type": "address"
+				}
+			],
+			"name": "CertifierBlocked",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"name": "subject",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "object",
+					"type": "address"
+				}
+			],
+			"name": "Retired",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "previousOwner",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "OwnershipTransferred",
+			"type": "event"
+		}
+	],
+	"transaction_hash": "0xaeeabd641f2965fab159fc6deb08c7fa440b64b02ff9dd7a2b9ded29393a2aef"
+}

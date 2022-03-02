@@ -178,10 +178,10 @@ function to_blockchain($issuedcertificate, $fromuser, $pk) {
     if (isset(json_decode($metadata)->expires)) {
         $enddate = strtotime(json_decode($metadata)->expires);
     } else {
-        $enddate = 0;
+        $enddate = 9999999999;//0; TODO Settings (if demo: 9999999999, if prod: 0)
     }
     if ($enddate != 0 and $enddate <= $startdate) {
-        return false;
+        return false; // TODO show Errormessage
     }
     $hashes = save_hash_in_blockchain($hash, $startdate, $enddate, $pk);
     if (isset($hashes->txhash)) {
@@ -359,9 +359,12 @@ function get_certificatehtml($id, $certmetadatajson) {
             }
         }
         try {
-            $html = str_replace('{' . $match . '}', $jsonobj, $html);
+            if (is_string($jsonobj)) {
+                $html = str_replace('{'.$match.'}', $jsonobj, $html);
+            }
         } catch (Exception $e) {
-            echo 'error'; // TODO: print error.
+            print_error('could_not_replace_string',
+                        'mod_ilddigitalcert');
         }
     }
 
