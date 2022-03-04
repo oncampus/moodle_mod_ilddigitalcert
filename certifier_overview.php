@@ -57,7 +57,7 @@ echo $OUTPUT->heading(get_string('overview', 'mod_ilddigitalcert'));
 // Reissue selected certificates.
 
 // Instantiate reissue form.
-$reissue_form = new mod_ilddigialcert_reissue_form();
+$reissue_form = new mod_ilddigialcert_reissue_form(qualified_me());
 if ($reissue_form_data = $reissue_form->get_data()) {
     $selected_certs = json_decode($reissue_form_data->selected);
     if (!empty($selected_certs)) {
@@ -100,7 +100,7 @@ $reissue_form->set_data($reissue_form_data);
 
 // Sign and register selected certificates in the blockchain.
 // Instantiate to_blockchain form.
-$to_bc_form = new mod_ilddigialcert_to_blockchain_form();
+$to_bc_form = new mod_ilddigialcert_to_blockchain_form(qualified_me());
 
 if ($to_bc_form_data = $to_bc_form->get_data()) {
     $selected_certs = json_decode($to_bc_form_data->selected);

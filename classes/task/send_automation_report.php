@@ -76,8 +76,8 @@ class send_automation_report extends \core\task\scheduled_task {
             AND timemodified > ?
             AND courseid $insql;";
         $issued_certificates = $DB->get_records_sql($issued_certificates_sql, array_merge(array($since), $inparams), IGNORE_MISSING);
-        print_r("        issued_certificates: ");
-        print_r($issued_certificates);
+        print_r("        issued_certificates_count: ");
+        print_r(sizeof($issued_certificates));
         if (empty($issued_certificates)) {
             // No need to send messages if there aren't any certificates to sign.
             return;
@@ -87,20 +87,21 @@ class send_automation_report extends \core\task\scheduled_task {
         $certifiers = get_certifiers();
         print_r("       certifiers: ");
         print_r($certifiers);
-        $subject = \get_string('automation_report:subject', 'mod_ilddigitalcert');
 
         // Send message to every certifier.
         foreach ($certifiers as $certifier) {
-            $last_message_sql = "SELECT MAX(timecreated)
-                FROM mdl_notifications
-                WHERE useridto = :userid
-                AND eventtype = 'ilddigitalcert_automation_report';";
-            $last_message = $DB->get_record_sql($last_message_sql, array("userid" => $certifier), IGNORE_MISSING);
+            // $last_message_sql = "SELECT MAX(timecreated)
+            //     FROM mdl_notifications
+            //     WHERE useridto = :userid
+            //     AND eventtype = 'ilddigitalcert_automation_report';";
+            // $last_message = $DB->get_record_sql($last_message_sql, array("userid" => $certifier), IGNORE_MISSING);
             $to_user = $DB->get_record("user", array('id' => $certifier), '*', IGNORE_MISSING);
 
-            $message_html = \get_string('automation_report:intro', 'mod_ilddigitalcert', $to_user->firstname . " " . $to_user->lastname);
+            $subject = (new \lang_string('automation_report:subject', 'mod_ilddigitalcert', null))->out($to_user->lang);
+            $message_html = (new \lang_string('automation_report:intro', 'mod_ilddigitalcert', $to_user->firstname . " " . $to_user->lastname))->out($to_user->lang);
 
             // Set categorys for certs.
+            $certids = array();
             $certs_responsible_for = array();
             $other_certs = $issued_certificates;
 
@@ -123,15 +124,15 @@ class send_automation_report extends \core\task\scheduled_task {
 
                 // Map certs to course.
                 $certs_of_course = array();
-                $certids = array();
                 foreach ($issued_certificates as $id => $cert) {
-                    if ($cert->courseid == $course->id) {
-                        $certs_of_course[] = $cert;
-                        $certids[] = $id;
-                        // Unset certs that fit into a category. So there are only certs left in $other_certs
-                        // that didn't fit into another category.
-                        unset($other_certs[$id]);
-                    }
+                    // Only choose certificates that were issued after the last message, to prevent duplicate notifications.
+                    if ($cert->courseid != $course->id) continue;
+
+                    $certs_of_course[] = $cert;
+                    $certids[] = $id;
+                    // Unset certs that fit into a category. So there are only certs left in $other_certs
+                    // that didn't fit into another category.
+                    unset($other_certs[$id]);
                 }
 
                 if (!empty($certs_of_course)) {
@@ -149,22 +150,22 @@ class send_automation_report extends \core\task\scheduled_task {
                             break;
                         }
                     }
-                    $message_html .= \mod_ilddigitalcert\manager::render_certs_table($certs);
+                    $message_html .= \mod_ilddigitalcert\manager::render_certs_table($certs, null, null, null, $to_user->lang);
                     $message_html .= '</br>';
                 }
             }
             if (!empty($other_certs)) {
-                $message_html .= '<h3>' . \get_string('automation_report:other_certs', 'mod_ilddigitalcert') . '</h3>';
-                $message_html .= \mod_ilddigitalcert\manager::render_certs_table($other_certs);
+                $message_html .= '<h3>' . (new \lang_string('automation_report:other_certs', 'mod_ilddigitalcert'))->out($to_user->lang) . '</h3>';
+                $message_html .= \mod_ilddigitalcert\manager::render_certs_table($other_certs, null, null, null, $to_user->lang);
                 $message_html .= '</br>';
             }
-            $message_html .= \get_string('automation_report:end', 'mod_ilddigitalcert');
+            $message_html .= (new \lang_string('automation_report:end', 'mod_ilddigitalcert'))->out($to_user->lang);
 
             $message_text = \html_to_text($message_html);
 
             // Create contexturl.
             $contexturl = (new \moodle_url('/mod/ilddigitalcert/certifier_overview.php?cert_json=' . \json_encode($certids)))->out(false);
-            $contexturlname = 'Manage signed certificates';
+            $contexturlname = (new \lang_string('automation_report:contexturlname', 'mod_ilddigitalcert'))->out($to_user->lang);
 
             $message = \mod_ilddigitalcert\manager::get_message(self::MESSAGE_NAME, $to_user, $subject, $message_html, $message_text, $contexturl, $contexturlname);
             try {

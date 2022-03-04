@@ -44,7 +44,7 @@ class manager {
      * @param int $course
      * @return string HTML representation of a certificates table.
      */
-    static function render_certs_table($certificates, $show_actions = false, $courseid = null, $userid = null) {
+    static function render_certs_table($certificates, $show_actions = false, $courseid = null, $userid = null, $lang = null) {
         global $CFG, $DB;
 
         if (!$certificates || empty($certificates)) {
@@ -61,31 +61,45 @@ class manager {
             $align[] = 'left';
         }
 
-        $head[] = get_string('status');
+        $head[] = (new \lang_string('status'))->out($lang);
         $align[] = 'center';
-        $head[] = get_string('title', 'mod_ilddigitalcert');
+        $head[] = (new \lang_string('title', 'mod_ilddigitalcert'))->out($lang);
         $align[] = 'left';
 
         if (!\is_scalar($userid)) {
-            $head[] = get_string('recipient', 'mod_ilddigitalcert');
+            $head[] = (new \lang_string('recipient', 'mod_ilddigitalcert'))->out($lang);
             $align[] = 'left';
         }
         if (!\is_scalar($courseid)) {
-            $head[] = get_string('course');
+            $head[] = (new \lang_string('course'))->out($lang);
             $align[] = 'left';
         }
 
-        $head[] = get_string('startdate', 'mod_ilddigitalcert');
+        $head[] = (new \lang_string('startdate', 'mod_ilddigitalcert'))->out($lang);
         $align[] = 'left';
 
         if ($show_actions === true) {
             $bulk_options = array(
-                '' => get_string('selectanaction'),
-                'toblockchain' => get_string('toblockchain', 'mod_ilddigitalcert'),
-                'reissue' => get_string('reissue', 'mod_ilddigitalcert'),
+                '' => (new \lang_string('selectanaction'))->out($lang),
+                'toblockchain' => (new \lang_string('toblockchain', 'mod_ilddigitalcert'))->out($lang),
+                'reissue' => (new \lang_string('reissue', 'mod_ilddigitalcert'))->out($lang),
             );
-            $bulk_actions = \html_writer::select($bulk_options, 'bulk_actions', 'selectanaction', null, array('id' => 'm-element-bulk-actions', 'class' => 'form-control'));
-            $bulk_actions .= \html_writer::empty_tag('input', array('id' => 'm-element-bulk-actions__button', 'class' => ' btn btn-secondary', 'type' => 'button', 'value' => get_string('go')));
+            $bulk_actions = \html_writer::select(
+                $bulk_options,
+                'bulk_actions', 
+                'selectanaction', 
+                null, 
+                array('id' => 'm-element-bulk-actions', 'class' => 'form-control')
+            );
+            $bulk_actions .= \html_writer::empty_tag(
+                'input', 
+                array(
+                    'id' => 'm-element-bulk-actions__button', 
+                    'class' => ' btn btn-secondary', 
+                    'type' => 'button', 
+                    'value' => (new \lang_string('go'))->out($lang)
+                )
+            );
 
             $head[] = $bulk_actions;
             $align[] = 'left';
@@ -104,10 +118,10 @@ class manager {
                 }
                 $row[] = \html_writer::checkbox('select-cert' . $certificate->id, $certificate->id, false, null, $attributes);
             }
-            $icon = '<img height="32px" title="' . get_string('pluginname', 'mod_ilddigitalcert') . '"
+            $icon = '<img height="32px" title="' . (new \lang_string('pluginname', 'mod_ilddigitalcert'))->out($lang) . '"
         src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
             if (isset($certificate->txhash)) {
-                $icon = '<img height="32px" title="' . get_string('registered_and_signed', 'mod_ilddigitalcert') . '"
+                $icon = '<img height="32px" title="' . (new \lang_string('registered_and_signed', 'mod_ilddigitalcert'))->out($lang) . '"
             src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-block.svg">';
             }
             $row[] = $icon;
@@ -150,18 +164,18 @@ class manager {
                     // To-Blockchain Action
                     $actions = '<div class="m-element-action-row">';
                     $actions .= '<button class="m-element-sign-cert btn btn-secondary" value="' . $certificate->id . '">
-                <img title="' . get_string('reissue', 'mod_ilddigitalcert') .
+                <img title="' . (new \lang_string('reissue', 'mod_ilddigitalcert'))->out($lang) .
                         '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/sign_black_24dp.svg"> ' .
-                        get_string('toblockchain', 'mod_ilddigitalcert') . '</button>';
+                        (new \lang_string('toblockchain', 'mod_ilddigitalcert'))->out($lang) . '</button>';
                     // Reissue action
                     // $actions .= html_writer::link(
                     //     new moodle_url('/mod/ilddigitalcert/teacher_view.php?id=' .
                     //         $certificate->cmid . '&reissueid=' . $certificate->id . '&action=reissue'),
-                    //     '<img alt="' . get_string('reissue', 'mod_ilddigitalcert') . '" title="' . get_string('reissue', 'mod_ilddigitalcert') . '"
+                    //     '<img alt="' . (new \lang_string('reissue', 'mod_ilddigitalcert'))->out($lang) . '" title="' . (new \lang_string('reissue', 'mod_ilddigitalcert') . '"
                     //     src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/refresh_grey_24x24.png">'
                     // );
                     $actions .= '<button class="m-element-reissue btn btn-secondary" value="' . $certificate->id . '">
-                <img title="' . get_string('reissue', 'mod_ilddigitalcert') .
+                <img title="' . (new \lang_string('reissue', 'mod_ilddigitalcert'))->out($lang) .
                         '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/reissue_black_24dp.svg"> Reissue
             </button>';
                     $actions .= '</div>';

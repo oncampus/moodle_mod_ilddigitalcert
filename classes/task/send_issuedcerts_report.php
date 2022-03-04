@@ -57,8 +57,8 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
 
         // Get issued certificates waiting to be signed.
         $issued_certificates = $DB->get_records('ilddigitalcert_issued', array('inblockchain' => false));
-        print_r("        issued_certificates: ");
-        print_r($issued_certificates);
+        print_r("        issued_certificates_count: ");
+        print_r(sizeof($issued_certificates));
         if (empty($issued_certificates)) {
             // No need to send messages if there aren't any certificates to sign.
             return;
@@ -68,15 +68,16 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
         $certifiers = get_certifiers();
         print_r("       certifiers: ");
         print_r($certifiers);
-        $subject = \get_string('issuedcerts_report:subject', 'mod_ilddigitalcert');
 
         // Send message to every certifier.
         foreach ($certifiers as $certifier) {
             $to_user = $DB->get_record("user", array('id' => $certifier), '*', IGNORE_MISSING);
 
-            $message_html = \get_string('issuedcerts_report:intro', 'mod_ilddigitalcert', $to_user->firstname . " " . $to_user->lastname);
+            $subject = (new \lang_string('issuedcerts_report:subject', 'mod_ilddigitalcert', null))->out($to_user->lang);
+            $message_html = (new \lang_string('issuedcerts_report:intro', 'mod_ilddigitalcert', $to_user->firstname . " " . $to_user->lastname))->out($to_user->lang);
 
             // Set categorys for certs.
+            $certids = array();
             $certs_responsible_for = array();
             $other_certs = $issued_certificates;
 
@@ -99,7 +100,6 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
 
                 // Map certs to course.
                 $certs_of_course = array();
-                $certids = array();
                 foreach ($issued_certificates as $id => $cert) {
                     if ($cert->courseid == $course->id) {
                         $certs_of_course[] = $cert;
@@ -125,25 +125,25 @@ class send_issuedcerts_report extends \core\task\scheduled_task {
                             break;
                         }
                     }
-                    $message_html .= \mod_ilddigitalcert\manager::render_certs_table($certs);
+                    $message_html .= \mod_ilddigitalcert\manager::render_certs_table($certs, null, null, null, $to_user->lang);
                     $message_html .= '</br>';
                 }
             }
             if (!empty($other_certs)) {
                 if (!empty($certs_responsible_for)) {
-                    $message_html .= '<h3>' . \get_string('issuedcerts_report:other_certs', 'mod_ilddigitalcert') . '</h3>';
+                    $message_html .= '<h3>' . (new \lang_string('issuedcerts_report:other_certs', 'mod_ilddigitalcert'))->out($to_user->lang) . '</h3>';
                 }
-                $message_html .= \mod_ilddigitalcert\manager::render_certs_table($other_certs);
+                $message_html .= \mod_ilddigitalcert\manager::render_certs_table($other_certs, null, null, null, $to_user->lang);
                 $message_html .= '</br>';
             }
-            $message_html .= \get_string('issuedcerts_report:end', 'mod_ilddigitalcert');
+            $message_html .= (new \lang_string('issuedcerts_report:end', 'mod_ilddigitalcert'))->out($to_user->lang);
 
             // Create and send message.
             $message_text = \html_to_text($message_html);
 
             // Create contexturl.
             $contexturl = (new \moodle_url('/mod/ilddigitalcert/certifier_overview.php?cert_json=' . \json_encode($certids)))->out(false);
-            $contexturlname = 'Sign issued certificates';
+            $contexturlname = (new \lang_string('issuedcerts_report:contexturlname', 'mod_ilddigitalcert'))->out($to_user->lang);
 
             $message = \mod_ilddigitalcert\manager::get_message(self::MESSAGE_NAME, $to_user, $subject, $message_html, $message_text, $contexturl, $contexturlname);
             try {

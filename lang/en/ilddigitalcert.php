@@ -36,11 +36,12 @@ $string['add_certifier'] = 'Add certifier';
 
 $string['automation'] = 'Automation';
 $string['automation_help'] = 'If automation is active, certificates will be signed and written to the blockchain automatically by the selected certifier.';
-$string['automation_report:subject'] = 'Automatically signed certificates';
+$string['automation_report:contexturlname'] = 'Manage signed certificates';
+$string['automation_report:end'] = '';
 $string['automation_report:intro'] = '<p>Hello {$a},</p>
 <p>following certificates were recently signed automatically and written to the blockchain successfully:</p>';
 $string['automation_report:other_certs'] = 'Other certificates';
-$string['automation_report:end'] = '';
+$string['automation_report:subject'] = 'Automatically signed certificates';
 
 $string['auto_certifier'] = 'Automatic certifier';
 $string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificates will be automatically signed.';
@@ -112,11 +113,12 @@ $string['invalid'] = 'Invalid certificate';
 $string['invalid_format'] = 'Invalid file format';
 $string['invalid_pk_format'] = 'The given private key is invalid';
 
-$string['issuedcerts_report:subject'] = 'Issued certificates waiting to be signed';
+$string['issuedcerts_report:contexturlname'] = 'Sign issued certificates';
+$string['issuedcerts_report:end'] = '';
 $string['issuedcerts_report:intro'] = '<p>Hello {$a},</p>
 <p>following certificates were recently issued, but still need to be signed:</p>';
 $string['issuedcerts_report:other_certs'] = 'Other certificates';
-$string['issuedcerts_report:end'] = '';
+$string['issuedcerts_report:subject'] = 'Issued certificates waiting to be signed';
 
 $string['issuer'] = 'Issuer';
 $string['issueraddress'] = 'Blockchainadresse der Zertifizierungsstelle';

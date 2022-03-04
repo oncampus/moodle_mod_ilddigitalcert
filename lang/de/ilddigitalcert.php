@@ -35,11 +35,12 @@ $string['ilddigitalcertname'] = 'Name';
 $string['add_certifier'] = 'Zertifizierer hinzufügen';
 $string['automation'] = 'Automatisierung';
 $string['automation_help'] = 'Wenn die Automatisierung aktiviert ist, werden die Zertifikate automatisch von dem angegebenen Zertifizierer signiert und in die Blockchain geschrieben. ';
-$string['automation_report:subject'] = 'Automatisch signierte Zertifikate';
+$string['automation_report:contexturlname'] = 'Verwaltung der signierten Zertifikate';
+$string['automation_report:end'] = '';
 $string['automation_report:intro'] = '<p>Hi {$a},</p>
 <p>folgende Zertifikate wurden kürzlich automatisch signiert und erfolgreich in die Blockchain geschrieben:</p>';
 $string['automation_report:other_certs'] = 'Other certificates';
-$string['automation_report:end'] = '';
+$string['automation_report:subject'] = 'Automatisch signierte Zertifikate';
 
 $string['auto_certifier'] = 'Automatischer Zertifizierer';
 $string['auto_certifier_help'] = 'Geben sie hier eine oder einen Zertifizierer*in an, in dessen/dessem Namen die Zertifikate automatisiert signiert werden sollen. Geeignete Zertifizierer müssen in diesem Kurs eingeschrieben sein und bereits eine gültige Blockchain-Adresse haben.';
@@ -111,11 +112,12 @@ $string['invalid'] = 'Das Zertifikat ist ungültig';
 $string['invalid_format'] = 'Ungültiges Dateiformat';
 $string['invalid_pk_format'] = 'Der gegebene Private Key ist ungültig.';
 
-$string['issuedcerts_report:subject'] = 'Zertifikate benötigen Ihre Signatur';
+$string['issuedcerts_report:contexturlname'] = 'Signiere die ausgestellten Zertifikate';
+$string['issuedcerts_report:end'] = '';
 $string['issuedcerts_report:intro'] = '<p>Hallo {$a},</p>
 <p>folgende Zertifikate wurden kürzlich ausgestellt. Bitte signieren Sie diese über die folgenden Schaltflächen:</p>';
 $string['issuedcerts_report:other_certs'] = 'Weitere Zertifikate';
-$string['issuedcerts_report:end'] = '';
+$string['issuedcerts_report:subject'] = 'Zertifikate benötigen Ihre Signatur';
 
 $string['issuer'] = 'Zertifizierungsstelle';
 $string['issueraddress'] = 'Blockchainadresse der Zertifizierungsstelle';

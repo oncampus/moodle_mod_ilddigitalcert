@@ -388,5 +388,21 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022030218, 'ilddigitalcert');
     }
 
+    
+    if ($oldversion < 2022030311) {
+
+        // Define field edci to be added to ilddigitalcert_issued.
+        $table = new xmldb_table('ilddigitalcert');
+        $field = new xmldb_field('auto_pk', XMLDB_TYPE_CHAR, '512', null, null, null, null, 'auto_certifier');
+
+        // Conditionally launch add field edci.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_precision($table, $field);
+        }
+
+        // Ilddigitalcert savepoint reached.
+        upgrade_mod_savepoint(true, 2022030311, 'ilddigitalcert');
+    }
+
     return true;
 }

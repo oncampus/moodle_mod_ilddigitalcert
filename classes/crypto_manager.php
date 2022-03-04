@@ -52,11 +52,9 @@ class crypto_manager {
     public static function loadEncryptionKeyFromConfig()
     {
         global $CFG;
-        try{
-            $keyAscii = file_get_contents($CFG->dataroot . '/filedir/ilddigitalcert-secret_key.txt');
-        } catch (\moodle_exception $e) {
-            throw new \coding_exception("A programmer has to generate a key first! See plugin installation guide for more infos.");
-        }
+        $key_file = $CFG->dataroot . '/filedir/ilddigitalcert-secret_key.txt';
+        if(!file_exists($key_file)) throw new \coding_exception("A programmer has to generate a key first! See plugin installation guide for more infos.");
+        $keyAscii = file_get_contents($key_file);
         return Key::loadFromAsciiSafeString($keyAscii);
     }
 

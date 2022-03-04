@@ -228,7 +228,7 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
                    0, array('maxfiles' => 1));
 
         // Make sure only valid userids are stored in db.
-        if(!is_int($data->auto_certifier)) {
+        if(!is_numeric($data->auto_certifier) || $data->auto_certifier <= 0) {
             $data->auto_certifier = null;
         }
 
