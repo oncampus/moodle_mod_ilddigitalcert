@@ -16,7 +16,7 @@ along with Moodle. If not, see
 <http: //www.gnu.org/licenses />.
 }}
 {{!
-@template mod_ilddigitalcert/teacher_view
+@template mod_ilddigitalcert/overview
 
 TODO: Description
 
@@ -29,20 +29,94 @@ Data attributes required for JS:
 Example context (json):
 {
 "certificate_name": "Zertifikat",
+"preview_url": "https://",
 "course_name": "Blockchain Grundlagen",
 "to_bc_form": "<form></form>",
 "reissue_form": "<form></form>",
+"revocation_form": "<form></form>",
 "search_form": "<form></form>",
 "search_count": 3,
-"certs_table": "<table></table>",
+"certs_table": "<table></table>",has_cap_certify
+"has_cap_viewall": "true",
+"has_cap_certify": "false",
 }
 }}
 
 {{> mod_ilddigitalcert/styles}}
-<p>{{#str}} overview_intro, mod_ilddigitalcert {{/str}}</p>
+{{#certificate_name}}
+<p>
+    <a href="{{ preview_url }}">{{#str}} preview, mod_ilddigitalcert {{/str}} "{{ certificate_name }}"</a>
+</p>
+{{/certificate_name}}
 
 {{{ search_form }}}
 
-<p>{{#str}} resultsfound, moodle, {{ search_count }} {{/str}}</p>
-
-{{{ certs_table }}}
+{{#has_cap_certify}}
+<!-- Modal containing to-blockchain-form -->
+<div class="modal moodle-has-zindex hidden" id="m-element-modal" data-region="modal-container" aria-hidden="false"
+    role="dialog" tabindex="-1" style="z-index: 1052;">
+    <div class="modal-dialog " role="document" data-region="modal" aria-labelledby="0-modal-title" tabindex="0">
+        <div class="modal-content hidden" id="m-element-modal__to-bc">
+            {{#to_bc_form}}
+            <div class="modal-header " data-region="header">
+                <h5 id="0-modal-title" class="modal-title" data-region="title">
+                    {{#str}} sign_cert, mod_ilddigitalcert {{/str}}
+                </h5>
+                <button type="button" class="close" data-action="hide" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{{#str}} sign_confirmation, mod_ilddigitalcert {{/str}}</p>
+                <ul class="m-element-modal__selected_certs"></ul>
+            </div>
+            <div class="modal-footer">
+                <p>{{#str}} sign_with_pk, mod_ilddigitalcert {{/str}}</p>
+                {{{ to_bc_form }}}
+            </div>
+        </div>
+        {{/to_bc_form}}
+        {{#reissue_form}}
+        <div class="modal-content hidden" id="m-element-modal__reissue">
+            <div class="modal-header " data-region="header">
+                <h5 id="0-modal-title" class="modal-title" data-region="title">
+                    {{#str}} reissue, mod_ilddigitalcert {{/str}}
+                </h5>
+                <button type="button" class="close" data-action="hide" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{{#str}} reissue_confirmation, mod_ilddigitalcert {{/str}}</p>
+                <ul class="m-element-modal__selected_certs"></ul>
+            </div>
+            <div class="modal-footer">
+                {{{ reissue_form }}}
+            </div>
+        </div>
+        {{/reissue_form}}
+        {{#revocation_form}}
+        <div class="modal-content hidden" id="m-element-modal__revoke">
+            <div class="modal-header " data-region="header">
+                <h5 id="0-modal-title" class="modal-title" data-region="title">
+                    {{#str}} revoke, mod_ilddigitalcert {{/str}}
+                </h5>
+                <button type="button" class="close" data-action="hide" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{{#str}} revoke_confirmation, mod_ilddigitalcert {{/str}}</p>
+                <ul class="m-element-modal__selected_certs"></ul>
+            </div>
+            <div class="modal-footer">
+                {{{ revocation_form }}}
+            </div>
+        </div>
+        {{/revocation_form}}
+    </div>
+</div>
+<div aria-hidden="true">
+    <div class="modal-backdrop hidden" aria-hidden="true" data-region="modal-backdrop" style="z-index: 1051;"></div>
+</div>
+{{/has_cap_certify}}

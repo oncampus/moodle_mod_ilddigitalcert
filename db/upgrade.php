@@ -404,5 +404,20 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022030311, 'ilddigitalcert');
     }
 
+    if ($oldversion < 2022030913) {
+
+        // Define field auto_pk, auto_certifier and automation to be added to ilddigitalcert.
+        $table = new xmldb_table('ilddigitalcert');
+        $field = new xmldb_field('automation_report', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'auto_pk');
+
+        // Conditionally add fields.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Ilddigitalcert savepoint reached.
+        upgrade_mod_savepoint(true, 2022030913, 'ilddigitalcert');
+    }
+
     return true;
 }

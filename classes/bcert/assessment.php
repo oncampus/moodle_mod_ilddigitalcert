@@ -104,7 +104,6 @@ class assessment
 
         $assessment->title = (string) $ass_xml->title->text;
 
-        // TODO: get grade
         $assessment->grade = (string) $ass_xml->grade;
         $assessment->startdate = (string) $ass_xml->startdate;
         $assessment->enddate = (string) $ass_xml->enddate;

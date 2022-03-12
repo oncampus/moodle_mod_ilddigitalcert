@@ -36,14 +36,16 @@ $string['add_certifier'] = 'Zertifizierer hinzufügen';
 $string['automation'] = 'Automatisierung';
 $string['automation_help'] = 'Wenn die Automatisierung aktiviert ist, werden die Zertifikate automatisch von dem angegebenen Zertifizierer signiert und in die Blockchain geschrieben. ';
 $string['automation_report:contexturlname'] = 'Verwaltung der signierten Zertifikate';
+$string['automation_report:enable'] = 'Wöchentlicher Bericht';
+$string['automation_report:enable_help'] = 'Wenn diese Option aktiviert ist, erhält der ausgewählte Zertifizierer am Ende jeder Woche einen Bericht, der alle Zertifikate auflistet, die in der vorangegangen Woche im dessen oder deren Namen signiert wurden.';
 $string['automation_report:end'] = '';
 $string['automation_report:intro'] = '<p>Hi {$a},</p>
-<p>folgende Zertifikate wurden kürzlich automatisch signiert und erfolgreich in die Blockchain geschrieben:</p>';
+<p>folgende Zertifikate wurden kürzlich automatisch in ihrem Namen signiert und erfolgreich in die Blockchain geschrieben:</p>';
 $string['automation_report:other_certs'] = 'Other certificates';
 $string['automation_report:subject'] = 'Automatisch signierte Zertifikate';
 
-$string['auto_certifier'] = 'Automatischer Zertifizierer';
-$string['auto_certifier_help'] = 'Geben sie hier eine oder einen Zertifizierer*in an, in dessen/dessem Namen die Zertifikate automatisiert signiert werden sollen. Geeignete Zertifizierer müssen in diesem Kurs eingeschrieben sein und bereits eine gültige Blockchain-Adresse haben.';
+$string['auto_certifier'] = 'Zertifizierer';
+$string['auto_certifier_help'] = 'Geben sie hier einen Zertifizierer an, in dessen/dessem Namen die Zertifikate automatisiert signiert werden sollen. Geeignete Zertifizierer müssen in diesem Kurs eingeschrieben sein und bereits eine gültige Blockchain-Adresse haben.';
 $string['auto_pk'] = 'Privater Schlüssel des Zertifizierers';
 $string['auto_pk_help'] = 'Geben Sie hier den privaten Schlüssel des oben angegebenen Zertifizierers an.';
 $string['block_heading'] = 'Digitale Zertifikate in der Blockchain';
@@ -52,11 +54,10 @@ $string['block_summary'] = '<p>Überprüfe hier die Echtheit Deiner digitalen Ze
 <p>Deine ausgedruckte Version des Zertifikates kannst Du überprüfen indem Du
 den untenstehenden QR-Code einscannst.
 </p>';
-$string['cert_waiting_for_registration'] = 'Dieses Zertifikat wartet auf Registrierung und Signierung in der Blockchain durch einen akkreditierten Zertifizierer.';
+$string['cert_waiting_for_registration'] = 'Dieses Zertifikat wartet auf Registrierung und Signierung in der Blockchain durch berechtigte Zertifizierer.';
 $string['certhash'] = 'Zertifikat-Hash';
 $string['certificate'] = 'Zertifikat';
-$string['certificate_overview'] = 'Alle Zertifikate im Kurs';
-$string['certifier'] = 'Zertifizierer:in';
+$string['certifier'] = 'Zertifizierer';
 $string['certifier_address'] = 'Blockchain-Adresse des Zertifizierers';
 $string['choose'] = 'Bitte wählen';
 $string['configlabel_blockchain_url'] = 'Blockchain URL';
@@ -91,6 +92,7 @@ $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Wählen Sie eine Zertifizierungsstelle';
 $string['error_choose_certifier'] = 'Wählen Sie eine:n Zertizierer:in';
 $string['error_register_cert'] = 'Fehler beim Speichern in der Blockchain';
+$string['error_revoke_cert'] = 'Fehler beim Wiederrufen';
 $string['examination_end'] = 'Prüfungsende';
 $string['examination_place'] = 'Prüfungsort';
 $string['examination_start'] = 'Prüfungsstart';
@@ -112,10 +114,12 @@ $string['invalid'] = 'Das Zertifikat ist ungültig';
 $string['invalid_format'] = 'Ungültiges Dateiformat';
 $string['invalid_pk_format'] = 'Der gegebene Private Key ist ungültig.';
 
+$string['issued'] = 'Das Zertifikat wurde ausgestellt, muss jedoch noch signiert und in der Blockchain registriert werden.';
 $string['issuedcerts_report:contexturlname'] = 'Signiere die ausgestellten Zertifikate';
 $string['issuedcerts_report:end'] = '';
 $string['issuedcerts_report:intro'] = '<p>Hallo {$a},</p>
 <p>folgende Zertifikate wurden kürzlich ausgestellt. Bitte signieren Sie diese über die folgenden Schaltflächen:</p>';
+$string['issuedcerts_report:nocertifierincourse'] = 'Achtung, aktuell ist kein Zertifizierer in den Kurs {$a} eingeschrieben. Nur Zertifizierer können ausgestellte Zertifikate signieren und in der Blockchain registrieren. Bitte schreiben sie einen Zertifizierer in den Kurs ein. Für weitere Hilfe wenden Sie sich an einen Admin.';
 $string['issuedcerts_report:other_certs'] = 'Weitere Zertifikate';
 $string['issuedcerts_report:subject'] = 'Zertifikate benötigen Ihre Signatur';
 
@@ -133,10 +137,16 @@ $string['issueremail'] = 'E-Mail';
 $string['issuerdescription'] = 'Beschreibung';
 
 $string['json'] = 'Metadaten';
+$string['subject_certificate_revoked'] = 'Ihr Zertifikat wurde wiederrufen';
 $string['subject_new_certificate'] = 'Neues digitales Zertifikat';
 $string['subject_new_digital_certificate'] = 'Neues digitales Zertifikat in der Blockchain';
 $string['messageprovider:ilddigitalcert_issuedcerts_report'] = 'Kürzlich ausgestellte Zertifikate';
 $string['messageprovider:ilddigitalcert_automation_report'] = 'Automatisch signierte Zertifikate';
+$string['message_certificate_revoked'] = '<p>Hallo {$a->fullname},</p>
+<p>Ihr digitales Zertifikat wurde wiederrufen.</p>
+<p>Hier können Sie sich Ihr Zertifikat ansehen: <a href="{$a->url}">{$a->url}</a>.</p>
+<p>Viele Grüße</p>
+<p>Ihr {$a->from} Team</p>';
 $string['message_new_certificate'] = 'Hallo {$a->fullname},
 
 Sie haben ein digitales Zertifikat erhalten.
@@ -240,8 +250,9 @@ Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
 $string['not_logged_in'] = 'Sie sind nicht im System angemeldet.';
 $string['only_blockchain'] = 'Registrierte Zertifikate';
 $string['only_nonblockchain'] = 'Unregistrierte Zertifikate';
-$string['overview'] = 'Übersicht';
-$string['overview_intro'] = 'Hier sehen Sie eine Übersicht über alle erworbenen Zertifikate aus allen Kursen, in die Sie eingeschrieben sind oder waren.';
+$string['overview'] = 'Ihre erworbenen Zertifikate';
+$string['overview_certifier'] = 'Übersicht ausgestellter Zertifikate';
+$string['overview_course'] = 'Ausgestellte Zertifikate im Kurs "{$a}"';
 $string['pdf'] = 'PDF';
 $string['preview'] = 'Vorschau für das Zertifikat';
 $string['recipient'] = 'Empfänger';
@@ -250,6 +261,10 @@ $string['reissue_confirmation'] = 'Wollen Sie folgende Zertifikate neuausstellen
 $string['reissue_error_already_signed'] = '{$a} Zertifikat(e) konnten nicht neuausgestellt werden, da diese bereits signiert und in die Blockchain geschrieben wurden.';
 $string['reissue_success'] = 'Das Zertifikat für: <b>{$a}</b> wurde erfolgreich neuausgestellt.';
 $string['registered_and_signed'] = 'Das Zertifikat wurde erfolgreich signiert und in der Blockchain registriert.';
+$string['revoke'] = 'Wiederrufen';
+$string['revoked'] = 'Das Zertifikat wurde erfolgreich wiederrufen.';
+$string['revoke_confirmation'] = 'Wollen Sie folgende Zertifikate wiederrufen?';
+$string['revoke_error_invalid'] = '{$a} Zertifikate konnten nicht wiederrufen werden, da diese noch nicht in der Blockchain registriert wurden.';
 $string['scan_qr_code'] = 'Um Ihr digitales Zertifikat an die Wallet zu senden, müssen Sie erst eine Verbindung zu dieser herstellen. Öffnen Sie dazu die App und scannen Sie den QR-Code. Folgen Sie anschließend den Anweisungen in der App.';
 $string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
 $string['send_automation_report'] = 'Erstattet Bericht über kürzlich automatisch signierte Zertifikate';

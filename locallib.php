@@ -199,7 +199,7 @@ function get_pdf_footerhtml($hash) {
  */
 function to_blockchain($issuedcertificate, $fromuser, $pk) {
     global $DB, $CFG, $SITE;
-
+    
     require_once('web3lib.php');
     $pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $fromuser);
     if (!$pref) {
@@ -565,7 +565,7 @@ function reissue_certificate($certmetadata, $userid, $cmid) {
         array('userid' => $userid, 'cmid' => $cmid, 'enrolmentid' => $enrolmentid)
     )) {
         // Check if cert is already in blockchain. if so, print error.
-        if (isset($issued->certhash)) {
+        if (isset($issued->txhash)) {
             print_error(
                 'already_in_blockchain',
                 'mod_ilddigitalcert',

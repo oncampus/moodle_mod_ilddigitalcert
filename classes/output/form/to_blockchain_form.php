@@ -18,9 +18,13 @@
  * Form that lets sign and register certificates in the blockchain.
  *
  * @package   mod_ilddigitalcert
- * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
+ * @copyright 2022, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_ilddigitalcert\output\form;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/formslib.php");
 
@@ -31,7 +35,7 @@ require_once($CFG->libdir . "/formslib.php");
  * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_ilddigialcert_to_blockchain_form extends moodleform {
+class to_blockchain_form extends \moodleform {
     /**
      * Form definition.
      * @return void
@@ -48,15 +52,8 @@ class mod_ilddigialcert_to_blockchain_form extends moodleform {
         $mform->addElement('password', 'pk', 'Private Key', $pk_attributes);
         $mform->addRule('pk', get_string('invalid_pk_format', 'ilddigitalcert'), 'regex', '/[A-Za-z0-9]{64}/', 'client');
 
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'ueid');
-        $mform->setType('ueid', PARAM_INT);
         $mform->addElement('hidden', 'selected', '', array('id' => 'm-element-to-bc__selected'));
         $mform->setType('selected', PARAM_NOTAGS);
-        $mform->addElement('hidden', 'action');
-        $mform->setType('action', PARAM_NOTAGS);
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submit', get_string('toblockchain', 'ilddigitalcert'), array('id' => 'm-element-to-bc__submit'));
@@ -77,5 +74,49 @@ class mod_ilddigialcert_to_blockchain_form extends moodleform {
         }
 
         return $data;
+    }
+
+    
+    /**
+     * Registers the certificates in the blockchain that were defined in the form.
+     *
+     * @return array
+     **/
+    public function action() {
+        global $DB, $USER;
+
+        // Get form data.
+        $data = $this->get_data();
+        $selected_certs = json_decode($data->selected);
+
+        if (empty($selected_certs)) return null;
+
+        // Get certificate records from selected ids.
+        list($insql, $inparams) = $DB->get_in_or_equal($selected_certs);
+        $sql = "SELECT * FROM {ilddigitalcert_issued} WHERE txhash IS NULL AND id $insql";
+        $certificates = $DB->get_records_sql($sql, $inparams);
+
+        // Write selected certs to the blockchain with the given private key.
+        foreach ($certificates as $issuedcertificate) {
+            if (!to_blockchain($issuedcertificate, $USER, $data->pk)) print_error('error_register_cert', 'mod_ilddigitalcert');
+
+            $recipient = json_decode($issuedcertificate->metadata)->{'extensions:recipientB4E'};
+            $recipientname = $recipient->givenname . ' ' . $recipient->surname;
+            $message = '<div><p>' . get_string('registered_and_signed', 'mod_ilddigitalcert') . '</p>';
+            $message .= '<p>Recipient: <b>' . $recipientname . '</b><br/>';
+            $message .= 'Hash: <b>' . $issuedcertificate->certhash . '</b><br/>';
+            $message .= 'Startdate: <b>' . json_decode($issuedcertificate->metadata)->issuedOn . '</b><br/>';
+            
+            if(isset(json_decode($issuedcertificate->metadata)->expires)) {
+                $message .= 'Enddate: <b>' . json_decode($issuedcertificate->metadata)->expires . '</b></p></div>';
+            }
+
+            \core\notification::success($message);
+        }
+            
+        $invalid_count = count($selected_certs) - count($certificates);
+        if ($invalid_count > 0) {
+            \core\notification::warning(get_string('sign_error_already_signed', 'mod_ilddigitalcert', $invalid_count));
+        }
     }
 }

@@ -53,7 +53,7 @@ class crypto_manager {
     {
         global $CFG;
         $key_file = $CFG->dataroot . '/filedir/ilddigitalcert-secret_key.txt';
-        if(!file_exists($key_file)) throw new \coding_exception("A programmer has to generate a key first! See plugin installation guide for more infos.");
+        if(!file_exists($key_file)) throw new \coding_exception("Encryption key file is missing. A programmer has to generate a key first! See plugin installation guide for more infos.");
         $keyAscii = file_get_contents($key_file);
         return Key::loadFromAsciiSafeString($keyAscii);
     }

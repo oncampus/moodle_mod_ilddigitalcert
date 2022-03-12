@@ -119,7 +119,6 @@ class achievement
 
         $root->appendXML($this->assessment->get_edci());
 
-        // TODO: get id from $qualification
         $root->addChild('specifiedBy')->addAttribute('idref', $this->qualification->get_id());
 
         return $root;

@@ -38,8 +38,10 @@ $string['automation'] = 'Automation';
 $string['automation_help'] = 'If automation is active, certificates will be signed and written to the blockchain automatically by the selected certifier.';
 $string['automation_report:contexturlname'] = 'Manage signed certificates';
 $string['automation_report:end'] = '';
+$string['automation_report:enable'] = 'Weekly report';
+$string['automation_report:enable_help'] = 'If this option is enabled the set certifier will receive a report at the end of every week that lists all the certificates that were signed in their name during the past week.';
 $string['automation_report:intro'] = '<p>Hello {$a},</p>
-<p>following certificates were recently signed automatically and written to the blockchain successfully:</p>';
+<p>following certificates were recently signed automatically in your name and written to the blockchain successfully:</p>';
 $string['automation_report:other_certs'] = 'Other certificates';
 $string['automation_report:subject'] = 'Automatically signed certificates';
 
@@ -56,7 +58,6 @@ $string['block_summary'] = '<p>Verify the authenticity of your digital certifica
 $string['cert_waiting_for_registration'] = 'Dieses Zertifikat wartet auf Registrierung und Signierung in der Blockchain durch einen akkreditierten Zertifizierer.';
 $string['certhash'] = 'Zertifikat-Hash';
 $string['certificate'] = 'Certificate';
-$string['certificate_overview'] = 'All certificates in this course';
 $string['certifier'] = 'Certifier';
 $string['certifier_address'] = 'Blockchain address of the certifier';
 $string['choose'] = 'Choose';
@@ -91,7 +92,8 @@ $string['edit_certifiers'] = 'Manage certifiers';
 $string['edit_issuers'] = 'Aussteller verwalten';
 $string['error_choose'] = 'Choose issuer';
 $string['error_choose_certifier'] = 'Choose certifier';
-$string['error_register_cert'] = 'Fehler beim Speichern in der Blockchain';
+$string['error_register_cert'] = 'Error during registration in the blockchain';
+$string['error_revoke_cert'] = 'Error during revocation';
 $string['examination_end'] = 'Examniation end';
 $string['examination_place'] = 'Examniation place';
 $string['examination_start'] = 'Examination start';
@@ -113,10 +115,12 @@ $string['invalid'] = 'Invalid certificate';
 $string['invalid_format'] = 'Invalid file format';
 $string['invalid_pk_format'] = 'The given private key is invalid';
 
+$string['issued'] = 'The certificate was issued, but still needs to be signed and registered in the blockchain.';
 $string['issuedcerts_report:contexturlname'] = 'Sign issued certificates';
 $string['issuedcerts_report:end'] = '';
 $string['issuedcerts_report:intro'] = '<p>Hello {$a},</p>
 <p>following certificates were recently issued, but still need to be signed:</p>';
+$string['issuedcerts_report:nocertifierincourse'] = 'Attention, at the moment there is no certifier enrolled in the course {$a}. Only certifiers are able to sign and register issued certificates in the blockchain. Please enrole a certifier in the course or consider contacting for further help.';
 $string['issuedcerts_report:other_certs'] = 'Other certificates';
 $string['issuedcerts_report:subject'] = 'Issued certificates waiting to be signed';
 
@@ -135,10 +139,16 @@ $string['issuerdescription'] = 'Description';
 
 
 $string['json'] = 'Metadata';
-$string['subject_new_certificate'] = 'Neues digitales Zertifikat';
-$string['subject_new_digital_certificate'] = 'Neues digitales Zertifikat in der Blockchain';
+$string['subject_certificate_revoked'] = 'Your Certificate was revoked';
+$string['subject_new_certificate'] = 'New digital certificate';
+$string['subject_new_digital_certificate'] = 'New digital certificate in the blockchain';
 $string['messageprovider:ilddigitalcert_issuedcerts_report'] = 'Recently issued certificates';
 $string['messageprovider:ilddigitalcert_automation_report'] = 'Automatically signed certificates';
+$string['message_certificate_revoked'] = '<p>Hi {$a->fullname},</p>
+<p>Your certificate was revoked.</p>
+<p>Here you can view your certificate: <a href="{$a->url}">{$a->url}</a>.</p>
+<p>Kind regards</p>
+<p>Your {$a->from} team</p>';
 $string['message_new_certificate'] = 'Hallo {$a->fullname},
 
 Sie haben ein digitales Zertifikat erhalten.
@@ -231,18 +241,23 @@ Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
 $string['not_logged_in'] = 'You are not logged in.';
 $string['only_blockchain'] = 'Registered certificates';
 $string['only_nonblockchain'] = 'Unregistered certificates';
-$string['overview'] = 'Overview';
-$string['overview_intro'] = 'Hier sehen Sie eine Übersicht über alle erworbenen Zertifikate aus allen Kursen, in die Sie eingeschrieben sind oder waren.';
+$string['overview'] = 'Your awarded certificates';
+$string['overview_certifier'] = 'Overview of issued certificates';
+$string['overview_course'] = 'Issued Certificates in course "{$a}"';
 $string['pdf'] = 'PDF';
-$string['preview'] = 'Vorschau für das Zertifikat';
+$string['preview'] = 'Preview the certificate';
 $string['recipient'] = 'Recipient';
-$string['reissue'] = 'Reissue certificate';
+$string['reissue'] = 'Reissue';
 $string['reissue_confirmation'] = 'Do you want to reissue following certificates?';
 $string['reissue_error_already_signed'] = 'Couldn\'t reissue {$a} certificat(s), because they where already signed and registered in the blockchain.';
 $string['reissue_success'] = 'Susscessfully reissued certificate for: <b>{$a}</b>';
 $string['registered_and_signed'] = 'The certificate was successfully signed and registered in the blockchain.';
+$string['revoke'] = 'Revoke';
+$string['revoked'] = 'The certificate was successfully revoked.';
+$string['revoke_confirmation'] = 'Do you want to revoke following certificates?';
+$string['revoke_error_invalid'] = '{$a} certificate(s) could\'nt be revoked, because they are not yet registered in the blockchain.';
 $string['scan_qr_code'] = 'To send your digital certificate to your wallet, you have to establish a connection first. To do this, open the app and scan the qr-code. Afterwards follow the instructions in the App.';
-$string['select_user'] = 'Wählen Sie eine/n Nutzer/in aus!';
+$string['select_user'] = 'Select a user!';
 $string['send_automation_report'] = 'Reports recently and automatically signed certs.';
 $string['send_issuedcerts_report'] = 'Reports issued certs waiting to be signed.';
 $string['send_to_wallet'] = 'Send to wallet';

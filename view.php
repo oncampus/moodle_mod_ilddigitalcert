@@ -226,7 +226,7 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
 } else if (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view = 'html') {
     // TODO elseif (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view == 'issue_teacher')//!
     // Zertifikatsübersicht als Teacher/certifier.
-    redirect($CFG->wwwroot . '/mod/ilddigitalcert/teacher_view.php?id=' . $cm->id . '&ueid=' . $ueid);
+    redirect($CFG->wwwroot . '/mod/ilddigitalcert/overview.php?id=' . $cm->id . '&ueid=' . $ueid);
 } else {
     // TODO unterscheiden ob $ueid (dann neue Funtktion get_issued_certificate) oder aktuelles enrolment!
 

@@ -19,7 +19,7 @@
  * written to  the blockchain automatically since the last report.
  *
  * @package    mod_ilddigitalcert
- * @copyright  2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
+ * @copyright  2022 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -56,24 +56,28 @@ class send_automation_report extends \core\task\scheduled_task {
         global $DB;
 
         // Get courses where automation is enabled.
-        if (!$auto_courses = $DB->get_record("ilddigitalcert", array("automation" => 1), "course", IGNORE_MISSING)) {
+        if (!$auto_courses = $DB->get_records("ilddigitalcert", array("automation" => 1, "automation_report" => 1), null, "course", IGNORE_MISSING)) {
             return;
         }
 
         print_r("        auto_courses: ");
         print_r($auto_courses);
+        $auto_courses = array_keys($auto_courses);
 
         list($insql, $inparams) = $DB->get_in_or_equal($auto_courses);
 
-        // Get certificates that have been automatically written to the blockchain in the last 24 hours.
-        $time = new \DateTime("now", \core_date::get_user_timezone_object());
-        $time->sub(new \DateInterval("P1D"));
-        $since = $time->getTimestamp();
+        // Get certificates that have been registered in the blockchain since the last report was sent.
+        if(!$since = $DB->get_field('task_scheduled', 'lastruntime', array('classname' => '\mod_ilddigitalcert\task\send_automation_report'), IGNORE_MISSING)) {
+            // Get certificates that have been automatically written to the blockchain in the last week.
+            $time = new \DateTime("now", \core_date::get_user_timezone_object());
+            $time->sub(new \DateInterval("P7D"));
+            $since = $time->getTimestamp();
+        }
 
         $issued_certificates_sql = "SELECT *
             FROM mdl_ilddigitalcert_issued
             WHERE txhash IS NOT NULL
-            AND timemodified > ?
+            AND timemodified >= ?
             AND courseid $insql;";
         $issued_certificates = $DB->get_records_sql($issued_certificates_sql, array_merge(array($since), $inparams), IGNORE_MISSING);
         print_r("        issued_certificates_count: ");
@@ -107,12 +111,20 @@ class send_automation_report extends \core\task\scheduled_task {
 
             // Get courses, for whom they are responsible.
             // Meaning ourses, they are enroled to and that have ilddigitalcert activities.
-            $courses_responsible_for_sql = "SELECT e.courseid AS id, c.fullname AS fullname, c.shortname AS shortname, idc.name AS cert_name FROM mdl_user_enrolments ue
-            JOIN mdl_enrol e ON e.id = ue.enrolid
-            JOIN mdl_ilddigitalcert idc ON idc.course = e.courseid
-            JOIN mdl_course c ON c.id = e.courseid
-            WHERE ue.userid = :userid;";
-            $courses_responsible_for = $DB->get_records_sql($courses_responsible_for_sql, array('userid' => $certifier), IGNORE_MISSING);
+            // $courses_responsible_for_sql = "SELECT e.courseid AS id, c.fullname AS fullname, c.shortname AS shortname, idc.name AS cert_name FROM mdl_user_enrolments ue
+            // JOIN mdl_enrol e ON e.id = ue.enrolid
+            // JOIN mdl_ilddigitalcert idc ON idc.course = e.courseid
+            // JOIN mdl_course c ON c.id = e.courseid
+            // WHERE ue.userid = :userid;";
+            // $courses_responsible_for = $DB->get_records_sql($courses_responsible_for_sql, array('userid' => $certifier), IGNORE_MISSING);
+            list($insql, $inparams) = $DB->get_in_or_equal($auto_courses);
+            $courses_responsible_for_sql = "SELECT c.id AS id, c.fullname AS fullname, c.shortname AS shortname, idc.name AS cert_name 
+                FROM {course} c
+                JOIN {ilddigitalcert} idc 
+                    ON idc.course = c.id 
+                WHERE c.id $insql
+                AND auto_certifier = ?;";
+            $courses_responsible_for = $DB->get_records_sql($courses_responsible_for_sql, array_merge($inparams, array($certifier)), IGNORE_MISSING);
             print_r("       courses_responsible_for: ");
             print_r($courses_responsible_for);
 
@@ -164,7 +176,7 @@ class send_automation_report extends \core\task\scheduled_task {
             $message_text = \html_to_text($message_html);
 
             // Create contexturl.
-            $contexturl = (new \moodle_url('/mod/ilddigitalcert/certifier_overview.php?cert_json=' . \json_encode($certids)))->out(false);
+            $contexturl = (new \moodle_url('/mod/ilddigitalcert/overview.php?cert_json=' . \json_encode($certids)))->out(false);
             $contexturlname = (new \lang_string('automation_report:contexturlname', 'mod_ilddigitalcert'))->out($to_user->lang);
 
             $message = \mod_ilddigitalcert\manager::get_message(self::MESSAGE_NAME, $to_user, $subject, $message_html, $message_text, $contexturl, $contexturlname);

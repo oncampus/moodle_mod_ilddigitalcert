@@ -18,9 +18,13 @@
  * Form that lets users search for specific cerificats.
  *
  * @package   mod_ilddigitalcert
- * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
+ * @copyright 2022, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_ilddigitalcert\output\form;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/formslib.php");
 
@@ -31,14 +35,12 @@ require_once($CFG->libdir . "/formslib.php");
  * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_ilddigialcert_search_certificates_form extends moodleform {
+class search_certificates_form extends \moodleform {
     /**
      * Form definition.
      * @return void
      */
     public function definition() {
-        global $CFG;
-
         $mform = $this->_form;
 
         $mform->addElement('html', '<div class="m-element-search-form col-md-9 form-inline align-items-start felement">');
@@ -62,10 +64,10 @@ class mod_ilddigialcert_search_certificates_form extends moodleform {
         );
         $mform->addElement('select', 'search_filter', '', $filter_options, $filter_attributes);
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'ueid');
-        $mform->setType('ueid', PARAM_INT);
+        $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
+        $mform->addElement('hidden', 'userid');
+        $mform->setType('userid', PARAM_INT);
 
         $mform->addElement('submit', 'search_submit', get_string('search'));
         $mform->addElement('submit', 'search_reset', get_string('reset'));
@@ -86,5 +88,55 @@ class mod_ilddigialcert_search_certificates_form extends moodleform {
         }
 
         return $data;
+    }
+
+
+    /**
+     * Builds a sql WHERE statement to search for certificates that meet the conditions defined in the form data.
+     *
+     * @return array Array containing an $sql WHERE statement and a set of $params.
+     **/
+    public function action() {
+        global $DB;
+        
+        // Get form data.
+        if(!$data = $this->get_data()) return null;
+
+        $search_query = $data->search_query;
+        $search_filter = $data->search_filter;
+        if (!$search_query && !$search_filter) return null;
+
+        $sql = '';
+        $params = array();
+        
+        if($data->courseid) {
+            $sql .= ' AND c.id = :courseid';
+            $params['courseid'] = $data->courseid;    
+        }
+        
+        if($data->userid) {
+            $sql .= ' AND  u.id = :userid';
+            $params['userid'] = $data->userid;    
+        }
+
+        if ($search_query !== '') {
+            $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
+            $sql .= ' AND (' . $DB->sql_like($fullname, ':search1', false, false) . '
+            OR ' . $DB->sql_like('c.shortname', ':search2', false, false) . '
+            OR ' . $DB->sql_like('c.fullname', ':search3', false, false) . '
+                OR ' . $DB->sql_like('idci.name', ':search4', false, false) . ')';
+            $params['search1'] = '%' . $search_query . '%';
+            $params['search2'] = '%' . $search_query . '%';
+            $params['search3'] = '%' . $search_query . '%';
+            $params['search4'] = '%' . $search_query . '%';
+        }
+
+        if ($search_filter === 'only_bc') {
+            $sql .= ' AND idci.txhash is not null ';
+        } else if ($search_filter === 'only_nonbc') {
+            $sql .= ' AND idci.txhash is null ';
+        }
+
+        return array($sql, $params);
     }
 }

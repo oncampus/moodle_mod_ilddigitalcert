@@ -88,19 +88,11 @@ function get_contract_abi($contractname) {
 }
 
 function get_contract_address($contractname) {
+    global $CFG;
     $contractname = get_contract_name($contractname);
-
-    if ($contractname == get_contract_name('CertMgmt')) {
-        $certmgmtaddress = get_config('ilddigitalcert', 'CertMgmt_address');
-        if (isset($certmgmtaddress) and $certmgmtaddress != '') {
-            return $certmgmtaddress;
-        }
-    } else if ($contractname == get_contract_name('IdentityMgmt')) {
-        $identitymgmtaddress = get_config('ilddigitalcert', 'IdentityMgmt_address');
-        if (isset($identitymgmtaddress) and $identitymgmtaddress != '') {
-            return $identitymgmtaddress;
-        }
-    }
+    $filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
+    $contract = json_decode(file_get_contents($filename));
+    return json_encode($contract->contract_address);
 }
 
 function get_contract_url($contractname) {
@@ -185,6 +177,14 @@ function store_certificate($hash, $startdate, $enddate, $pk) {
     return $hashes;
 }
 
+/**
+ * Revocation of a certificate identified by $certhash using the $pk of a certifier.
+ * 
+ * @param string $certhash Hash of certificate, that will be revoked.
+ * @param string $pk Private Key of certifier
+ * 
+ * @return bool True if revocation was successful, else false 
+ */
 function revoke_certificate($certhash, $pk) {
     // TODO: testen.
     $url = get_contract_url('CertMgmt');

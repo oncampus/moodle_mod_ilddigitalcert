@@ -1,18 +1,19 @@
 let modal = null;
 let modal_to_bc = null;
 let modal_reissue = null;
+let modal_revoke = null;
 let modal_dialog = null;
 let modal_backdrop = null;
 let modal_close_btns = null;
 let selected_input_to_bc = null;
 let selected_input_reissue = null;
+let selected_input_revoke = null;
 let cert_lists = null;
 let selected = new Set();
 
 let certs = [];
 let certs_table = null;
-let sign_btns = null;
-let reissue_btns = null;
+let action_btns = null;
 let check_all = null;
 let check_certs = null;
 let bulk_action = null;
@@ -29,10 +30,11 @@ function init() {
   if (modal) {
     modal_to_bc = modal.querySelector('#m-element-modal__to-bc');
     modal_reissue = modal.querySelector('#m-element-modal__reissue');
+    modal_revoke = modal.querySelector('#m-element-modal__revoke');
     modal_dialog = modal.querySelector('.modal-dialog');
     modal_backdrop = document.querySelector('.modal-backdrop');
     modal_close_btns = modal.querySelectorAll(
-      '#m-element-modal .close, #m-element-to-bc__cancel, #m-element-reissue__cancel'
+      '#m-element-modal .close, #m-element-to-bc__cancel, #m-element-reissue__cancel, #m-element-revoke__cancel'
     );
     selected_input_to_bc = modal_to_bc.querySelector(
       '#m-element-to-bc__selected'
@@ -40,14 +42,16 @@ function init() {
     selected_input_reissue = modal_reissue.querySelector(
       '#m-element-reissue__selected'
     );
+    selected_input_revoke = modal_revoke.querySelector(
+      '#m-element-revoke__selected'
+    );
     cert_lists = modal.querySelectorAll('.m-element-modal__selected_certs');
   }
 
   certs = [];
   certs_table = document.querySelector('.m-element-certs-table');
   if (certs_table) {
-    sign_btns = certs_table.querySelectorAll('.m-element-sign-cert');
-    reissue_btns = certs_table.querySelectorAll('.m-element-reissue');
+    action_btns = certs_table.querySelectorAll('.m-element-action');
     check_all = certs_table.querySelector('#m-element-select-all-certs');
     check_certs = certs_table.querySelectorAll('.m-element-select-cert');
     bulk_action = certs_table.querySelector('#m-element-bulk-actions');
@@ -60,10 +64,6 @@ function init() {
   search_input = document.getElementById('m-element-search__query');
   filter_input = document.getElementById('m-element-search__filter');
 
-  unselectAll();
-
-  getCerts();
-
   if (modal_close_btns) {
     modal_close_btns.forEach((close) =>
       close.addEventListener('click', closeModal)
@@ -75,6 +75,13 @@ function init() {
   }
 
   if (bulk_action_button && bulk_action) {
+    
+    if (check_certs) {
+      bulk_action.addEventListener('change', () => {
+        updateCheckboxState();
+      });
+    }
+
     bulk_action_button.addEventListener('click', () => {
       if (selected.size > 0) {
         showModal(bulk_action.value);
@@ -98,22 +105,17 @@ function init() {
     });
   }
 
-  if (sign_btns) {
-    for (var i = 0; i < sign_btns.length; i++) {
-      sign_btns[i].addEventListener('click', function () {
+  if (action_btns) {
+    for (var i = 0; i < action_btns.length; i++) {
+      action_btns[i].addEventListener('click', function () {
+        let action = this.getAttribute('action')
+        bulk_action.value = action;
+        updateCheckboxState();
         unselectAll();
+        let row = this.parentNode.parentNode.parentNode;
+        row.querySelector('.m-element-select-cert').checked = true;
         selected.add(this.value);
-        showModal('toblockchain');
-      });
-    }
-  }
-
-  if (reissue_btns) {
-    for (var i = 0; i < reissue_btns.length; i++) {
-      reissue_btns[i].addEventListener('click', function () {
-        unselectAll();
-        selected.add(this.value);
-        showModal('reissue');
+        showModal(action);
       });
     }
   }
@@ -123,6 +125,27 @@ function init() {
       closeModal();
     }
   };
+
+  unselectAll();
+
+  getCerts();
+
+  updateCheckboxState();
+}
+
+function updateCheckboxState() {
+  if(!check_certs || !bulk_action) return;
+  
+  let rows = certs_table.querySelectorAll('tbody > tr:not(.emptyrow)');
+  rows.forEach((row) => {
+    let checkbox = row.querySelector('.m-element-select-cert');
+    let registered = row.querySelector('.col-status img')?.getAttribute('value');
+    checkbox.disabled = (bulk_action.value === '' ? false : bulk_action.value === 'revoke' ? !registered : registered);
+    updateSelected(checkbox);
+  });
+
+
+    unselectAll();
 }
 
 function showModal(action) {
@@ -135,6 +158,9 @@ function showModal(action) {
   } else if (action === 'reissue') {
     modal_reissue.classList.remove('hidden');
     modal_reissue.classList.add('show');
+  } else if (action === 'revoke') {
+    modal_revoke.classList.remove('hidden');
+    modal_revoke.classList.add('show');
   } else {
     return false;
   }
@@ -157,35 +183,35 @@ function closeModal() {
   modal_backdrop.classList.add('hidden');
   modal_reissue.classList.remove('show');
   modal_reissue.classList.add('hidden');
+  modal_revoke.classList.remove('show');
+  modal_revoke.classList.add('hidden');
   modal_to_bc.classList.remove('show');
   modal_to_bc.classList.add('hidden');
 }
 
 function updateSelected(checkbox) {
-  if (checkbox.checked) {
-    selected.add(checkbox.value);
-  } else {
+  if (!checkbox.checked || checkbox.disabled) {
     selected.delete(checkbox.value);
+  } else {
+    selected.add(checkbox.value);
   }
 }
 
 function selectAll() {
   check_certs.forEach((checkbox) => {
-    if(checkbox.disabled === true) return;
-    checkbox.checked = true;
-    selected.add(checkbox.value);
+    if(checkbox.disabled === false) {
+      checkbox.checked = true;
+      selected.add(checkbox.value);
+    }
   });
+  check_all.checked = true;
 }
 
 function unselectAll() {
-  if (!check_all) {
-    return false;
-  }
-
   check_certs.forEach((checkbox) => {
     checkbox.checked = false;
-    selected.delete(checkbox.value);
   });
+  selected.clear();
   check_all.checked = false;
 }
 
@@ -205,22 +231,32 @@ function setSelected() {
 
     selected.forEach((cert) => {
       let cert_item = document.createElement('li');
-      cert_item.textContent =
-        certs[cert].name +
-        ' | ' +
-        certs[cert].recipient +
-        ' | ' +
-        certs[cert].date;
+      let text = certs[cert].name;
+      if(certs[cert].recipient) {
+        text += ' | ' + certs[cert].recipient;
+      }
+      if(certs[cert].course) {
+        text += ' | ' + certs[cert].course;
+      }
+      text += ' | ' + certs[cert].date;
+        
+      cert_item.textContent = text;
       list.appendChild(cert_item);
     });
   });
 
+  let selected_json = JSON.stringify([...selected])
+
   if (selected_input_to_bc) {
-    selected_input_to_bc.value = JSON.stringify([...selected]);
+    selected_input_to_bc.value = selected_json;
   }
 
   if (selected_input_reissue) {
-    selected_input_reissue.value = JSON.stringify([...selected]);
+    selected_input_reissue.value = selected_json;
+  }
+
+  if (selected_input_revoke) {
+    selected_input_revoke.value = selected_json;
   }
 }
 
@@ -231,18 +267,21 @@ function removeChilds(parent) {
 }
 
 function getCerts() {
-  if (!certs_table) {
-    return false;
-  }
-  let rows = certs_table.querySelectorAll('tbody > tr');
+  if (!certs_table) return false;
+  if(!certs_table.querySelector('.col-select')) return false;
+
+  let rows = certs_table.querySelectorAll('tbody > tr:not(.emptyrow)');
   rows.forEach((row) => {
+    let id = row.querySelector('.m-element-select-cert')?.value;
+    if(!id) return;
     let cert = {
-      name: row.querySelector('.c2 a').textContent,
-      recipient: row.querySelector('.c3 a').textContent,
-      date: row.querySelector('.c4').textContent,
+      name: row.querySelector('.col-title a')?.textContent,
+      recipient: row.querySelector('.col-recipient a')?.textContent,
+      course: row.querySelector('.col-course a')?.textContent,
+      date: row.querySelector('.col-startdate')?.textContent,
     };
 
-    let id = row.querySelector('.m-element-select-cert').value;
     certs[id] = cert;
-  });
+    }
+  );
 }

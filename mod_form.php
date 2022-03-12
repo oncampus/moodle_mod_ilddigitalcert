@@ -195,6 +195,11 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $mform->addElement('passwordunmask', 'auto_pk', get_string('auto_pk', 'mod_ilddigitalcert'));
         $mform->addHelpButton('auto_pk', 'auto_pk', 'mod_ilddigitalcert');
 
+        // Enable weekly automation report.
+        $mform->addElement('advcheckbox', 'automation_report', get_string('automation_report:enable', 'mod_ilddigitalcert'), get_string('enable'), array('group' => 1), array(0, 1));
+        $mform->addHelpButton('automation_report', 'automation_report:enable', 'mod_ilddigitalcert');
+        $mform->setDefault('automation_report', 1);
+
         // Add standard elements.
         $this->standard_coursemodule_elements();
 

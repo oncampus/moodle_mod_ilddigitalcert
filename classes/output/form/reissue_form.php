@@ -18,9 +18,13 @@
  * Form to reissue certificates.
  *
  * @package   mod_ilddigitalcert
- * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
+ * @copyright 2022, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_ilddigitalcert\output\form;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/formslib.php");
 
@@ -31,7 +35,7 @@ require_once($CFG->libdir . "/formslib.php");
  * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_ilddigialcert_reissue_form extends moodleform {
+class reissue_form extends \moodleform {
     /**
      * Form definition.
      * @return void
@@ -41,14 +45,8 @@ class mod_ilddigialcert_reissue_form extends moodleform {
         $mform = $this->_form;
 
         // Private key input.
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'ueid');
-        $mform->setType('ueid', PARAM_INT);
         $mform->addElement('hidden', 'selected', '', array('id' => 'm-element-reissue__selected'));
         $mform->setType('selected', PARAM_NOTAGS);
-        $mform->addElement('hidden', 'action');
-        $mform->setType('action', PARAM_NOTAGS);
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submit', get_string('reissue', 'ilddigitalcert'), array('id' => 'm-element-reissue__submit'));
@@ -69,5 +67,44 @@ class mod_ilddigialcert_reissue_form extends moodleform {
         }
 
         return $data;
+    }
+
+
+    /**
+     * Reissues the certificates that were defined in the form.
+     *
+     * @return array
+     **/
+    public function action() {
+        global $DB;
+
+        // Get form data.
+        $data = $this->get_data();
+        $selected_certs = json_decode($data->selected);
+
+        if (empty($selected_certs)) return null;
+        // Get certificate records from selected ids.
+        list($insql, $inparams) = $DB->get_in_or_equal($selected_certs);
+        $sql = "SELECT * FROM {ilddigitalcert_issued} WHERE txhash IS NULL AND id $insql";
+        $certificates = $DB->get_records_sql($sql, $inparams);
+
+        // Write selected certificates to blockchain
+        foreach ($certificates as $certificate) {
+            if (!$reissueuser = $DB->get_record('user', array('id' => $certificate->userid, 'confirmed' => 1, 'deleted' => 0))) return null;
+
+            list($course, $cm) = get_course_and_cm_from_cmid($certificate->cmid, 'ilddigitalcert');
+            $certmetadata = generate_certmetadata($cm, $reissueuser);
+            reissue_certificate($certmetadata, $certificate->userid, $cm->id);
+
+            $recipient = $certmetadata->{'extensions:recipientB4E'};
+            $recipientname = $recipient->givenname . ' ' . $recipient->surname;
+
+            \core\notification::success(get_string('reissue_success', 'mod_ilddigitalcert', $recipientname));
+        }
+
+        $invalid_count = count($selected_certs) - count($certificates);
+        if ($invalid_count > 0) {
+            \core\notification::warning(get_string('reissue_error_already_signed', 'mod_ilddigitalcert', $invalid_count));
+        }
     }
 }
