@@ -182,7 +182,7 @@ class certificate
         $bcert->verification = verification::from_edci($xml);
 
         if (isset($xml->institutionToken)) {
-            $bcert->institution_token = $xml->institutionToken;
+            $bcert->institution_token = (string)  $xml->institutionToken;
         }
 
         return $bcert;

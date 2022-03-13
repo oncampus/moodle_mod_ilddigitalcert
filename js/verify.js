@@ -180,6 +180,22 @@ async function dateiauswahl(evt) {
                 cache: false,
                 processData:false
             }).responseText;
+            console.log(result);
+        }
+        else if (gewaehlteDateien[0].type == 'application/xml' || gewaehlteDateien[0].name.match('.xml')) { // JSON!
+            let formData = new FormData();
+            formData.append('action', 'validateEDCI');
+            formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
+            result = $.ajax({
+                type: 'POST',
+                async: false,
+                url: verificationStepUrl,
+                data: formData,
+                contentType: false,
+                cache: false,
+                processData:false
+            }).responseText;
+            console.log(result);
         }
     }
     if (result == 'error') {
@@ -401,6 +417,7 @@ async function processMeta(meta) {
     }).responseText;
     await sleep(sleepTime);
     var hash = result;
+    console.log(hash);
     processHash(hash, meta);
 }
 

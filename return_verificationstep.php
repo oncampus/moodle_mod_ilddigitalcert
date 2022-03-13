@@ -55,7 +55,9 @@ if ($action == 'meta' and $meta != '') {
     ($_FILES['file']['type'] == 'application/xml' or strpos($_FILES['file']['name'], '.xml') !== false)) {
     $file = $_FILES['file'];
     // TODO: validate.
-    echo file_get_contents($file['tmp_name']);
+    $edci = file_get_contents($file['tmp_name']);
+    $json = \mod_ilddigitalcert\bcert\certificate::from_edci($edci)->get_ob();
+    echo $json;
 } else if ($action == 'pdf' and !empty($_FILES['file']['name']) and $_FILES['file']['type'] == 'application/pdf') {
     // Verifing validity of a pdf file
     $file = $_FILES['file'];
@@ -64,7 +66,7 @@ if ($action == 'meta' and $meta != '') {
     $attachmentlistresult = shell_exec('pdfdetach -list '.$pdf.' 2>&1');
     $attachmentlist = explode("\n", $attachmentlistresult);
     $attachments = array();
-    $n = 0;
+    $n = -1;
 
     $bcrt_index = -1;
     $xml_index = -1;
@@ -81,17 +83,17 @@ if ($action == 'meta' and $meta != '') {
         $filename = basename($entry[1]);
 
         // More than 1 attachment per allowed file type .bcrt and .xml? -> error.
-        if (str_ends_with($filename, '.bcrt')) {
+        if (substr($filename, -5) === '.bcrt') {
             if ($bcrt_index === -1) {
                 $bcrt_index = $n;
             } else {
                 $error = 'error: too many .bcrt attachements detected';
             }
-        } else if (str_ends_with($filename, '.xml')) {
+        } else if (substr($filename, -4) ==='.xml') {
             if ($xml_index === -1) {
                 $xml_index = $n;
             } else {
-                $error = 'error: too many .bcrt attachements detected';
+                $error = 'error: too many .xml attachements detected';
             }
         }
     }
@@ -99,10 +101,10 @@ if ($action == 'meta' and $meta != '') {
         echo $error;
     } else {
         // echo file contents of both .bcrt and edci .xml attachements as json
-        $result = new stdClass();
-        $result->metadata = get_attachement_content($bcrt_index);
-        $result->edci = get_attachement_content($xml_index);
-        echo json_encode($result);
+        // $result = new stdClass();
+        // $result->metadata = get_attachement_content($bcrt_index, $pdf);
+        // $result->edci = get_attachement_content($xml_index, $pdf);
+        echo get_attachement_content($bcrt_index, $pdf);
     }
 } else if ($action == 'baseString' and $base64string != '') {
     echo base64_decode($base64string);
@@ -151,7 +153,8 @@ if ($action == 'meta' and $meta != '') {
          ', file: '.$_FILES['file']['name'];
 }
 
-function get_attachement_content($index) {
+function get_attachement_content($index, $pdf) {
+    global $CFG;
     if (!is_dir($CFG->dataroot.'/temp/ilddigitalcert')) {
         mkdir($CFG->dataroot.'/temp/ilddigitalcert', 0775);
     }
@@ -167,6 +170,7 @@ function get_attachement_content($index) {
         // Return attachements file content.
         return $filecontent;
     } else {
-        echo null;
+        throw new \coding_exception('Could\'nt detach attachement from pdf.');
+        die();
     }
 }

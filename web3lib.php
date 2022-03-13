@@ -92,7 +92,8 @@ function get_contract_address($contractname) {
     $contractname = get_contract_name($contractname);
     $filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
     $contract = json_decode(file_get_contents($filename));
-    return json_encode($contract->contract_address);
+
+    return $contract->contract_address;
 }
 
 function get_contract_url($contractname) {
@@ -124,6 +125,7 @@ function store_certificate($hash, $startdate, $enddate, $pk) {
     $eth = $web3->eth;
 
     $contract = new Contract($web3->provider, $contractabi);
+
     $contract->at($contractadress);
 
     $hashes = new stdClass();

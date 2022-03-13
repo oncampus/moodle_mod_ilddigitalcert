@@ -46,7 +46,7 @@ echo '<div style="background-color: rgba(16,111,111,.7);margin:-15px -20px 80px 
       <h3 style="color: white;">Digitale Zertifikate in der Blockchain</h3>
       <b style="color: white;">
         <p>Überprüfe hier die Echtheit Deiner digitalen Zertifikate.</p>
-        <p>Ziehe dazu einfach Dein Zertifikat (PDF oder BCRT-Datei) per Drag and Drop in das Feld.</p>
+        <p>Ziehe dazu einfach Dein Zertifikat (PDF oder XML oder BCRT-Datei) per Drag and Drop in das Feld.</p>
         <p>Deine ausgedruckte Version des Zertifikates kannst Du überprüfen indem Du
         den untenstehenden QR-Code einscannst.
         </p>

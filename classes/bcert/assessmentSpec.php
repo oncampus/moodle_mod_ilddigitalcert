@@ -89,7 +89,9 @@ class assessmentSpec
         $new->title = (string) $spec_xml->title->text;
         $new->homepage = (string) $spec_xml->homepage['uri'];
         $new->identifier = (string) $spec_xml->identifier;
-        $new->date = (string) $spec_xml->date;
+        if(isset($spec_xml->date) && !empty($spec_xml->date)) {
+            $new->date = (string) $spec_xml->date;
+        }
         return $new;
     }
 
@@ -123,7 +125,9 @@ class assessmentSpec
         $spec->title = $this->title;
         $spec->regulationsid = $this->identifier;
         $spec->url = $this->homepage;
-        $spec->date = $this->date;
+        if(isset($this->date) && !empty($this->date)) {
+            print_r($spec->date);
+        }
         $spec->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ExaminationRegulationsB4E/context.json';
         $spec->type = ["Extension", "ExaminationRegulationsB4E"];
         return $spec;
@@ -141,7 +145,9 @@ class assessmentSpec
         $root->addChild('identifier', $this->identifier);
         $root->addTextNode('title', $this->title);
         $root->addChild('homepage')->addAttribute('uri', $this->homepage);
-        $root->addChild('date', $this->date);
+        if(isset($this->date) && !empty($this->date)) {
+            $root->addChild('date', $this->date);
+        }
 
         return $root;
     }

@@ -150,12 +150,18 @@ class assessment
     public function get_ob()
     {
         $assessment = new \stdClass();
-        $assessment->title = $this->title;
-        $assessment->startdate = $this->startdate;
-        $assessment->enddate = $this->enddate;
-        $assessment->place = $this->place;
+        // if(isset($this->title) && !empty($this->title)) {
+        //     $assessment->title = $this->title;
+        // }
+        if(isset($this->startdate) && !empty($this->startdate)) {
+            $assessment->startdate = $this->startdate;
+        }
+        if(isset($this->enddate) && !empty($this->enddate)) {
+            $assessment->enddate = $this->enddate;
+        }
         $assessment->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ExaminationB4E/context.json';
         $assessment->type = ["Extension", "ExaminationB4E"];
+        $assessment->place = $this->place;
         return $assessment;
     }
 
