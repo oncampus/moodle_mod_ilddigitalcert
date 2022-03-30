@@ -26,6 +26,8 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
 require_once('locallib.php');
 
+use mod_ilddigitalcert\bcert\certificate;
+
 $id = required_param('id', PARAM_INT);
 $view = optional_param('view', 'html', PARAM_RAW);
 $issuedid = optional_param('issuedid', 0, PARAM_INT);
@@ -37,7 +39,7 @@ if ($id) {
     $course         = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $moduleinstance = $DB->get_record('ilddigitalcert', array('id' => $cm->instance), '*', MUST_EXIST);
 } else {
-    print_error(get_string('missingidandcmid', 'mod_ilddigitalcert'));
+    throw new moodle_exception(get_string('missingidandcmid', 'mod_ilddigitalcert'));
 }
 
 require_login($course, true, $cm);
@@ -62,71 +64,15 @@ $PAGE->set_context($modulecontext);
 // Zertifikat ansehen als Teacher/certifier.
 if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::instance($course->id))) {
     $issuedcertificate = $DB->get_record('ilddigitalcert_issued', array('id' => $issuedid));
-    $certmetadatajson = $issuedcertificate->metadata;
+    $metacertificate = certificate::from_ob($issuedcertificate->metadata);
 
-    $metadataobj = json_decode($certmetadatajson);
-    $filename = $issuedcertificate->name . '_' .
-        $metadataobj->{'extensions:recipientB4E'}->givenname . '_' .
-        $metadataobj->{'extensions:recipientB4E'}->surname . '_' .
-        strtotime($metadataobj->issuedOn) . '.bcrt';
-    $filename = 'certificate.bcrt';
     if ($view == 'download') {
-        $fs = get_file_storage();
+        create_certificate_files($issuedcertificate, $metacertificate);
 
-        // Create .bcrt file
-        $fileinfo = array(
-            'contextid' => $modulecontext->id,     // ID of context.
-            'component' => 'mod_ilddigitalcert',   // Usually = table name.
-            'filearea' => 'metadata',              // Usually = table name.
-            'itemid' => $issuedcertificate->id,   // Usually = ID of row in table.
-            'filepath' => '/',                     // Any path beginning and ending in /.
-            'filename' => $filename
-        );              // Any filename.
-        $file = $fs->get_file(
-            $fileinfo['contextid'],
-            $fileinfo['component'],
-            $fileinfo['filearea'],
-            $fileinfo['itemid'],
-            $fileinfo['filepath'],
-            $fileinfo['filename']
+        $url = new moodle_url(
+            '/mod/ilddigitalcert/download.php',
+            array('icid' => $issuedcertificate->id, 'cmid' => $cm->id, 'download' => $download)
         );
-        if ($file) {
-            $file->delete();
-        }
-
-        // Institution token / salt hinzufügen damit der Hash auch richtig berechnet werden kann.
-        $token = get_token($issuedcertificate->institution_token);
-        $metadata = json_decode($certmetadatajson);
-        $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($token);
-        $certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-        $fs->create_file_from_string($fileinfo, $certmetadatajson);
-
-        if(isset($issuedcertificate->edci)) {
-            // Create .xml file
-            $fileinfo_xml = array(
-            'contextid' => $modulecontext->id,     // ID of context.
-            'component' => 'mod_ilddigitalcert',   // Usually = table name.
-            'filearea' => 'metadata',              // Usually = table name.
-            'itemid' => $issuedcertificate->id,   // Usually = ID of row in table.
-            'filepath' => '/',                     // Any path beginning and ending in /.
-            'filename' => 'certificate.xml');              // Any filename.
-            $file = $fs->get_file($fileinfo_xml['contextid'], $fileinfo_xml['component'], $fileinfo_xml['filearea'],
-                $fileinfo_xml['itemid'], $fileinfo_xml['filepath'], $fileinfo_xml['filename']);
-            if ($file) {
-                $file->delete();
-            }
-
-            // Add institution token to edci.
-            $bcert = mod_ilddigitalcert\bcert\certificate::from_edci($issuedcertificate->edci);
-            $bcert->add_institution_token($token);
-            $issuedcertificate->edci = $bcert->get_edci();
-
-            $fs->create_file_from_string($fileinfo_xml, $issuedcertificate->edci);
-        }
-
-        $url = $CFG->wwwroot.'/mod/ilddigitalcert/download.php?id='.$modulecontext->id.
-            '&icid='.$issuedcertificate->id.'&cmid='.$cm->id.'&download='.$download;
         redirect($url);
     }
 
@@ -134,34 +80,49 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
     echo $OUTPUT->heading(get_string('pluginname', 'mod_ilddigitalcert'));
 
     echo html_writer::link(
-        new moodle_url('/mod/ilddigitalcert/view.php?id=' . $id . '&issuedid=' . $issuedid . '&view=html&ueid=' . $ueid),
+        new moodle_url(
+            '/mod/ilddigitalcert/view.php',
+            array('id' => $id, 'issuedid' => $issuedid, 'view' => 'html', 'ueid' => $ueid)
+        ),
         get_string('html', 'mod_ilddigitalcert')
     );
     echo ' | ';
     echo html_writer::link(
-        new moodle_url('/mod/ilddigitalcert/view.php?id=' . $id . '&issuedid=' . $issuedid . '&view=data&ueid=' . $ueid),
+        new moodle_url(
+            '/mod/ilddigitalcert/view.php',
+            array('id' => $id, 'issuedid' => $issuedid, 'view' => 'data', 'ueid' => $ueid)
+        ),
         get_string('data', 'mod_ilddigitalcert')
     );
     if (isset($issuedcertificate->txhash)) {
+        // Create certificate files, that can be downloaded.
+        create_certificate_files($issuedcertificate, $metacertificate);
+
         echo '<br />' . get_string('download') . ': ';
         echo html_writer::link(
-            new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&issuedid='.$issuedid.'&view=download&ueid='.$ueid),
+            new moodle_url(
+                '/mod/ilddigitalcert/view.php',
+                array('id' => $id, 'issuedid' => $issuedid, 'view' => 'download', 'ueid' => $ueid)
+            ),
             get_string('json', 'mod_ilddigitalcert'));
-        
-        if(isset($issuedcertificate->edci)) {
+
+        if (isset($issuedcertificate->edci)) {
             echo ' | ';
             echo html_writer::link(
                 new moodle_url(
-                    '/mod/ilddigitalcert/view.php?id='.$id.'&issuedid='.$issuedid.'&view=download&download=edci&ueid='.$ueid),
+                    '/mod/ilddigitalcert/view.php',
+                    array('id' => $id, 'issuedid' => $issuedid, 'view' => 'download', 'download' => 'edci', 'ueid' => $ueid)
+                ),
                 get_string('edci', 'mod_ilddigitalcert'));
         }
-        
+
         $pdf = true; // TODO in die Settings!
         if ($pdf) {
             echo ' | ';
             echo html_writer::link(
                 new moodle_url(
-                    '/mod/ilddigitalcert/view.php?id=' . $id . '&issuedid=' . $issuedid . '&view=download&download=pdf&ueid=' . $ueid
+                    '/mod/ilddigitalcert/view.php',
+                    array('id' => $id, 'issuedid' => $issuedid, 'view' => 'download', 'download' => 'pdf', 'ueid' => $ueid)
                 ),
                 get_string('pdf', 'mod_ilddigitalcert')
             );
@@ -174,7 +135,8 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
             echo ' | ';
             echo html_writer::link(
                 new moodle_url(
-                    '/mod/ilddigitalcert/send_to_wallet.php?id=' . $cm->id
+                    '/mod/ilddigitalcert/send_to_wallet.php',
+                    array('id' => $cm->id)
                 ),
                 get_string('send_to_wallet', 'mod_ilddigitalcert')
             );
@@ -182,13 +144,12 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
     }
     // TODO Zertifikat anzeigen!
     if ($view == 'data') {
-        $metadata = json_decode($certmetadatajson);
         echo '<div><p>';
-        display_metadata($metadata);
+        display_metadata($metacertificate->get_ob(false));
         echo '</p></div>';
     } else if ($view == 'html') {
         echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
-        echo get_certificatehtml($cm->instance, $certmetadatajson);
+        echo get_certificatehtml($cm->instance, $metacertificate->get_ob());
         echo '</div>';
 
         if (isset($issuedcertificate->txhash)) {
@@ -197,14 +158,10 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
             echo '<h3>Zertifikat in der Blockchain überprüfen</h3>'; // TODO sprachpaket!
 
             $salt = get_token($issuedcertificate->institution_token);
-            $metadata = json_decode($certmetadatajson);
-            $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($salt);
-            $certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-            $hash = calculate_hash($certmetadatajson);
-            $url = $CFG->wwwroot . '/mod/ilddigitalcert/verify.php?hash=' . $hash;
+            $hash = $metacertificate->get_ob_hash($salt);
+            $url = new moodle_url('/mod/ilddigitalcert/verify.php', array('hash' => $hash));
             $img = '<img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=' . $url . '&choe=UTF-8"
-                title="Zertifikat überprüfen" />';
+                title="Zertifikat überprüfen" />'; // TODO Add missing lang string.
             echo html_writer::link($url, $img);
         }
     }
@@ -219,27 +176,29 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
     echo $OUTPUT->heading(get_string('pluginname', 'mod_ilddigitalcert'));
     echo '<p>' . get_string('preview', 'mod_ilddigitalcert') . ' "' . $moduleinstance->name . '"</p>';
     echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
-    echo get_certificatehtml($cm->instance, json_encode(generate_certmetadata($cm, $USER)));
+    echo get_certificatehtml($cm->instance, certificate::new($cm, $USER)->get_ob());
     echo '</div>';
-    echo '<p>' . html_writer::link($CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $id . '&ueid=' . $ueid, get_string('back')) . '</p>';
+    echo '<p>' . html_writer::link(
+        new moodle_url('/mod/ilddigitalcert/view.php', array('id' => $id, 'ueid' => $ueid)),
+        get_string('back')
+    ) . '</p>';
     echo $OUTPUT->footer();
 } else if (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view = 'html') {
     // TODO elseif (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view == 'issue_teacher')//!
     // Zertifikatsübersicht als Teacher/certifier.
-    redirect($CFG->wwwroot . '/mod/ilddigitalcert/overview.php?id=' . $cm->id . '&ueid=' . $ueid);
+    redirect(new moodle_url('/mod/ilddigitalcert/overview.php', array('id' => $cm->id, 'ueid' => $ueid)));
 } else {
     // TODO unterscheiden ob $ueid (dann neue Funtktion get_issued_certificate) oder aktuelles enrolment!
 
     // View Certificate as student.
-    $certmetadata = generate_certmetadata($cm, $USER);
 
     if ($ueid == 0) {
-        $certmetadatajson = issue_certificate($certmetadata, $USER->id, $cm->id);
+        $certmetadatajson = issue_certificate(certificate::new($cm, $USER), $cm);
     } else {
         $certmetadatajson = get_issued_certificate($USER->id, $cm->id, $ueid);
     }
     if (!$certmetadatajson) {
-        print_error(
+        throw new moodle_exception(
             'found_no_issued_certificate',
             'mod_ilddigitalcert',
             new moodle_url(
@@ -248,84 +207,19 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
             )
         );
     }
+
     $issuedcertificate = $DB->get_record('ilddigitalcert_issued', array('userid' => $USER->id, 'cmid' => $cm->id));
+    $metacertificate = certificate::from_ob($certmetadatajson);
 
-    // TODO: nur wenn in BC gespeichert.
-
-    $bc = true;
-
-    if ($view == 'download' and $bc) {
-        // TODO: save json file if not already done.
-
-        $fs = get_file_storage();
-
-        $metadataobj = json_decode($certmetadatajson);
-        $filename = $issuedcertificate->name . '_' .
-            $metadataobj->{'extensions:recipientB4E'}->givenname . '_' .
-            $metadataobj->{'extensions:recipientB4E'}->surname . '_' .
-            strtotime($metadataobj->issuedOn) . '.bcrt';
-        $filename = 'certificate.bcrt';
-        // Prepare file record object.
-        $fileinfo = array(
-            'contextid' => $modulecontext->id,     // ID of context.
-            'component' => 'mod_ilddigitalcert',   // usually = table name.
-            'filearea' => 'metadata',              // usually = table name.
-            'itemid' => $issuedcertificate->id,    // usually = ID of row in table.
-            'filepath' => '/',                     // any path beginning and ending in /.
-            'filename' => $filename
-        );              // any filename.
-
-        // Get file.
-        $file = $fs->get_file(
-            $fileinfo['contextid'],
-            $fileinfo['component'],
-            $fileinfo['filearea'],
-            $fileinfo['itemid'],
-            $fileinfo['filepath'],
-            $fileinfo['filename']
-        );
-
-        // Delete it if it exists.
-        if ($file) {
-            $file->delete();
-        }
-
-        // Institution token / add salt to calculate hash correctly.
-        $token = get_token($issuedcertificate->institution_token);
-        $metadata = json_decode($certmetadatajson);
-        $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($token);
-        $certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-        // Create file.
-        $fs->create_file_from_string($fileinfo, $certmetadatajson);
-
-
-        if(isset($issuedcertificate->edci)) {
-            // Create .xml file
-            $fileinfo_xml = array(
-                'contextid' => $modulecontext->id,     // ID of context.
-                'component' => 'mod_ilddigitalcert',   // Usually = table name.
-                'filearea' => 'metadata',              // Usually = table name.
-                'itemid' => $issuedcertificate->id,   // Usually = ID of row in table.
-                'filepath' => '/',                     // Any path beginning and ending in /.
-                'filename' => 'certificate.xml');              // Any filename.
-            $file = $fs->get_file($fileinfo_xml['contextid'], $fileinfo_xml['component'], $fileinfo_xml['filearea'],
-                $fileinfo_xml['itemid'], $fileinfo_xml['filepath'], $fileinfo_xml['filename']);
-            if ($file) {
-                $file->delete();
-            }
-
-            // Add institution token to edci.
-            $bcert = mod_ilddigitalcert\bcert\certificate::from_edci($issuedcertificate->edci);
-            $bcert->add_institution_token($token);
-            $issuedcertificate->edci = $bcert->get_edci();
-            
-            $fs->create_file_from_string($fileinfo_xml, $issuedcertificate->edci);
-        }
+    // Download only if certificcate is registerd in the blockchain.
+    if ($view == 'download' and isset($issuedcertificate->txhash)) {
+        create_certificate_files($issuedcertificate, $metacertificate);
 
         // TODO check what happens when content is changing.
-        $url = $CFG->wwwroot . '/mod/ilddigitalcert/download.php?id=' .
-            $modulecontext->id . '&icid=' . $issuedcertificate->id . '&cmid=' . $cm->id . '&download=' . $download;
+        $url = new moodle_url(
+            '/mod/ilddigitalcert/download.php',
+            array('icid' => $issuedcertificate->id, 'cmid' => $cm->id, 'download' => $download)
+        );
         redirect($url);
     }
 
@@ -346,12 +240,12 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         get_string('data', 'mod_ilddigitalcert')
     );
     if (isset($issuedcertificate->txhash)) {
+        // Create certificate files, that can be downloaded.
+        create_certificate_files($issuedcertificate, $metacertificate);
+
         echo '<br />' . get_string('download') . ': ';
-        // Backup: echo html_writer::link(new moodle_url('/mod/ilddigitalcert/view.php?id='.$id.'&view=download&ueid='.$ueid), //.
-        // Backup:   get_string('json', 'mod_ilddigitalcert'));//.
-        $pdf = true; // TODO in settings.
+        $pdf = true; // TODO Add the option to disable the pdf download in the settings.
         if ($pdf) {
-            // Backup: echo ' | '; //.
             echo html_writer::link(
                 new moodle_url('/mod/ilddigitalcert/view.php?id=' . $id . '&view=download&download=pdf&ueid=' . $ueid),
                 get_string('pdf', 'mod_ilddigitalcert')
@@ -362,6 +256,8 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
             '0' != get_config('mod_ilddigitalcert', 'dcxapikey') and
             '0' != get_config('mod_ilddigitalcert', 'dcconnectorid')
         ) {
+            create_certificate_files($issuedcertificate, $metacertificate);
+
             echo ' | ';
             echo html_writer::link(
                 new moodle_url(
@@ -373,29 +269,24 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
     }
 
     if ($view == 'data') {
-        $metadata = json_decode($certmetadatajson);
         echo '<div><p>';
-        display_metadata($metadata);
+        display_metadata($metacertificate->get_ob(false));
         echo '</p></div>';
     } else if ($view == 'html') {
         echo '<div id="zertifikat-page" style="border: 0px solid #bfbfbf;margin: 20px 0px;max-width: 800px;">';
-        echo get_certificatehtml($cm->instance, $certmetadatajson);
+        echo get_certificatehtml($cm->instance, $metacertificate->get_ob());
         echo '</div>';
 
         if (isset($issuedcertificate->txhash)) {
             // Show QR-Code.
             echo '<br />';
-            echo '<h3>Zertifikat in der Blockchain überprüfen</h3>';
+            echo '<h3>Zertifikat in der Blockchain überprüfen</h3>'; // TODO Add missing lang string.
 
             $salt = get_token($issuedcertificate->institution_token);
-            $metadata = json_decode($certmetadatajson);
-            $metadata->{'extensions:institutionTokenILD'} = get_extension_institutiontoken_ild($salt);
-            $certmetadatajson = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-            $hash = calculate_hash($certmetadatajson);
-            $url = $CFG->wwwroot . '/mod/ilddigitalcert/verify.php?hash=' . $hash;
+            $hash = $metacertificate->get_ob_hash($salt);
+            $url = new moodle_url('/mod/ilddigitalcert/verify.php', array('hash' => $hash));
             $img = '<img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=' .
-                $url . '&choe=UTF-8" title="Zertifikat überprüfen" />';
+                $url . '&choe=UTF-8" title="Zertifikat überprüfen" />'; // TODO Add missing lang string.
             echo html_writer::link($url, $img);
         }
     }

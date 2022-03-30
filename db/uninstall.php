@@ -33,9 +33,9 @@ function xmldb_ilddigitalcert_uninstall() {
     global $CFG;
     $result = true;
 
-    $menu_item = "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
+    $menuitem = "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
     $menu = $CFG->customusermenuitems;
-    $menu = str_replace($menu_item, "", $menu);
+    $menu = str_replace($menuitem, "", $menu);
     set_config('customusermenuitems', $menu);
 
     return $result;

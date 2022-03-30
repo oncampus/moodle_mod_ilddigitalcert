@@ -14,25 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\output\form;
+
 /**
- * This script is producing a downloadable file
+ * Form to confirm sending digital cert to connector wallet.
  *
  * @package     mod_ilddigitalcert
- * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
+ * @copyright   2021 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once('../../config.php');
-require_once('locallib.php');
-
-require_login();
-
-$modulecontextid = optional_param('id', 0, PARAM_INT);
-$uid = optional_param('uid', 0, PARAM_INT);
-$cmid = optional_param('cmid', 0, PARAM_INT);
-
-if ($modulecontextid != 0 and $uid != 0) {
-    download_json($modulecontextid, $uid);
-} else {
-    redirect($CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$cmid);
+class dcconnectorconfirm_form extends \moodleform {
+    /**
+     * Adds elements to form.
+     *
+     * @return void
+     */
+    public function definition() {
+        $this->add_action_buttons(true, get_string('send_to_wallet', 'mod_ilddigitalcert'));
+    }
 }

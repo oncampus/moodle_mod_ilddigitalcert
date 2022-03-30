@@ -28,14 +28,13 @@ require_once('locallib.php');
 require_login();
 
 // TODO check capabilities.
-$modulecontextid = optional_param('id', 0, PARAM_INT);
 $icid = optional_param('icid', 0, PARAM_INT);
 $cmid = optional_param('cmid', 0, PARAM_INT);
 $download = optional_param('download', 'json', PARAM_RAW);
 
-if ($modulecontextid != 0 and $icid != 0) {
-    download_json($modulecontextid, $icid, $download);
+if ($icid != 0) {
+    download_json($icid, $download);
 
 } else {
-    redirect($CFG->wwwroot.'/mod/ilddigitalcert/view.php?id='.$cmid);
+    redirect(new moodle_url('/mod/ilddigitalcert/view.php', array('id' => $cmid)));
 }

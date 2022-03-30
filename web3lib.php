@@ -24,22 +24,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// if (!file_exists('vendor/autoload.php')) {
-//     require_once(__DIR__.'/../../config.php');
+if (!file_exists('vendor/autoload.php')) {
+    require_once(__DIR__.'/../../config.php');
 
-//     require_login();
-//     $context = context_system::instance();
+    require_login();
+    $context = context_system::instance();
 
-//     $PAGE->set_context($context);
-//     $PAGE->set_url('/mod/ilddigitalcert/web3lib.php');
-//     $PAGE->set_title('web3lib.php error');
-//     $PAGE->set_heading('web3lib.php error');
+    $PAGE->set_context($context);
+    $PAGE->set_url('/mod/ilddigitalcert/web3lib.php');
+    $PAGE->set_title('web3lib.php error');
+    $PAGE->set_heading('web3lib.php error');
 
-//     echo $OUTPUT->header();
-//     \core\notification::error(get_string('not_installed_correctly', 'mod_ilddigitalcert'));
-//     echo $OUTPUT->footer();
-//     die();
-// }
+    echo $OUTPUT->header();
+    \core\notification::error(get_string('not_installed_correctly', 'mod_ilddigitalcert'));
+    echo $OUTPUT->footer();
+    die();
+}
+
 require('vendor/autoload.php');
 
 use Web3\Web3;
@@ -48,22 +49,36 @@ use Web3\RequestManagers\HttpRequestManager;
 use Web3\Contract;
 use Web3p\EthereumTx\Transaction;
 use Web3p\EthereumUtil\Util;
-use Web3\Contracts\Types\Bytes;
-use phpseclib\Math\BigInteger;
 
 global $account;
 
+/**
+ * Resolves the name of an existing contract, based on a given simplified contractname.
+ *
+ * @param string $contractname
+ * @return string
+ */
 function get_contract_name($contractname) {
     $contractnames = array('CertMgmt'       => 'CertificateManagement',
                         'IdentityMgmt' => 'IdentityManagement');
-    if(!array_key_exists($contractname, $contractnames)) throw new \coding_exception("Array key $contractname does not exist in given array.");
+    if (!array_key_exists($contractname, $contractnames)) {
+        throw new \coding_exception("Array key $contractname does not exist in given array.");
+    }
     $contractname = $contractnames[$contractname];
-    if(!get_config('ilddigitalcert', 'demo_mode')) {
+
+    // Return the name of contracts, meant for production use, if the demo_mode is not activated.
+    if (!get_config('ilddigitalcert', 'demo_mode')) {
         $contractname .= '_prod';
     }
     return $contractname;
 }
 
+/**
+ * Checks if the blockchain node identified by the given $url is active.
+ *
+ * @param string $url
+ * @return boolean True if the node is active, else false;
+ */
 function check_node($url) {
     $web3 = new Web3(new HttpProvider(new HttpRequestManager($url, 30)));
     $success = false;
@@ -79,23 +94,43 @@ function check_node($url) {
     return $success;
 }
 
+/**
+ * Get the logic of a smart contract identified by the given $contractname.
+ *
+ * @param string $contractname
+ * @return string
+ */
 function get_contract_abi($contractname) {
     global $CFG;
     $contractname = get_contract_name($contractname);
-    $filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
+    $filename = $CFG->dirroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
     $contract = json_decode(file_get_contents($filename));
     return json_encode($contract->contract_abi);
 }
 
+/**
+ * Get the blockchain address of a smart contract identified by the given $contractname.
+ *
+ * @param string $contractname
+ * @return string
+ */
 function get_contract_address($contractname) {
     global $CFG;
     $contractname = get_contract_name($contractname);
-    $filename = $CFG->wwwroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
+    $filename = $CFG->dirroot.'/mod/ilddigitalcert/contracts/'.$contractname.'.json';
     $contract = json_decode(file_get_contents($filename));
 
     return $contract->contract_address;
 }
 
+/**
+ * Getter for the blockchain_url that is set in the plugin config. Checks wether the url identifies an active node on the network.
+ * If it is not the failover_url is checked and returned if active. If both are invalid an error is thrown.
+ *
+ * @param string $contractname
+ * @return string
+ * @throws moodle_exception
+ */
 function get_contract_url($contractname) {
     $contractname = get_contract_name($contractname);
 
@@ -107,12 +142,23 @@ function get_contract_url($contractname) {
         return $blockchainurl;
     } else if (isset($failoverurl) and $failoverurl != '' and check_node($failoverurl)) {
         return $failoverurl;
-    } else {
-        // TODO error.
-        return false;
     }
+    throw new moodle_exception(
+        get_string('error_novalidblockchainurl', 'mod_ilddigitalcert'),
+        '',
+        new moodle_url('/admin/settings.php', array('section' => 'modsettingilddigitalcert'))
+    );
 }
 
+/**
+ * Write the given certificate $hash in the blockchain with a given privatekey.
+ *
+ * @param string $hash
+ * @param int $startdate
+ * @param int $enddate
+ * @param string $pk Provate key.
+ * @return stdClass Object containing transaction and certificate hashes.
+ */
 function store_certificate($hash, $startdate, $enddate, $pk) {
     $url = get_contract_url('CertMgmt');
     $account = get_address_from_pk($pk);
@@ -181,11 +227,11 @@ function store_certificate($hash, $startdate, $enddate, $pk) {
 
 /**
  * Revocation of a certificate identified by $certhash using the $pk of a certifier.
- * 
+ *
  * @param string $certhash Hash of certificate, that will be revoked.
  * @param string $pk Private Key of certifier
- * 
- * @return bool True if revocation was successful, else false 
+ *
+ * @return bool True if revocation was successful, else false
  */
 function revoke_certificate($certhash, $pk) {
     // TODO: testen.
@@ -242,6 +288,12 @@ function revoke_certificate($certhash, $pk) {
     return false;
 }
 
+/**
+ * Retrieves the certificate information stored in the blockchain that is identified by the given $certhash.
+ *
+ * @param string $certhash
+ * @return stdClass
+ */
 function get_certificate($certhash) {
     $cert = new stdClass();
 
@@ -265,6 +317,13 @@ function get_certificate($certhash) {
     return $cert;
 }
 
+/**
+ * Registers a new certifier on the blockchain for a user with $useraddress and using the private key of an admin.
+ *
+ * @param string $useraddress
+ * @param string $adminpk
+ * @return void
+ */
 function add_certifier_to_blockchain($useraddress, $adminpk) {
     $url = get_contract_url('IdentityMgmt');
     $account = get_address_from_pk($adminpk);
@@ -306,6 +365,12 @@ function add_certifier_to_blockchain($useraddress, $adminpk) {
     });
 }
 
+/**
+ * Checks if the given $address belongs to a registered certifier.
+ *
+ * @param string $address
+ * @return boolean True if $address blongs to a registered certifier, else false.
+ */
 function is_accredited_certifier($address) {
     $certifier = false;
 
@@ -324,6 +389,13 @@ function is_accredited_certifier($address) {
     return $certifier;
 }
 
+/**
+ * Unregisteres a certifier identified by $useraddress on the bockchain with the given privatekey $adminpk.
+ *
+ * @param string $useraddress
+ * @param string $adminpk
+ * @return void
+ */
 function remove_certifier_from_blockchain($useraddress, $adminpk) {
     $url = get_contract_url('IdentityMgmt');
     $account = get_address_from_pk($adminpk);
@@ -363,6 +435,12 @@ function remove_certifier_from_blockchain($useraddress, $adminpk) {
     });
 }
 
+/**
+ * Get the blockchain address belonging to a given privatekey $pk.
+ *
+ * @param string $pk
+ * @return string
+ */
 function get_address_from_pk($pk) {
     $util = new Util();
     $publickey = $util->privateKeyToPublicKey($pk);
@@ -370,6 +448,12 @@ function get_address_from_pk($pk) {
     return $address;
 }
 
+/**
+ * Get the blockchain address of the institution a certifier identified by $address
+ *
+ * @param string $address
+ * @return string
+ */
 function get_institution_from_certifier($address) {
     $institutionaddress = false;
 
@@ -388,6 +472,11 @@ function get_institution_from_certifier($address) {
     return $institutionaddress;
 }
 
+/**
+ * Get pending transaction on the blochchain.
+ *
+ * @return void
+ */
 function get_pending_transactions() {
     $url = get_contract_url('IdentityMgmt');
     $web3 = new Web3(new HttpProvider(new HttpRequestManager($url, 30)));

@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Library of utility functions for mod_ilddigitalcert.
- *
- * @package    mod_ilddigitalcert
- * @copyright  2022 ILD TH Lübeck <dev.ild@th-luebeck.de>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_ilddigitalcert;
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,30 +25,32 @@ require_once($CFG->dirroot . '/mod/ilddigitalcert/web3lib.php');
  * Library of utility functions for mod_ilddigitalcert.
  *
  * @package   mod_ilddigitalcert
- * @copyright 2021, Pascal Hürten <pascal.huerten@th-luebeck.de>
+ * @copyright 2022, Pascal Hürten <pascal.huerten@th-luebeck.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-    
+
     /**
      * Revokes a certificate and send an email to the former subject of the certificate.
      *
-     * @param object $issuedcertificate Object that contains the certificate that should dbe revoked.
-     * @param core_user $fromuser Moodle user/certifier that revokes the certificate.
+     * @param \stdClass $issuedcertificate Object that contains the certificate that should dbe revoked.
+     * @param \core_user $fromuser Moodle user/certifier that revokes the certificate.
      * @param string $pk private key of the certifier.
-     * 
+     *
      * @return bool Returns false if the cert couldn´t be revoked, else true.
      */
     public static function revoke($issuedcertificate, $fromuser, $pk) {
         global $DB, $CFG, $SITE;
-        
+
         require_once('web3lib.php');
         $pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $fromuser);
         if (!$pref) {
-            print_error('not_a_certifier', 'mod_ilddigitalcert');
+            \core\notification::error(get_string('not_a_certifier', 'mod_ilddigitalcert'));
+            return false;
         } else {
             if ($pref != get_address_from_pk($pk)) {
-                print_error('wrong_private_key', 'mod_ilddigitalcert');
+                \core\notification::error(get_string('wrong_private_key', 'mod_ilddigitalcert'));
+                return false;
             }
         }
 
@@ -64,9 +58,10 @@ class manager {
             return false;
         }
 
-        
         // If revocation successful.
-        if (!revoke_certificate($issuedcertificate->certhash, $pk)) return false;
+        if (!revoke_certificate($issuedcertificate->certhash, $pk)) {
+            return false;
+        }
 
         // Unset metadata that describes properties of a signed certifiacte.
         $metadata = $issuedcertificate->metadata;
@@ -83,13 +78,7 @@ class manager {
         $issuedcertificate->txhash = null;
         $issuedcertificate->metadata = $json;
         $issuedcertificate->institution_token = null;
-
-        
-        // Create edci-Certificate.
-        // Convert openBadge metadata to edci.
-        // $edci = \mod_ilddigitalcert\bcert\certificate::from_ob($json)->get_edci();
-        // Add edci to $issuedcertificate.
-        // $issuedcertificate->edci = $edci;
+        $issuedcertificate->edci = null;
 
         $DB->update_record('ilddigitalcert_issued', $issuedcertificate);
 
@@ -119,7 +108,7 @@ class manager {
      * @param int $course
      * @return string HTML representation of a certificates table.
      */
-    public static function render_certs_table($certificates, $show_actions = false, $courseid = null, $userid = null, $lang = null) {
+    public static function render_certs_table($certificates, $courseid = null, $userid = null, $lang = null) {
         global $CFG, $DB;
 
         if (!$certificates || empty($certificates)) {
@@ -129,13 +118,6 @@ class manager {
         // Create certificates table.
         $table = new \html_table();
         $table->attributes['class'] = 'generaltable m-element-certs-table';
-
-
-        if ($show_actions === true) {
-            $head[] = \html_writer::checkbox('check-all', null, false, null, array('id' => 'm-element-select-all-certs'));
-            $colclasses[] = 'col-select-all-certs';
-            $align[] = 'left';
-        }
 
         $head[] = (new \lang_string('status'))->out($lang);
         $colclasses[] = 'col-status';
@@ -159,34 +141,6 @@ class manager {
         $colclasses[] = 'col-startdate';
         $align[] = 'left';
 
-        if ($show_actions === true) {
-            $bulk_options = array(
-                '' => (new \lang_string('selectanaction'))->out($lang),
-                'toblockchain' => (new \lang_string('toblockchain', 'mod_ilddigitalcert'))->out($lang),
-                'reissue' => (new \lang_string('reissue', 'mod_ilddigitalcert'))->out($lang),
-            );
-            $bulk_actions = \html_writer::select(
-                $bulk_options,
-                'bulk_actions', 
-                'selectanaction', 
-                null, 
-                array('id' => 'm-element-bulk-actions', 'class' => 'form-control')
-            );
-            $bulk_actions .= \html_writer::empty_tag(
-                'input', 
-                array(
-                    'id' => 'm-element-bulk-actions__button', 
-                    'class' => ' btn btn-secondary', 
-                    'type' => 'button', 
-                    'value' => (new \lang_string('go'))->out($lang)
-                )
-            );
-
-            $head[] = $bulk_actions;
-            $colclasses[] = null;
-            $align[] = 'left';
-        }
-
         $table->head = $head;
         $table->colclasses = $colclasses;
         $table->align = $align;
@@ -194,18 +148,13 @@ class manager {
         // Fill table.
         foreach ($certificates as $certificate) {
             $row = array();
-            if ($show_actions === true) {
-                $attributes = array('class' => 'm-element-select-cert');
-                if (isset($certificate->txhash)) {
-                    $attributes["disabled"] = 'true';
-                }
-                $row[] = \html_writer::checkbox('select-cert' . $certificate->id, $certificate->id, false, null, $attributes);
-            }
-            $icon = '<img height="32px" title="' . (new \lang_string('pluginname', 'mod_ilddigitalcert'))->out($lang) . '"
-        src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
+            $icon = '<img height="32px" title="'
+                . (new \lang_string('pluginname', 'mod_ilddigitalcert'))->out($lang)
+                . '"src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-certificate.svg">';
             if (isset($certificate->txhash)) {
-                $icon = '<img height="32px" title="' . (new \lang_string('registered_and_signed', 'mod_ilddigitalcert'))->out($lang) . '"
-            src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-block.svg">';
+                $icon = '<img height="32px" title="'
+                    . (new \lang_string('registered_and_signed', 'mod_ilddigitalcert'))->out($lang)
+                    . '"src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/blockchain-block.svg">';
             }
             $row[] = $icon;
 
@@ -214,7 +163,6 @@ class manager {
                     $certificate->cmid . '&issuedid=' . $certificate->id . '&ueid=' . ($certificate->enrolmentid ?? 0),
                 $certificate->name
             );
-
 
             if (!\is_scalar($userid)) {
                 $user = $DB->get_record_sql(
@@ -238,29 +186,6 @@ class manager {
 
             $row[] = date('d.m.Y - H:i', $certificate->timecreated);
 
-            if ($show_actions === true) {
-                if (!isset($certificate->txhash)) {
-                    // To-Blockchain Action
-                    $actions = '<div class="m-element-action-row">';
-                    $actions .= '<button class="m-element-action-toblockchain btn btn-secondary" value="' . $certificate->id . '">
-                <img title="' . (new \lang_string('reissue', 'mod_ilddigitalcert'))->out($lang) .
-                        '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/sign_black_24dp.svg"> ' .
-                        (new \lang_string('toblockchain', 'mod_ilddigitalcert'))->out($lang) . '</button>';
-                    // Reissue action
-                    $actions .= '<button class="m-element-action-reissue btn btn-secondary" value="' . $certificate->id . '">
-                <img title="' . (new \lang_string('reissue', 'mod_ilddigitalcert'))->out($lang) .
-                        '" src="' . $CFG->wwwroot . '/mod/ilddigitalcert/pix/reissue_black_24dp.svg"> Reissue
-            </button>';
-                    $actions .= '</div>';
-                    $row[] = $actions;
-                } else {
-                    // TODO check revoked.
-                    // TODO if not revoked: revoke certificate.
-                    $row[] = '';
-                    // TODO if revoked: unrevoke certificate.
-                }
-            }
-
             $table->data[] = $row;
         }
 
@@ -276,15 +201,15 @@ class manager {
      * @param string $subject
      * @param string $html
      * @param string $text
-     * @return object Message object.
+     * @return \core\message\message Message object.
      */
-    public static function get_message($name, $to_user, $subject, $html, $text, $contexturl = null, $contexturlname = null) {
+    public static function get_message($name, $touser, $subject, $html, $text, $contexturl = null, $contexturlname = null) {
 
         $message = new \core\message\message();
-        $message->component = 'mod_ilddigitalcert'; // Your plugin's name
-        $message->name = $name; // Your notification name from message.php
-        $message->userfrom = \core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here
-        $message->userto = $to_user;
+        $message->component = 'mod_ilddigitalcert';
+        $message->name = $name;
+        $message->userfrom = \core_user::get_noreply_user();
+        $message->userto = $touser;
         $message->subject = $subject;
         $message->fullmessageformat = FORMAT_HTML;
 
@@ -292,10 +217,10 @@ class manager {
 
         $message->fullmessage = $text;
 
-        $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message
+        $message->notification = 1;
 
         if ($contexturl) {
-            $message->contexturl = $contexturl; // A relevant URL for the notification
+            $message->contexturl = $contexturl;
         }
         if ($contexturlname) {
             $message->contexturlname = $contexturlname;

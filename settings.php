@@ -58,18 +58,6 @@ if ($hassiteconfig) {
         get_string('configlabel_failover_url', 'mod_ilddigitalcert'),
         get_string('configdesc_failover_url', 'mod_ilddigitalcert'), 'http://quorum.th-luebeck.de:8545'
     ));
-    // $settings->add(new admin_setting_configtext(
-    //     'ilddigitalcert/CertMgmt_address',
-    //     get_string('configlabel_CertMgmt_address', 'mod_ilddigitalcert'),
-    //     get_string('configdesc_CertMgmt_address', 'mod_ilddigitalcert'),
-    //     '' // TODO: // , '0x8a7e3622D3f200aBb1B00D25126f86256c7368dB'//.
-    // ));
-    // $settings->add(new admin_setting_configtext(
-    //     'ilddigitalcert/IdentityMgmt_address',
-    //     get_string('configlabel_IdentityMgmt_address', 'mod_ilddigitalcert'),
-    //     get_string('configdesc_IdentityMgmt_address', 'mod_ilddigitalcert'),
-    //     '' // TODO: // , '0xF40ec6b07009de471F3E2773b276F434F2c1c567'//.
-    // ));
 
 
     $settings->add(new admin_setting_heading(

@@ -23,7 +23,6 @@
  */
 
 require_once(__DIR__.'/../../config.php');
-require_once('edit_issuers_form.php');
 require_once($CFG->libdir.'/adminlib.php');
 
 require_login();
@@ -45,7 +44,7 @@ if (has_capability('moodle/site:config', $context)) {
     // Projekte.
     $url = new moodle_url('/mod/ilddigitalcert/edit_issuers.php');
 
-    $mform = new edit_issuers_form($url.'?id='.$id, array('issuerid' => $id));
+    $mform = new mod_ilddigitalcert\output\form\edit_issuers_form($url.'?id='.$id, array('issuerid' => $id));
 
     if ($mform->is_cancelled()) {
         redirect($url);

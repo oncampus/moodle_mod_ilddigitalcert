@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_ilddigitalcert\output\form;
+
 /**
  * Form for adding, editing and removing certification authorities edit_issuers.php).
  *
@@ -21,17 +23,14 @@
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once("$CFG->libdir/formslib.php");
-
-class edit_issuers_form extends moodleform {
-    // Add elements to form.
+class edit_issuers_form extends \moodleform {
+    /**
+     * Form defintion
+     *
+     * @return void
+     */
     public function definition() {
-        global $CFG;
-
-        $mform = $this->_form; // Don't forget the underscore!
+        $mform = $this->_form;
 
         if (isset($this->_customdata['issuerid'])) {
             $mform->addElement('hidden', 'issuerid', $this->_customdata['issuerid']);
@@ -91,19 +90,19 @@ class edit_issuers_form extends moodleform {
         $mform->setType('issuerpob', PARAM_INT);
 
         $this->add_action_buttons(true, get_string('save'));
-
     }
 
-    // Custom validation should be added here.
-    public function validation($data, $files) {
-        return array();
-    }
-
+    /**
+     * Load the issuer image as a draft before rendering the form.
+     *
+     * @param array $defaultvalues
+     * @return void
+     */
     public function data_preprocessing(&$defaultvalues) {
         if (isset($this->_customdata['issuerid']) and $this->_customdata['issuerid'] > 0) {
             if ($this->current->instance) {
                 $draftitemid = file_get_submitted_draft_itemid('issuerimage');
-                $context = context_system::instance();
+                $context = \context_system::instance();
                 file_prepare_draft_area($draftitemid,
                                         $context->id,
                                         'mod_ilddigitalcert',

@@ -22,13 +22,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Return if the plugin supports $feature.
+ * Returns true if the plugin supports $feature.
  *
  * @param string $feature Constant representing the feature.
- * @return true | null True if the feature is supported, null otherwise.
+ * @return true|null True if the feature is supported, null otherwise.
  */
 function ilddigitalcert_supports($feature) {
     switch ($feature) {
@@ -98,14 +96,21 @@ function ilddigitalcert_delete_instance($id) {
     return true;
 }
 
+/**
+ * Triggers the issuance of a certificate for the current user when the activity becomes available to them.
+ *
+ * @param cm_info $cm
+ * @return void
+ */
 function ilddigitalcert_cm_info_dynamic(cm_info $cm) {
     global $USER, $CFG, $DB;
     // Try to get $cm->get_user_visible() wich might throw errors in moodle versions prior to 3.9.10.
-    // $uservisible is set to true as a default.
-    $uservisible = true;
+    // In case of errors default $uservisible to true.
+
     try {
         $uservisible = $cm->get_user_visible();
     } catch (\Exception $e) {
+        $uservisible = true;
     }
 
     // User can access the activity.
@@ -123,16 +128,16 @@ function ilddigitalcert_cm_info_dynamic(cm_info $cm) {
                     and ue.userid = :userid ';
             $params = array('courseid' => $courseid, 'userid' => $USER->id);
             if ($enrolment = $DB->get_records_sql($sql, $params)) {
+                // Certificate will not be issued, if user is enrolled with more than 1 enrolments.
                 if (count($enrolment) > 1) {
-                    \core\notification::info(get_string('to_many_enrolments', 'mod_ilddigitalcert'));
+                    \core\notification::error(get_string('to_many_enrolments', 'mod_ilddigitalcert'));
                     return;
                 }
             }
             // Issue certificate.
             require_once($CFG->dirroot . '/mod/ilddigitalcert/locallib.php');
-            $certmetadata = generate_certmetadata($cm, $USER);
-            // Certificate will not be issued, if user is enrolled with more than 1 enrolments.
-            issue_certificate($certmetadata, $USER->id, $cm->id);
+            $metacertificate = \mod_ilddigitalcert\bcert\certificate::new($cm, $USER);
+            issue_certificate($metacertificate, $cm);
         }
     }
 }

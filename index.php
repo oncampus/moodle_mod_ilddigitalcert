@@ -33,6 +33,7 @@ require_course_login($course);
 
 $coursecontext = context_course::instance($course->id);
 
+// TODO: Create event course_module_instance_list_viewed.
 $event = \mod_ilddigitalcert\event\course_module_instance_list_viewed::create(array(
     'context' => $modulecontext
 ));

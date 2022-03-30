@@ -26,15 +26,15 @@ require_once(__DIR__ . '/../../config.php');
 require_once('locallib.php');
 
 $id = optional_param('id', null, PARAM_INT);
-$cert_json = optional_param('cert_json', null, PARAM_NOTAGS);
+$certjson = optional_param('cert_json', null, PARAM_NOTAGS);
 $download = optional_param('download', '', PARAM_ALPHA);
-$template_data = array();
+$templatedata = array();
 
-if($id) {
+if ($id) {
     list($course, $cm) = get_course_and_cm_from_cmid($id, 'ilddigitalcert');
 
     require_login($course, true, $cm);
-    
+
     $moduleinstance = $DB->get_record('ilddigitalcert', array('id' => $cm->instance), '*', MUST_EXIST);
     $context = context_module::instance($cm->id);
     $PAGE->set_title(format_string($moduleinstance->name));
@@ -42,7 +42,7 @@ if($id) {
     $PAGE->set_url('/mod/ilddigitalcert/overview.php?id=' . $id);
 } else {
     require_login();
-    
+
     $context = context_system::instance();
     $PAGE->set_context($context);
     $PAGE->set_title(format_string(get_string('pluginname', 'mod_ilddigitalcert')));
@@ -54,160 +54,160 @@ if (isguestuser()) {
     redirect(new moodle_url('/login/'));
 }
 
-$has_cap_viewall = has_capability('moodle/grade:viewall', $context);
-$has_cap_certify = get_user_preferences('mod_ilddigitalcert_certifier', false, $USER) ? true : false;
+$hascapviewall = has_capability('moodle/grade:viewall', $context);
+$hascapcertify = get_user_preferences('mod_ilddigitalcert_certifier', false, $USER) ? true : false;
 
-$template_data['has_cap_viewall'] = $has_cap_viewall;
-$template_data['has_cap_certify'] = $has_cap_certify;
+$templatedata['has_cap_viewall'] = $hascapviewall;
+$templatedata['has_cap_certify'] = $hascapcertify;
 
 $PAGE->requires->js(new moodle_url('/mod/ilddigitalcert/js/pk_form.js'));
 
-if($has_cap_certify) {
+if ($hascapcertify) {
     // Reissue selected certificates.
     // Instantiate reissue form.
-    $reissue_form = new \mod_ilddigitalcert\output\form\reissue_form(qualified_me());
+    $reissueform = new \mod_ilddigitalcert\output\form\reissue_form(qualified_me());
     // Set default data.
-    if (!$reissue_form->get_data()) {
-        $reissue_form_data = (object) [
+    if (!$reissueform->get_data()) {
+        $reissueformdata = (object) [
             'selected' => '[]',
         ];
 
         // Set default data (if any).
-        $reissue_form->set_data($reissue_form_data);
+        $reissueform->set_data($reissueformdata);
     } else {
-        $reissue_form->action();
+        $reissueform->action();
     }
 
     // Set template data needed for rendering the $reissue_form.
-    $template_data['reissue_form'] = $reissue_form->render();
+    $templatedata['reissue_form'] = $reissueform->render();
 
 
     // Sign and register selected certificates in the blockchain.
     // Instantiate to_blockchain form.
-    $to_bc_form = new \mod_ilddigitalcert\output\form\to_blockchain_form(qualified_me());
+    $tobcform = new \mod_ilddigitalcert\output\form\to_blockchain_form(qualified_me());
 
     // Set default data.
-    if (!$to_bc_form->get_data()) {
-        $to_bc_form_data = (object) [
+    if (!$tobcform->get_data()) {
+        $tobcformdata = (object) [
             'selected' => '[]',
             'pk' => '',
         ];
 
         // Set default data (if any).
-        $to_bc_form->set_data($to_bc_form_data);
+        $tobcform->set_data($tobcformdata);
     } else {
-        $to_bc_form->action();
+        $tobcform->action();
     }
 
     // Set template data needed for rendering the $to_bc_form.
-    $template_data['to_bc_form'] = $to_bc_form->render();    
-    
+    $templatedata['to_bc_form'] = $tobcform->render();
+
     // Revoke selected certificates.
     // Instantiate revocation form.
-    $revocation_form = new \mod_ilddigitalcert\output\form\revocation_form(qualified_me());
+    $revocationform = new \mod_ilddigitalcert\output\form\revocation_form(qualified_me());
 
     // Set default data.
-    if (!$revocation_form->get_data()) {
-        $revocation_form_data = (object) [
+    if (!$revocationform->get_data()) {
+        $revocationformdata = (object) [
             'selected' => '[]',
             'pk' => '',
         ];
 
         // Set default data (if any).
-        $revocation_form->set_data($revocation_form_data);
+        $revocationform->set_data($revocationformdata);
     } else {
-        $revocation_form->action();
+        $revocationform->action();
     }
 
     // Set template data needed for rendering the $to_bc_form.
-    $template_data['revocation_form'] = $revocation_form->render();
+    $templatedata['revocation_form'] = $revocationform->render();
 }
 
 // Instantiate search form.
-$search_form = new \mod_ilddigitalcert\output\form\search_certificates_form(qualified_me());
+$searchform = new \mod_ilddigitalcert\output\form\search_certificates_form(qualified_me());
 // Set default data (if any).
-if (!$search_form->get_data()) {
-    $search_form_data = (object) [
+if (!$searchform->get_data()) {
+    $searchformdata = (object) [
         'search_query' => '',
         'search_filter' => '',
     ];
 
-    if(isset($course)) {
-        $search_form_data->courseid = $course->id;
+    if (isset($course)) {
+        $searchformdata->courseid = $course->id;
     }
 
-    if(!$has_cap_viewall) {
-        $search_form_data->userid = $USER->id;
+    if (!$hascapviewall) {
+        $searchformdata->userid = $USER->id;
     }
-    
-    $search_form->set_data($search_form_data);
-}
 
-// Get selected certificates.
- else { // Get search results;
-    list($conditions, $params) = $search_form->action();
+    $searchform->set_data($searchformdata);
+} else {
+    // Get search results.
+    list($conditions, $params) = $searchform->action();
 }
 
 // Else get all certificates.
 if (!isset($conditions)) {
     $conditions = '';
     $params = array();
-    if(isset($course)) {
+    if (isset($course)) {
         $conditions = ' AND courseid = :courseid';
         $params['courseid'] = $course->id;
     }
-    if(!$has_cap_viewall) {
+    if (!$hascapviewall) {
         $conditions = ' AND userid = :userid';
         $params['userid'] = $USER->id;
     }
-    
-    if ($cert_json) {
-        $cert_ids = json_decode($cert_json);
-        
-        if(isset($cert_ids) && !empty($cert_ids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($cert_ids, SQL_PARAMS_NAMED);
+
+    if ($certjson) {
+        $certids = json_decode($certjson);
+
+        if (isset($certids) && !empty($certids)) {
+            list($insql, $inparams) = $DB->get_in_or_equal($certids, SQL_PARAMS_NAMED);
             $conditions .= " AND idci.id $insql";
             $params = array_merge($params, $inparams);
-
-            print_r($conditions);
-            print_r($params);
         }
     }
 }
 
 // Set template data needed for rendering the $search_form.
-$template_data['search_form'] = $search_form->render();
+$templatedata['search_form'] = $searchform->render();
 
 
 // Build page.
 echo $OUTPUT->header();
 
-if($id) {
+if ($id) {
     echo $OUTPUT->heading(get_string('overview_certifier', 'mod_ilddigitalcert'));
 
-    $template_data ['certificate_name'] = $moduleinstance->name;
-    $template_data ['preview_url'] = (new moodle_url('/mod/ilddigitalcert/view.php', array("id" => $id, 'view' => "preview")))->out(false);
-    $template_data ['course_name'] = $course->fullname;
+    $templatedata['certificate_name'] = $moduleinstance->name;
+    $templatedata['preview_url'] = (
+        new moodle_url(
+            '/mod/ilddigitalcert/view.php',
+            array("id" => $id, 'view' => "preview")
+        )
+    )->out(false);
+    $templatedata['course_name'] = $course->fullname;
 } else {
-    if($has_cap_viewall) {
+    if ($hascapviewall) {
         echo $OUTPUT->heading(get_string('overview_certifier', 'mod_ilddigitalcert'));
     } else {
         echo $OUTPUT->heading(get_string('overview', 'mod_ilddigitalcert'));
     }
 }
 
-echo $OUTPUT->render_from_template('mod_ilddigitalcert/overview', $template_data);    
+echo $OUTPUT->render_from_template('mod_ilddigitalcert/overview', $templatedata);
 
 // Build certificate table that shows search results.
 $table = new \mod_ilddigitalcert\output\table\certificate_table(
-    'cert_table' . '_' . date('now'),
-    $has_cap_certify,
+    'cert_table' . '_' . time(),
+    $hascapcertify,
     isset($course) ? $course->id : null,
-    $has_cap_viewall ? null : $USER->id
+    $hascapviewall ? null : $USER->id
 );
 
 // Set table sql.
-$select = 'idci.id AS certid, idci.name, idci.cmid, idci.enrolmentid, idci.timecreated as issued_on, idci.certhash as status, 
+$select = 'idci.id AS certid, idci.name, idci.cmid, idci.enrolmentid, idci.timecreated as issued_on, idci.certhash as status,
     u.*, c.id AS courseid, c.shortname AS courseshortname';
 $from = '{ilddigitalcert_issued} idci, {user} u, {course} c';
 $where = 'u.id = idci.userid AND  c.id = idci.courseid';

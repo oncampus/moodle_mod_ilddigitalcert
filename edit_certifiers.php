@@ -23,7 +23,6 @@
  */
 
 require_once(__DIR__.'/../../config.php');
-require_once('edit_issuers_form.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once('locallib.php');
 require_once('web3lib.php');

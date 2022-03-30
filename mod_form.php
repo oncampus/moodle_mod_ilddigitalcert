@@ -80,16 +80,20 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $mform->addRule('issuer', get_string('error_choose', 'mod_ilddigitalcert'), 'numeric', null, 'client');
         $mform->addRule('issuer', null, 'required', null, 'client');
 
-        $mform->addElement('textarea',
-                           'description',
-                           get_string("description", "mod_ilddigitalcert"),
-                           'wrap="virtual" rows="5" cols="50"');
+        $mform->addElement(
+            'textarea',
+            'description',
+            get_string("description", "mod_ilddigitalcert"),
+            'wrap="virtual" rows="5" cols="50"'
+        );
 
         // Template.
-        $mform->addElement('editor',
-                           'template',
-                           get_string('template', 'mod_ilddigitalcert'),
-                           array('element_type' => 'htmleditor'));
+        $mform->addElement(
+            'editor',
+            'template',
+            get_string('template', 'mod_ilddigitalcert'),
+            array('element_type' => 'htmleditor')
+        );
         $mform->setType('template', PARAM_RAW);
 
         // Image.
@@ -100,94 +104,129 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $mform->addElement('filemanager', 'image', get_string("image", "mod_ilddigitalcert"), null, $filemanageroptions);
 
         // Badge criteria.
-        $mform->addElement('textarea',
-                           'criteria',
-                           get_string("criteria", "mod_ilddigitalcert"),
-                           'wrap="virtual" rows="5" cols="50"');
+        $mform->addElement(
+            'textarea',
+            'criteria',
+            get_string("criteria", "mod_ilddigitalcert"),
+            'wrap="virtual" rows="5" cols="50"'
+        );
         // Badge expertise.
-        $mform->addElement('textarea',
-                           'expertise',
-                           get_string("expertise", "mod_ilddigitalcert"),
-                           'wrap="virtual" rows="5" cols="50"');
+        $mform->addElement(
+            'textarea',
+            'expertise',
+            get_string("expertise", "mod_ilddigitalcert"),
+            'wrap="virtual" rows="5" cols="50"'
+        );
 
         // Expire date.
-        $mform->addElement('date_selector',
-                           'expiredate', get_string('expiredate', 'mod_ilddigitalcert'),
-                           array('startyear' => date('Y', time()),
-                                 'stopyear' => intval(date('Y', time())) + 10,
-                                 'optional' => true));
+        $mform->addElement(
+            'date_selector',
+            'expiredate', get_string('expiredate', 'mod_ilddigitalcert'),
+            array('startyear' => date('Y', time()),
+                'stopyear' => intval(date('Y', time())) + 10,
+                'optional' => true
+            )
+        );
         // Expire period.
-        $mform->addElement('duration',
-                           'expireperiod',
-                           get_string('expireperiod', 'mod_ilddigitalcert'),
-                           array('optional' => true));
+        $mform->addElement(
+            'duration',
+            'expireperiod',
+            get_string('expireperiod', 'mod_ilddigitalcert'),
+            array('optional' => true)
+        );
 
         // Examination start/end.
-        $mform->addElement('date_selector',
-                           'examination_start',
-                           get_string('examination_start', 'mod_ilddigitalcert'),
-                           array('startyear' => date('Y', time()),
-                                 'stopyear' => intval(date('Y', time())) + 10,
-                                 'optional' => true));
-        $mform->addElement('date_selector',
-                           'examination_end',
-                           get_string('examination_end', 'mod_ilddigitalcert'),
-                           array('startyear' => date('Y', time()),
-                                 'stopyear' => intval(date('Y', time())) + 10,
-                                 'optional' => true));
+        $mform->addElement(
+            'date_selector',
+            'examination_start',
+            get_string('examination_start', 'mod_ilddigitalcert'),
+            array(
+                'startyear' => date('Y', time()),
+                'stopyear' => intval(date('Y', time())) + 10,
+                'optional' => true
+            )
+        );
+        $mform->addElement(
+            'date_selector',
+            'examination_end',
+            get_string('examination_end', 'mod_ilddigitalcert'),
+            array(
+                'startyear' => date('Y', time()),
+                'stopyear' => intval(date('Y', time())) + 10,
+                'optional' => true
+            )
+        );
         // Examination place.
-        $mform->addElement('text',
-                           'examination_place',
-                           get_string('examination_place', 'mod_ilddigitalcert'),
-                           array('size' => '64'));
+        $mform->addElement(
+            'text',
+            'examination_place',
+            get_string('examination_place', 'mod_ilddigitalcert'),
+            array('size' => '64')
+        );
         $mform->setType('examination_place', PARAM_TEXT);
         // Examination regulations.
-        $mform->addElement('text',
-                           'examination_regulations',
-                           get_string('examination_regulations', 'mod_ilddigitalcert'),
-                           array('size' => '64'));
+        $mform->addElement(
+            'text',
+            'examination_regulations',
+            get_string('examination_regulations', 'mod_ilddigitalcert'),
+            array('size' => '64')
+        );
         $mform->setType('examination_regulations', PARAM_TEXT);
         // Examination regulations url.
-        $mform->addElement('text',
-                           'examination_regulations_url',
-                           get_string('examination_regulations_url', 'mod_ilddigitalcert'),
-                           array('size' => '64'));
+        $mform->addElement(
+            'text',
+            'examination_regulations_url',
+            get_string('examination_regulations_url', 'mod_ilddigitalcert'),
+            array('size' => '64')
+        );
         $mform->setType('examination_regulations_url', PARAM_TEXT);
         // Examination regulations_id.
-        $mform->addElement('text',
-                           'examination_regulations_id',
-                           get_string('examination_regulations_id', 'mod_ilddigitalcert'),
-                           array('size' => '64'));
+        $mform->addElement(
+            'text',
+            'examination_regulations_id',
+            get_string('examination_regulations_id', 'mod_ilddigitalcert'),
+            array('size' => '64')
+        );
         $mform->setType('examination_regulations_id', PARAM_TEXT);
         // Examination regulations_date.
-        $mform->addElement('date_selector',
-                           'examination_regulations_date',
-                           get_string('examination_regulations_date', 'mod_ilddigitalcert'),
-                           array('startyear' => intval(date('Y', time())) - 10,
-                                 'stopyear' => intval(date('Y', time())) + 10,
-                                 'optional' => true));
+        $mform->addElement(
+            'date_selector',
+            'examination_regulations_date',
+            get_string('examination_regulations_date', 'mod_ilddigitalcert'),
+            array(
+                'startyear' => intval(date('Y', time())) - 10,
+                'stopyear' => intval(date('Y', time())) + 10,
+                'optional' => true
+            )
+        );
 
-        // Automation and process configuration section
+        // Automation and process configuration section.
         $mform->addElement('header', 'automationheader', get_string('automation', 'mod_ilddigitalcert'));
         $mform->setExpanded('automationheader');
 
         // Enable automation checkbox.
-        $mform->addElement('advcheckbox', 'automation', get_string('automation', 'mod_ilddigitalcert'), get_string('enable'), array('group' => 1), array(0, 1));
+        $mform->addElement('advcheckbox', 'automation', get_string('automation', 'mod_ilddigitalcert'),
+            get_string('enable'), array('group' => 1), array(0, 1));
         $mform->addHelpButton('automation', 'automation', 'mod_ilddigitalcert');
 
         // Get Certifiers that are enroled in the course.
-        $certifiers = get_certifiers($this->get_course()->id);
-        $auto_certifiers = array('a' => get_string('choose', 'mod_ilddigitalcert'));
+        if (is_object($this->get_course())) {
+            $courseid = ((object) $this->get_course())->id;
+        } else {
+            $courseid = $this->get_course();
+        }
+        $certifiers = get_certifiers($courseid);
+        $autocertifiers = array('a' => get_string('choose', 'mod_ilddigitalcert'));
         foreach ($certifiers as $certifier) {
-            $auto_certifiers[$certifier->id] = $certifier->firstname . ' ' . $certifier->lastname;
+            $autocertifiers[$certifier->id] = $certifier->firstname . ' ' . $certifier->lastname;
         }
 
-        if(!$auto_certifiers) {
-            $auto_certifiers = array('a' => get_string('no_certifier', 'mod_ilddigitalcert'));
+        if (!$autocertifiers) {
+            $autocertifiers = array('a' => get_string('no_certifier', 'mod_ilddigitalcert'));
         }
 
         // Choose moodle-user that is responsible for certification.
-        $mform->addElement('select', 'auto_certifier', get_string('certifier', 'mod_ilddigitalcert'), $auto_certifiers);
+        $mform->addElement('select', 'auto_certifier', get_string('certifier', 'mod_ilddigitalcert'), $autocertifiers);
         $mform->addHelpButton('auto_certifier', 'auto_certifier', 'mod_ilddigitalcert');
         $mform->setDefault('auto_certifier', 'a');
 
@@ -196,7 +235,8 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $mform->addHelpButton('auto_pk', 'auto_pk', 'mod_ilddigitalcert');
 
         // Enable weekly automation report.
-        $mform->addElement('advcheckbox', 'automation_report', get_string('automation_report:enable', 'mod_ilddigitalcert'), get_string('enable'), array('group' => 1), array(0, 1));
+        $mform->addElement('advcheckbox', 'automation_report', get_string('automation_report:enable', 'mod_ilddigitalcert'),
+            get_string('enable'), array('group' => 1), array(0, 1));
         $mform->addHelpButton('automation_report', 'automation_report:enable', 'mod_ilddigitalcert');
         $mform->setDefault('automation_report', 1);
 
@@ -216,7 +256,7 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
             $defaultvalues['template'] = array('text' => $defaultvalues['template'], 'format' => FORMAT_HTML);
 
             // Decrypts the pk if already set to prevent double encryption on save.
-            if($defaultvalues['auto_pk']) {
+            if ($defaultvalues['auto_pk']) {
                 $defaultvalues['auto_pk'] = \mod_ilddigitalcert\crypto_manager::decrypt($defaultvalues['auto_pk']);
             }
         }
@@ -233,18 +273,17 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
                    0, array('maxfiles' => 1));
 
         // Make sure only valid userids are stored in db.
-        if(!is_numeric($data->auto_certifier) || $data->auto_certifier <= 0) {
+        if (!is_numeric($data->auto_certifier) || $data->auto_certifier <= 0) {
             $data->auto_certifier = null;
         }
 
-
         // If automation is disabled, unset pk.
-        if(!$data->automation) {
+        if (!$data->automation) {
             $data->auto_pk = null;
         }
 
         // If pk is set, encrypt it to protect from non trustworthy db user.
-        if(!empty($data->auto_pk)) {
+        if (!empty($data->auto_pk)) {
             $data->auto_pk = \mod_ilddigitalcert\crypto_manager::encrypt($data->auto_pk);
         }
 

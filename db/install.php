@@ -22,23 +22,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
- * Post installation procedure
+ * Post installation procedure.
  */
 function xmldb_ilddigitalcert_install() {
     global $CFG;
     $result = true;
 
-    $new_item = "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
+    $newitem = "\nmodulenameplural,mod_ilddigitalcert|/mod/ilddigitalcert/overview.php|grades";
     $menu = $CFG->customusermenuitems;
 
     // Remove any old motbot menu items, if there are any.
-    $menu = str_replace($new_item, "", $menu);
+    $menu = str_replace($newitem, "", $menu);
 
     // Add the motbot menu item.
-    $menu = $menu .= $new_item;
+    $menu = $menu .= $newitem;
     set_config('customusermenuitems', $menu);
 
     return $result;

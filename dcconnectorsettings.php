@@ -23,7 +23,6 @@
  */
 
 require_once(__DIR__.'/../../config.php');
-require_once('dcconnectorsettings_form.php');
 require_once($CFG->libdir.'/adminlib.php');
 
 require_login();
@@ -40,12 +39,12 @@ if (has_capability('moodle/site:config', $context)) {
     admin_externalpage_setup('ilddigitalcert_dcconnectorsettings');
 
     $url = new moodle_url('/mod/ilddigitalcert/dcconnectorsettings.php');
-    $mform = new dcconnectorsettings_form($url);
+    $mform = new mod_ilddigitalcert\output\form\dcconnectorsettings_form($url);
 
     if ($mform->is_cancelled()) {
         redirect($url);
     } else if ($fromform = $mform->get_data()) {
-        //get_config($plugin, $name) set_config($name, $value, $plugin)
+        // get_config($plugin, $name) set_config($name, $value, $plugin)
         set_config('dchost', $fromform->dchost, 'mod_ilddigitalcert');
         set_config('dcxapikey', $fromform->dcxapikey, 'mod_ilddigitalcert');
         set_config('dcconnectorid', $fromform->dcconnectorid, 'mod_ilddigitalcert');

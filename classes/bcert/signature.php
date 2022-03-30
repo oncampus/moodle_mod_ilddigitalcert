@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A signature object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
@@ -26,44 +24,64 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class signature
-{
+class signature {
+
+
+    /** @var string Blockchain address of the certifier. */
+    private $address;
+
+    /** @var string Email of the certifier. */
+    private $email;
+
+    /** @var string Given name of the cerifier. */
+    private $givennames;
+
+    /** @var string Surname of the certifier. */
+    private $familyname;
+
+    /** @var string Role of the certifier in his organization. */
+    private $role;
+
+    /** @var string Datetime of the moment the certificate was signed. */
+    private $certificationdate;
+
+    /** @var string Datetime of the moment the certificate was signed. Optional attribute. */
+    private $certificationplace;
 
     /**
-     * @var string Blockchain address of the certifier.
+     * Getter for certificationdate attribute.
+     *
+     * @return string
      */
-    private $address = "";
-
-    /**
-     * @var string Email of the certifier.
-     */
-    private $email = "";
-
-    /**
-     * @var string Given name of the cerifier.
-     */
-    private $givenname = "";
-
-    /**
-     * @var string Surname of the certifier.
-     */
-    private $surname = "";
-
-    /**
-     * @var string Role of the certifier in his organization.
-     */
-    private $role = "";
-
-    /**
-     * @var string Datetime of the moment the certificate was signed.
-     */
-    private $certificationdate = "";
+    public function get_certificationdate() {
+        return $this->certificationdate;
+    }
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+    }
+
+
+    /**
+     * Creates a signature object based on a given certifier.
+     *
+     * @param \core_user $certifier
+     * @return signature
+     */
+    public static function new($certifier, $courseid) {
+        $new = new self();
+        $new->address = get_user_preferences('mod_ilddigitalcert_certifier', 'dummyaddress', $certifier);
+        $new->email = $certifier->email;
+        $new->givennames = $certifier->firstname;
+        $new->familyname = $certifier->lastname;
+        $new->role = manager::get_role_in_course($certifier->id, $courseid);
+        $new->certificationdate = date('c', time());
+        if (isset($certifier->city) and $certifier->city != '') {
+            $new->certificationplace = $certifier->city; // TODO Is this correct?
+        }
+        return $new;
     }
 
     /**
@@ -72,52 +90,62 @@ class signature
      * @param mySimpleXMLElement $xml Contains the signature information in edci format.
      * @return signature
      */
-    public static function from_edci($xml)
-    {
-        $new = new signature();
+    public static function from_edci($xml) {
+        if (!isset($xml->signature)) {
+            return null;
+        }
+        $new = new self();
         $new->address = (string) $xml->signature->address;
-        $new->email = (string)  $xml->signature->email;
-        $new->givenname = (string) $xml->signature->givenname;
-        $new->surname = (string) $xml->signature->surname;
-        $new->role = (string) $xml->signature->role;
-        $new->certificationdate = (string) $xml->signature->certificationdate;
+        $new->email = str_replace('mailto:', '', $xml->signature->mailBox['uri']);
+        $new->givennames = (string) $xml->signature->givenNames->text;
+        $new->familyname = (string) $xml->signature->familyName->text;
+        $new->role = (string) $xml->signature->role->text;
+        $new->certificationdate = (string) $xml->signature->certificationDate;
+        if (isset($xml->signature->certificationplace)) {
+            $new->certificationplace = (string) $xml->signature->certificationPlace->text;
+        }
         return $new;
     }
 
     /**
      * Creates a signature Object based on an openBadge certificate.
      *
-     * @param mySimpleXMLElement $json Contains the signature information in openBadge format.
+     * @param \stdClass $json Contains the signature information in openBadge format.
      * @return signature
      */
-    public static function from_ob($json)
-    {
-        $new = new signature();
+    public static function from_ob($json) {
+        if (!isset($json->{'extensions:signatureB4E'})) {
+            return null;
+        }
+        $new = new self();
         $new->address = $json->{'extensions:signatureB4E'}->address;
         $new->email = $json->{'extensions:signatureB4E'}->email;
-        $new->givenname = $json->{'extensions:signatureB4E'}->givenname;
-        $new->surname = $json->{'extensions:signatureB4E'}->surname;
+        $new->givennames = $json->{'extensions:signatureB4E'}->givenname;
+        $new->familyname = $json->{'extensions:signatureB4E'}->surname;
         $new->role = $json->{'extensions:signatureB4E'}->role;
         $new->certificationdate = $json->{'extensions:signatureB4E'}->certificationdate;
+        $new->certificationplace = manager::get_if_key_exists($json->{'extensions:signatureB4E'}, 'certificationplace');
         return $new;
     }
 
     /**
      * Returns a default Object containing signature data in openBadge format.
      *
-     * @return object
+     * @return \stdClass
      */
-    public function get_ob()
-    {
+    public function get_ob() {
         $signature = new \stdClass();
         $signature->address = $this->address;
         $signature->email = $this->email;
-        $signature->surname = $this->surname;
-        $signature->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/SignatureB4E/context.json';
+        $signature->surname = $this->familyname;
+        $signature->{'@context'} = \mod_ilddigitalcert\bcert\manager::CONTEXT_B4E_SIGNATURE;
         $signature->role = $this->role;
         $signature->certificationdate = $this->certificationdate;
         $signature->type = ["Extension", "SignatureB4E"];
-        $signature->givenname = $this->givenname;
+        $signature->givenname = $this->givennames;
+        if (isset($this->certificationplace)) {
+            $signature->certificationplace = $this->certificationplace;
+        }
         return $signature;
     }
 
@@ -126,16 +154,19 @@ class signature
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty('signature');
 
         $root->addChild('address', $this->address);
-        $root->addChild('email', $this->email);
-        $root->addChild('givenname', $this->givenname);
-        $root->addChild('surname', $this->surname);
-        $root->addChild('role', $this->role);
-        $root->addChild('certificationdate', $this->certificationdate);
+        $mailbox = $root->addChild('mailBox');
+        $mailbox->addAttribute('uri', 'mailto:' . $this->email);
+        $root->addtextnode('givenNames', $this->givennames);
+        $root->addtextnode('familyName', $this->familyname);
+        $root->addtextnode('role', $this->role);
+        $root->addChild('certificationDate', $this->certificationdate);
+        if (isset($this->certificationplace)) {
+            $root->addtextnode('certificationPlace', $this->certificationplace);
+        }
 
         return $root;
     }

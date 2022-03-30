@@ -54,7 +54,7 @@ echo '<div style="background-color: rgba(16,111,111,.7);margin:-15px -20px 80px 
       </b>
     </div>
     <div style="clear:both;height: 0px;"></div>
-  </div>';
+  </div>'; // TODO Add missing lang string.
 
 $imgurls = array($CFG->wwwroot.'/mod/ilddigitalcert/pix/botti_blockchain_check_1.png',
           $CFG->wwwroot.'/mod/ilddigitalcert/pix/botti_blockchain_check_2.png',
@@ -133,7 +133,7 @@ echo '<div id="verifydiv" align="center">
         <b>Ungültig</b>
       </p>
     </div>
-  </div>';
+  </div>'; // TODO Add missing lang string.
 
 echo '<p id="assertionPage" style="clear: both;"></p>';
 
@@ -141,10 +141,10 @@ echo '<p id="assertionPage" style="clear: both;"></p>';
 echo '<div id="certdata" align="center"
         style="display:none;padding:20px;min-width:300px;width:100%;max-width:650px;margin:30px auto;border: 0px solid #bfbfbf;">';
 echo '<p align="left" style="margin: 0 auto;max-width: 610px;">
-        Hash: <span id="span-result-hash" style="color:#106F6F;word-wrap: break-word;"></span><br/>';
-echo 'Gültig ab <span id="span-result-start" style="color:#106F6F;"></span> ';
-echo '<span id="prespan-result-end" style="display:none;">bis <span id="span-result-end" style="color:#106F6F;"></span></span>';
-echo 'Zertifizierungsstelle: <br/><span id="span-result-institution"></span></p>';
+        Hash: <span id="span-result-hash" style="color:#106F6F;word-wrap: break-word;"></span><br/>'; // TODO Add missing lang string.
+echo 'Gültig ab <span id="span-result-start" style="color:#106F6F;"></span> '; // TODO Add missing lang string.
+echo '<span id="prespan-result-end" style="display:none;">bis <span id="span-result-end" style="color:#106F6F;"></span></span>'; // TODO Add missing lang string.
+echo 'Zertifizierungsstelle: <br/><span id="span-result-institution"></span></p>'; // TODO Add missing lang string.
 echo '</div>';
 
 // Backup: zoom: 0.75; -moz-transform: scale(0.75); -moz-transform-origin: 0 0; -o-transform: scale(0.75);//!
@@ -153,7 +153,9 @@ echo '</div>';
 // Backup: width:100%;max-width: 800px;-webkit-transform: scale(1.00); -webkit-transform-origin: 0 0;"></iframe>;//!
 echo '<iframe id="certpageiframe"
         style="display:none;border: 0px solid #bfbfbf;padding:15px;margin: 20px auto;width:100%;max-width: 800px;"></iframe>';
-echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>'; // TODO
-$PAGE->requires->js(new moodle_url($CFG->wwwroot.'/mod/ilddigitalcert/js/verify.js'));
+echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>';
+$PAGE->requires->js(new moodle_url('/mod/ilddigitalcert/js/verify.js'));
+$PAGE->requires->string_for_js('verify', 'mod_ilddigitalcert');
+$PAGE->requires->string_for_js('No_institution_found_in_IPFS', 'mod_ilddigitalcert');
 
 echo $OUTPUT->footer();

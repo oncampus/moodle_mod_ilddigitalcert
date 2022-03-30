@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Library of helper functions for converting certificates and navigate their data structures.
  *
@@ -26,22 +24,39 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2021 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manager
-{
+class manager {
+
+    const CONTEXT_OPENBADGES = 'https://w3id.org/openbadges/v2';
+    const CONTEXT_ILD_INSTITUTION_TOKEN = 'https://raw.githubusercontent.com/ild-thl/schema_extension_ild/master/institution_token_ild.json';
+    const CONTEXT_B4E_ADDRESS = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/AddressB4E/context.json';
+    const CONTEXT_B4E_ASSERTIONPAGE = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/AssertionPageB4E/context.json';
+    const CONTEXT_B4E_ASSERTIONREFERENCE = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/AssertionReferenceB4E/context.json';
+    const CONTEXT_B4E_BADGEINFO = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/BadgeInfoB4E/context.json';
+    const CONTEXT_B4E_BADGEEXPERTISE = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/BadgeExpertiseB4E/context.json';
+    const CONTEXT_B4E_BADGETEMPLATE = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/BadgeTemplateB4E/context.json';
+    const CONTEXT_B4E_CONTRACT = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ContractB4E/context.json';
+    const CONTEXT_B4E_EXAMINATION = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ExaminationB4E/context.json';
+    const CONTEXT_B4E_EXAMINATION_REGULATIONS = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ExaminationRegulationsB4E/context.json';
+    const CONTEXT_B4E_RECIPIENT = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/RecipientB4E/context.json';
+    const CONTEXT_B4E_SIGNATURE = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/SignatureB4E/context.json';
+    const CONTEXT_B4E_VERIFY = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/VerifyB4E/context.json';
+
     /**
      * Checks if the object has a value for key $key, and returns the value if it exists.
      *
-     * @param object $object Object
+     * @param \stdClass $haystack Object
      * @param string $key Key
      * @return *
      */
-    public static function get_if_object_key_exists($object, $key)
-    {
-        if (isset($object->{$key})) {
-            return $object->$key;
-        } else {
-            return null;
+    public static function get_if_key_exists($haystack, $key) {
+        if (is_array($haystack) && array_key_exists($key, $haystack)) {
+            return $haystack[$key];
         }
+        if (isset($haystack->{$key})) {
+            return $haystack->$key;
+        }
+
+        return null;
     }
 
     /**
@@ -51,8 +66,7 @@ class manager
      * @param string $key Key
      * @return *|null
      */
-    public static function get_if_array_key_exists($array, $key)
-    {
+    public static function get_if_array_key_exists($array, $key) {
         if (array_key_exists($key, $array)) {
             return $array[$key];
         } else {
@@ -66,8 +80,70 @@ class manager
      * @param string $string XML String
      * @return string
      */
-    public static function xml_escape($string)
-    {
+    public static function xml_escape($string) {
         return str_replace(array('&', '<', '>', '\'', '"'), array('&amp;', '&lt;', '&gt;', '&apos;', '&quot;'), $string);
+    }
+
+    /**
+     * Get logo/image file of an issuer.
+     *
+     * @param int $issuerid
+     * @return stored_file|null
+     */
+    public static function get_issuer_image($issuerid) {
+        $context = \context_system::instance();
+
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($context->id, 'mod_ilddigitalcert', 'issuer', $issuerid);
+        foreach ($files as $file) {
+            if ($file->get_filename() != '.') {
+                return $file;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get image file of a certificate.
+     *
+     * @param int $cmid Context module id.
+     * @return stored_file|null
+     */
+    public static function get_certificate_image($cmid) {
+        $context = \context_module::instance($cmid);
+        // Get image file.
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($context->id, 'mod_ilddigitalcert', 'content', 0);
+        foreach ($files as $file) {
+            if ($file->get_filename() != '.') {
+                return $file;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a string conatining the roles of a user in a given course.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return string
+     */
+    public static function get_role_in_course($userid, $courseid) {
+        $coursecontext = \context_course::instance($courseid);
+        $roles = get_user_roles($coursecontext, $userid, true);
+
+        return array_reduce(
+            $roles,
+            function($ax, $dx) {
+                if (empty($ax)) {
+                    return $dx->shortname;
+                }
+                return $ax . ", {$dx->shortname}";
+            },
+            ''
+        );
     }
 }

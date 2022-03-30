@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A organization object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
@@ -26,86 +24,96 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class organization
-{
-    /**
-     * @var  int counter that gets incremented with every organization object that gets created, used to generate a unique id.
-     */
+class organization {
+
+    /** @var  int counter that gets incremented with every organization object that gets created, used to generate a unique id. */
     private static $count = 0;
 
-    /**
-     * @var string Unique identifier.
-     */
-    private $id = "";
+    /** @var string Unique identifier. */
+    private $id;
 
-    /**
-     * @var string EDCI identifier.
-     */
-    private $identifier = "";
+    /** @var string EDCI identifier. */
+    private $identifier;
 
-    /**
-     * @var string Edci registration title.
-     */
+    /** @var string Edci registration title. */
     private $registration = "DUMMY-REGISTRATION";
 
-    /**
-     * @var string Prefered title.
-     */
-    private $pref_label = "";
+    /** @var string Prefered title. */
+    private $preflabel;
 
-    /**
-     * @var string Alternative title or description.
-     */
-    private $alt_label = "";
+    /** @var string Alternative title or description. Optional attribute. */
+    private $altlabel;
 
-    /**
-     * @var string Homepage.
-     */
-    private $homepage = "";
+    /** @var string Homepage. */
+    private $homepage;
 
-    /**
-     * @var string Country the organization is registered at.
-     */
-    private $location = "";
+    /** @var string Country the organization is registered at. */
+    private $location;
 
-    /**
-     * @var string ZIP Code.
-     */
-    private $zip = "";
+    /** @var string ZIP Code. */
+    private $zip;
 
-    /**
-     * @var string Street name and number.
-     */
-    private $street = "";
+    /** @var string Street name and number. */
+    private $street;
 
-    /**
-     * @var string Adress including location, zip and street.
-     */
-    private $full_address = "";
+    /** @var string Post office box number. Optional attribute. */
+    private $pob;
 
-    /**
-     * @var  image Logo.
-     */
+    /** @var string Adress including location, zip and street. */
+    private $fulladdress;
+
+    /** @var image Logo. Optional attribute. */
     private $logo;
 
-    /**
-     * @var string Email.
-     */
-    private $email = "";
+    /** @var string Email. */
+    private $email;
 
     /**
      * @var string used as an unique identifier for the qualification.
      */
-    public function get_id()
-    {
+    public function get_id() {
         return $this->id;
     }
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+        self::$count += 1;
+    }
+
+    /**
+     * Creates an organization object based on
+     *
+     * @param \stdClass $issuer
+     * @return void
+     */
+    public static function issuer($issuer) {
+        $new = new self();
+
+        $new->id = 'urn:bcert:org:' . self::$count;
+        $new->identifier = (new \moodle_url(
+            '/mod/ilddigitalcert/edit_issuers.php',
+            array('action' => 'edit', 'id' => $issuer->id)
+        ))->out();
+        $new->preflabel = $issuer->name;
+        if (isset($issuer->description)) {
+            $new->altlabel = $issuer->description;
+        }
+        $new->email = $issuer->email;
+        $new->homepage = $issuer->url;
+        $new->location = $issuer->location;
+        $new->zip = $issuer->zip;
+        $new->street = $issuer->street;
+        $new->fulladdress = $new->street;
+        if (isset($issuer->pob)) {
+            $new->pob = $issuer->pob;
+            $new->fulladdress .= ', PO Box ' . $new->pob;
+        }
+        $new->fulladdress .= ', ' . $new->zip . ' ' . $new->location;
+        $new->logo = image::new(\mod_ilddigitalcert\bcert\manager::get_issuer_image($issuer->id), 'logo');
+
+        return $new;
     }
 
     /**
@@ -114,21 +122,27 @@ class organization
      * @param mySimpleXMLElement $xml Contains the organization information in edci format.
      * @return organization
      */
-    public static function from_edci($xml)
-    {
+    public static function from_edci($xml) {
         $org = new organization();
-        $org_xml = $xml->agentReferences->organization[0];
-        $org->id = $org_xml['id'];
-        $org->identifier = (string) $org_xml->identifier;
-        $org->pref_label = (string) $org_xml->prefLabel->text;
-        $org->alt_label = (string) $org_xml->altLabel->text;
-        $org->email = (string) $org_xml->email;
-        $org->homepage = (string) $org_xml->homepage['uri'];
-        $org->location = (string) $org_xml->hasLocation->hasAddress->location;
-        $org->zip = (string) $org_xml->hasLocation->hasAddress->zip;
-        $org->street = (string) $org_xml->hasLocation->hasAddress->street;
-        $org->full_address = $org_xml->hasLocation->hasAddress->fullAddress->text;
-        $org->logo = image::from_edci($org_xml->logo);
+        $orgxml = $xml->agentReferences->organization[0];
+        $org->id = $orgxml['id'];
+        $org->identifier = (string) $orgxml->identifier;
+        $org->preflabel = (string) $orgxml->prefLabel->text;
+        if (isset($orgxml->altLabel)) {
+            $org->altlabel = (string) $orgxml->altLabel->text;
+        }
+        $org->email = str_replace('mailto:', '', $orgxml->contactPoint->mailBox['uri']);
+        $org->homepage = (string) $orgxml->homepage['uri'];
+        $org->location = (string) $orgxml->hasLocation->hasAddress->location->text;
+        $org->zip = (string) $orgxml->hasLocation->hasAddress->zip;
+        $org->street = (string) $orgxml->hasLocation->hasAddress->street->text;
+        $org->fulladdress = $orgxml->hasLocation->hasAddress->fullAddress->text;
+        if (isset($orgxml->hasLocation->hasAddress->pob)) {
+            $org->pob = (string) $orgxml->hasLocation->hasAddress->pob;
+        }
+        if (isset($orgxml->logo)) {
+            $org->logo = image::from_edci($orgxml->logo);
+        }
         return $org;
     }
 
@@ -138,47 +152,58 @@ class organization
      * @param mySimpleXMLElement $json Contains the organization information in openBadge format.
      * @return organization
      */
-    public static function from_ob($data)
-    {
+    public static function from_ob($data) {
         $org = new organization();
-        self::$count += 1;
         $org->id = 'urn:bcert:org:' . self::$count;
         $org->identifier = $data->badge->issuer->id;
-        $org->pref_label = $data->badge->issuer->name;
-        $org->alt_label = $data->badge->issuer->description;
+        $org->preflabel = $data->badge->issuer->name;
+        $org->altlabel = manager::get_if_key_exists($data->badge->issuer, 'description');
         $org->email = $data->badge->issuer->email;
         $org->homepage = $data->badge->issuer->url;
         $org->location = $data->badge->issuer->{'extensions:addressB4E'}->location;
         $org->zip = $data->badge->issuer->{'extensions:addressB4E'}->zip;
         $org->street = $data->badge->issuer->{'extensions:addressB4E'}->street;
-        $org->full_address = $org->street . ', ' . $org->zip . ' ' . $org->location;
-        $org->logo = image::from_ob('logo', $data->badge->issuer->image);
+        $org->pob = manager::get_if_key_exists($data->badge->issuer->{'extensions:addressB4E'}, 'pob');
+        $org->fulladdress = $org->street;
+        if (isset($org->pob)) {
+            $org->fulladdress .= ', PO Box ' . $org->pob;
+        }
+        $org->fulladdress .= ', ' . $org->zip . ' ' . $org->location;
+        if (isset($data->badge->issuer->image)) {
+            $org->logo = image::from_ob('logo', $data->badge->issuer->image);
+        }
         return $org;
     }
 
     /**
      * Returns a default Object containing organization data in openBadge format.
      *
-     * @return object
+     * @return \stdClass
      */
-    public function get_ob()
-    {
+    public function get_ob() {
         $issuer = new \stdClass();
-        $issuer->description = $this->alt_label;
+        if (isset($this->altlabel)) {
+            $issuer->description = $this->altlabel;
+        }
         $issuer->{'extensions:addressB4E'} = (object) [
             'location' => $this->location,
             'zip' => $this->zip,
             'street' => $this->street,
-            '@context' => 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/AddressB4E/context.json',
+            '@context' => \mod_ilddigitalcert\bcert\manager::CONTEXT_B4E_ADDRESS,
             'type' => ["Extension", "AddressB4E"]
         ];
+        if (isset($this->pob)) {
+            $issuer->{'extensions:addressB4E'}->pob = $this->pob;
+        }
         $issuer->email = $this->email;
-        $issuer->name = $this->pref_label;
+        $issuer->name = $this->preflabel;
         $issuer->url = $this->homepage;
-        $issuer->{'@context'} = 'https://w3id.org/openbadges/v2';
+        $issuer->{'@context'} = \mod_ilddigitalcert\bcert\manager::CONTEXT_OPENBADGES;
         $issuer->type = 'Issuer';
         $issuer->id = $this->identifier;
-        $issuer->image = $this->logo->get_ob();
+        if (isset($this->logo)) {
+            $issuer->image = $this->logo->get_ob();
+        }
 
         return $issuer;
     }
@@ -188,25 +213,32 @@ class organization
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty('organization');
         $root->addAttribute('id', $this->id);
         $root->addChild('identifier', manager::xml_escape($this->identifier));
+        $contactpoint = $root->addChild('contactPoint');
+        $mailbox = $contactpoint->addChild('mailBox');
+        $mailbox->addAttribute('uri', 'mailto:' . $this->email);
         $root->addChild('registration', $this->registration);
-        $root->addTextNode('prefLabel', $this->pref_label);
-        $root->addTextNode('altLabel', $this->alt_label);
+        $root->addtextnode('prefLabel', $this->preflabel);
+        if (isset($this->altlabel)) {
+            $root->addtextnode('altLabel', $this->altlabel);
+        }
         $root->addChild('homepage')->addAttribute('uri', $this->homepage);
-        $has_location = $root->addChild('hasLocation');
-        $has_address = $has_location->addChild('hasAddress');
-        $has_address->addTextNode('fullAddress', $this->full_address);
-        $has_address->addChild('location', $this->location);
-        $has_address->addChild('zip', $this->zip);
-        $has_address->addChild('street', $this->street);
+        $haslocation = $root->addChild('hasLocation');
+        $hasaddress = $haslocation->addChild('hasAddress');
+        $hasaddress->addtextnode('fullAddress', $this->fulladdress);
+        $hasaddress->addtextnode('location', $this->location);
+        $hasaddress->addChild('zip', $this->zip);
+        $hasaddress->addtextnode('street', $this->street);
+        if (isset($this->pob)) {
+            $hasaddress->addChild('pob', $this->pob);
+        }
 
-        $root->appendXML($this->logo->get_edci());
-
-        $root->addChild('email', $this->email);
+        if (isset($this->logo)) {
+            $root->appendXML($this->logo->get_edci());
+        }
 
         return $root;
     }

@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A verification object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
@@ -26,23 +24,31 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class verification
-{
-    /**
-     * @var string Url that a user can use to verify the validity of a certificate.
-     */
-    private $verifyaddress = "";
+class verification {
 
-    /**
-     * @var string is a hash of the json certificate.
-     */
-    private $assertionhash = "";
+    /** @var string Url that a user can use to verify the validity of a certificate. */
+    private $verifyaddress;
+
+    /** @var string is a hash of the json certificate. */
+    private $assertionhash;
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+    }
+
+    /**
+     * Creates a verfication object based on a given hash.
+     *
+     * @param string $hash
+     * @return verification
+     */
+    public static function new($hash) {
+        $new = new self();
+        $new->verifyaddress = (new \moodle_url('/mod/ilddigitalcert/verify.php', array('hash' => $hash)))->out();
+        $new->assertionhash = 'sha256$' . substr($hash, 2);
+        return $new;
     }
 
     /**
@@ -51,22 +57,26 @@ class verification
      * @param mySimpleXMLElement $xml Contains the certificate information in edci format.
      * @return verification
      */
-    public static function from_edci($xml)
-    {
+    public static function from_edci($xml) {
+        if (!isset($xml->verification)) {
+            return null;
+        }
         $new = new verification();
-        $new->verifyaddress = (string) $xml->verification->verifyaddress;
-        $new->assertionhash = (string) $xml->verification->assertionhash;
+        $new->verifyaddress = (string) $xml->verification->verifyAddress['uri'];
+        $new->assertionhash = (string) $xml->verification->assertionHash;
         return $new;
     }
 
     /**
      * Creates a verification Object based on an openBadge certificate.
      *
-     * @param mySimpleXMLElement $json Contains the certificate information in openBadge format.
+     * @param \stdClass $json Contains the certificate information in openBadge format.
      * @return verification
      */
-    public static function from_ob($json)
-    {
+    public static function from_ob($json) {
+        if (!isset($json->verification)) {
+            return null;
+        }
         $new = new verification();
         $new->verifyaddress = $json->verification->{'extensions:verifyB4E'}->verifyaddress;
         $new->assertionhash = $json->verification->{'extensions:verifyB4E'}->assertionhash;
@@ -76,16 +86,17 @@ class verification
     /**
      * Returns a default Object containing verification data in openBadge format.
      *
-     * @return object
+     * @return \stdClass
      */
-    public function get_ob()
-    {
+    public function get_ob() {
         $verification = new \stdClass();
         $verification->{'extensions:verifyB4E'} = new \stdClass();
         $verification->{'extensions:verifyB4E'}->verifyaddress = $this->verifyaddress;
         $verification->{'extensions:verifyB4E'}->type = ["Extension", "VerifyB4E"];
         $verification->{'extensions:verifyB4E'}->assertionhash = $this->assertionhash;
-        $verification->{'extensions:verifyB4E'}->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/VerifyB4E/context.json';
+        $verification
+            ->{'extensions:verifyB4E'}
+            ->{'@context'} = \mod_ilddigitalcert\bcert\manager::CONTEXT_B4E_VERIFY;
         return $verification;
     }
 
@@ -94,12 +105,11 @@ class verification
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty('verification');
 
-        $root->addChild('verifyaddress', manager::xml_escape($this->verifyaddress));
-        $root->addChild('assertionhash', manager::xml_escape($this->assertionhash));
+        $root->addChild('verifyAddress')->addAttribute('uri', manager::xml_escape($this->verifyaddress));
+        $root->addChild('assertionHash', manager::xml_escape($this->assertionhash));
 
         return $root;
     }

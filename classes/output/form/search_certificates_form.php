@@ -14,19 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Form that lets users search for specific cerificats.
- *
- * @package   mod_ilddigitalcert
- * @copyright 2022, Pascal Hürten <pascal.huerten@th-luebeck.de>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_ilddigitalcert\output\form;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . "/formslib.php");
 
 /**
  * Form that lets users search for specific cerificats.
@@ -38,6 +26,7 @@ require_once($CFG->libdir . "/formslib.php");
 class search_certificates_form extends \moodleform {
     /**
      * Form definition.
+     *
      * @return void
      */
     public function definition() {
@@ -46,23 +35,23 @@ class search_certificates_form extends \moodleform {
         $mform->addElement('html', '<div class="m-element-search-form col-md-9 form-inline align-items-start felement">');
 
         // Search query input.
-        $search_query_attributes = array(
+        $searchqueryattributes = array(
             'id' => 'm-element-search__query',
             'placeholder' => get_string('search'),
         );
-        $mform->addElement('text', 'search_query', null, $search_query_attributes);
+        $mform->addElement('text', 'search_query', null, $searchqueryattributes);
         $mform->setType('search_query', PARAM_NOTAGS);
 
         // Search filter dropdown select.
-        $filter_attributes = array(
+        $filterattributes = array(
             'id' => 'm-element-search__filter',
         );
-        $filter_options = array(
+        $filteroptions = array(
             '' => get_string('all'),
             'only_bc' => get_string('only_blockchain', 'mod_ilddigitalcert'),
             'only_nonbc' => get_string('only_nonblockchain', 'mod_ilddigitalcert'),
         );
-        $mform->addElement('select', 'search_filter', '', $filter_options, $filter_attributes);
+        $mform->addElement('select', 'search_filter', '', $filteroptions, $filterattributes);
 
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
@@ -98,42 +87,46 @@ class search_certificates_form extends \moodleform {
      **/
     public function action() {
         global $DB;
-        
-        // Get form data.
-        if(!$data = $this->get_data()) return null;
 
-        $search_query = $data->search_query;
-        $search_filter = $data->search_filter;
-        if (!$search_query && !$search_filter) return null;
+        // Get form data.
+        if (!$data = $this->get_data()) {
+            return null;
+        }
+
+        $searchquery = $data->search_query;
+        $searchfilter = $data->search_filter;
+        if (!$searchquery && !$searchfilter) {
+            return null;
+        }
 
         $sql = '';
         $params = array();
-        
-        if($data->courseid) {
+
+        if ($data->courseid) {
             $sql .= ' AND c.id = :courseid';
-            $params['courseid'] = $data->courseid;    
-        }
-        
-        if($data->userid) {
-            $sql .= ' AND  u.id = :userid';
-            $params['userid'] = $data->userid;    
+            $params['courseid'] = $data->courseid;
         }
 
-        if ($search_query !== '') {
+        if ($data->userid) {
+            $sql .= ' AND  u.id = :userid';
+            $params['userid'] = $data->userid;
+        }
+
+        if ($searchquery !== '') {
             $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
             $sql .= ' AND (' . $DB->sql_like($fullname, ':search1', false, false) . '
             OR ' . $DB->sql_like('c.shortname', ':search2', false, false) . '
             OR ' . $DB->sql_like('c.fullname', ':search3', false, false) . '
                 OR ' . $DB->sql_like('idci.name', ':search4', false, false) . ')';
-            $params['search1'] = '%' . $search_query . '%';
-            $params['search2'] = '%' . $search_query . '%';
-            $params['search3'] = '%' . $search_query . '%';
-            $params['search4'] = '%' . $search_query . '%';
+            $params['search1'] = '%' . $searchquery . '%';
+            $params['search2'] = '%' . $searchquery . '%';
+            $params['search3'] = '%' . $searchquery . '%';
+            $params['search4'] = '%' . $searchquery . '%';
         }
 
-        if ($search_filter === 'only_bc') {
+        if ($searchfilter === 'only_bc') {
             $sql .= ' AND idci.txhash is not null ';
-        } else if ($search_filter === 'only_nonbc') {
+        } else if ($searchfilter === 'only_nonbc') {
             $sql .= ' AND idci.txhash is null ';
         }
 

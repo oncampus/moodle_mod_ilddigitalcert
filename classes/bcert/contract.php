@@ -18,6 +18,8 @@ namespace mod_ilddigitalcert\bcert;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/ilddigitalcert/web3lib.php');
+
 /**
  * A verification object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
@@ -26,29 +28,35 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class contract
-{
+class contract {
+    /** @var string smart contract info. */
+    private $abi;
 
-    /**
-     * @var string smart contract info.
-     */
-    private $abi = "";
+    /** @var string Blockchain address. */
+    private $address;
 
-    /**
-     * @var string Blockchain address.
-     */
-    private $address = "";
-
-    /**
-     * @var string The node the certificate was initialy introduced to the blockchain.
-     */
-    private $node = "";
+    /** @var string The node the certificate was initialy introduced to the blockchain. */
+    private $node;
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+    }
+
+    /**
+     * Creates a contract object.
+     *
+     * @return contract
+     */
+    public static function new() {
+        $new = new self();
+
+        $new->abi = get_contract_abi('CertMgmt');
+        $new->address = get_contract_address('CertMgmt');
+        $new->node = get_contract_url('CertMgmt');
+
+        return $new;
     }
 
     /**
@@ -57,8 +65,10 @@ class contract
      * @param mySimpleXMLElement $xml Contains the contract information in edci format.
      * @return contract
      */
-    public static function from_edci($xml)
-    {
+    public static function from_edci($xml) {
+        if (!isset($xml->contract)) {
+            return null;
+        }
         $new = new contract();
         $new->abi = (string) $xml->contract->abi;
         $new->address = (string) $xml->contract->address;
@@ -69,11 +79,13 @@ class contract
     /**
      * Creates a contract Object based on an openBadge certificate.
      *
-     * @param mySimpleXMLElement $json Contains the contract information in openBadge format.
+     * @param \stdClass $json Contains the contract information in openBadge format.
      * @return contract
      */
-    public static function from_ob($json)
-    {
+    public static function from_ob($json) {
+        if (!isset($json->{'extensions:contractB4E'})) {
+            return null;
+        }
         $new = new contract();
         $new->abi = $json->{'extensions:contractB4E'}->abi;
         $new->address = $json->{'extensions:contractB4E'}->address;
@@ -85,17 +97,16 @@ class contract
     /**
      * Returns a default Object containing contract data in openBadge format.
      *
-     * @return object
+     * @return \stdClass
      */
-    public function get_ob()
-    {
-        $cobtract = new \stdClass();
-        $cobtract->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ContractB4E/context.json';
-        $cobtract->type = ["Extension", "ContractB4E"];
-        $cobtract->abi = $this->abi;
-        $cobtract->address = $this->address;
-        $cobtract->node = $this->node;
-        return $cobtract;
+    public function get_ob() {
+        $contract = new \stdClass();
+        $contract->{'@context'} = \mod_ilddigitalcert\bcert\manager::CONTEXT_B4E_CONTRACT;
+        $contract->type = ["Extension", "ContractB4E"];
+        $contract->abi = $this->abi;
+        $contract->address = $this->address;
+        $contract->node = $this->node;
+        return $contract;
     }
 
 
@@ -104,8 +115,7 @@ class contract
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty('contract');
 
         $root->addChild('abi', manager::xml_escape($this->abi));

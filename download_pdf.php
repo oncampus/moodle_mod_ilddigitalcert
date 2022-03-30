@@ -23,11 +23,11 @@
  */
 
 require_once('../../config.php');
+require_login();
 require_once('locallib.php');
 
-$fileid = optional_param('id', 0, PARAM_INT);
+$fileid = required_param('id', PARAM_INT);
 
-// TODO: check if user is logged in!?
 if ($fileid > 0) {
     download_file($fileid);
 }

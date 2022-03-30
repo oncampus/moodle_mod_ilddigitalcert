@@ -37,9 +37,9 @@ $string['add_certifier'] = 'Add certifier';
 $string['automation'] = 'Automation';
 $string['automation_help'] = 'If automation is active, certificates will be signed and written to the blockchain automatically by the selected certifier.';
 $string['automation_report:contexturlname'] = 'Manage signed certificates';
-$string['automation_report:end'] = '';
 $string['automation_report:enable'] = 'Weekly report';
 $string['automation_report:enable_help'] = 'If this option is enabled the set certifier will receive a report at the end of every week that lists all the certificates that were signed in their name during the past week.';
+$string['automation_report:end'] = '';
 $string['automation_report:intro'] = '<p>Hello {$a},</p>
 <p>following certificates were recently signed automatically in your name and written to the blockchain successfully:</p>';
 $string['automation_report:other_certs'] = 'Other certificates';
@@ -55,45 +55,47 @@ $string['block_summary'] = '<p>Verify the authenticity of your digital certifica
 <p>Simply drag and drop your certificate (PDF or BCRT file) into the field.</ p>
 <p>You can check your printed version of the certificate by scanning the QR code below.
 </p>';
-$string['cert_waiting_for_registration'] = 'Dieses Zertifikat wartet auf Registrierung und Signierung in der Blockchain durch einen akkreditierten Zertifizierer.';
-$string['certhash'] = 'Zertifikat-Hash';
+$string['cert_waiting_for_registration'] = 'This certificate is waiting to be signed by an accredited certifier and to be registered in the blockchain.';
+$string['certhash'] = 'Certificate hash';
 $string['certificate'] = 'Certificate';
 $string['certifier'] = 'Certifier';
 $string['certifier_address'] = 'Blockchain address of the certifier';
 $string['choose'] = 'Choose';
 $string['configlabel_blockchain_url'] = 'Blockchain URL';
-$string['configlabel_CertMgmt_address'] = 'Smart-Contract-Adresse CertMgmt';
+$string['configlabel_CertMgmt_address'] = 'Smart-Contract-Address CertMgmt';
 $string['configlabel_custom_menu_entry'] = 'Entry in custom menu';
 $string['configlabel_failover_url'] = 'Alternative Blockchain URL';
 $string['configlabel_IdentityMgmt_address'] = 'Smart-Contract-Adresse IdentityMgmt';
 $string['configlabel_max_token_age'] = 'Max token age';
 $string['configlabel_demo_mode'] = 'Enable demo mode';
-$string['configdesc_blockchain_url'] = 'Diese Adresse wird benötigt um die Verbindung zu einem geeigneten Blockchain-Knoten herzustellen.';
+$string['configdesc_blockchain_url'] = 'This address is needed to establish a connection to a suitable blockchain node.';
 $string['configdesc_CertMgmt_address'] = 'Address of the smart contract for the management of certificates in the blockchain.<br/>
 Address of the current (2020-09-28) contract: 0x8a7e3622D3f200aBb1B00D25126f86256c7368dB';
-$string['configdesc_custom_menu_entry'] = 'Fügt einen Eintrag im Nutzermenü hinzu, der zur persönlichen Zertifikatsübersicht führt.';
-$string['configdesc_failover_url'] = 'Diese URL wird verwendet, wenn die primäre Blockchain URL nicht erreichbar ist.';
+$string['configdesc_custom_menu_entry'] = 'Adds an entry in the custom usermenu, that links to the personal certifiacte overview.';
+$string['configdesc_failover_url'] = 'This url will be used if the primary blockchain url is not reachable.';
 $string['configdesc_IdentityMgmt_address'] = 'Address of the smart contract for the management of user roles in the blockchain.<br/>
 Address of the current (2020-09-28) contract: 0xF40ec6b07009de471F3E2773b276F434F2c1c567';
-$string['configdesc_max_token_age'] = 'Diese Dauer gibt an nach welcher Zeit der Link zum Generieren eines Privat Keys seine Gültigkeit verliert.';
+$string['configdesc_max_token_age'] = 'This duration specifies how long the link for generating a private key will be valid.';
 $string['configdesc_demo_mode'] = 'For demo or testing purposes enable this option. Certificates will be written to a demo blockchain that is not meant for production use. Please do not use personal data while this option is enabled.';
 $string['criteria'] = 'Criteria';
 $string['data'] = 'Certificate data';
 $string['dcxapikey'] = 'API key';
 $string['dcconnectorid'] = 'Connector id';
 $string['dcconnectorsettings'] = 'Connector settings';
+$string['dcconnector_pdfuploaddesc'] = 'PDF certificate file with embedded certificate metadata.';
 $string['dchost'] = 'Domain';
-$string['delete_certifier'] = 'Aus Blockchain entfernen';
+$string['delete_certifier'] = 'Remove from blockchain';
 $string['descconfig'] = 'Information about the issuer';
 $string['description'] = 'Description';
 $string['drag_n_drop'] = 'Click here or drag and drop to upload file';
 $string['edci'] = 'EDCI';
 $string['edit_certifiers'] = 'Manage certifiers';
-$string['edit_issuers'] = 'Aussteller verwalten';
+$string['edit_issuers'] = 'Manage certifiers';
 $string['error_choose'] = 'Choose issuer';
 $string['error_choose_certifier'] = 'Choose certifier';
 $string['error_register_cert'] = 'Error during registration in the blockchain';
 $string['error_revoke_cert'] = 'Error during revocation';
+$string['error_novalidblockchainurl'] = 'No valid or active blockchain url could be found. Please check the plugin settings and enter a valid blockchain url.';
 $string['examination_end'] = 'Examniation end';
 $string['examination_place'] = 'Examniation place';
 $string['examination_start'] = 'Examination start';
@@ -101,12 +103,12 @@ $string['examination_regulations'] = 'Examination regulations';
 $string['examination_regulations_url'] = 'Examination regulations url';
 $string['examination_regulations_id'] = 'Examination regulations version';
 $string['examination_regulations_date'] = 'Examination regulations date';
-$string['expertise'] = 'Kenntnisse';
+$string['expertise'] = 'Competences';
 $string['expiredate'] = 'Expire date';
 $string['expireperiod'] = 'Expire period';
 $string['file_upload_error'] = 'Error while sending file';
 $string['generate_adr_from_pk'] = 'Generate blockchain adress and private key';
-$string['generate_pk'] = 'Link zum generieren des Private Key per E-Mail versenden';
+$string['generate_pk'] = 'Send E-Mail including a link for generating a private key';
 $string['headerconfig'] = 'Issuer';
 $string['html'] = 'Certificate';
 $string['image'] = 'Image';
@@ -125,7 +127,7 @@ $string['issuedcerts_report:other_certs'] = 'Other certificates';
 $string['issuedcerts_report:subject'] = 'Issued certificates waiting to be signed';
 
 $string['issuer'] = 'Issuer';
-$string['issueraddress'] = 'Blockchainadresse der Zertifizierungsstelle';
+$string['issueraddress'] = 'Blockchainaddress of the issuing institution';
 $string['issuername_label'] = 'Name';
 $string['issuername_descr'] = 'Name of the issuer';
 
@@ -149,95 +151,97 @@ $string['message_certificate_revoked'] = '<p>Hi {$a->fullname},</p>
 <p>Here you can view your certificate: <a href="{$a->url}">{$a->url}</a>.</p>
 <p>Kind regards</p>
 <p>Your {$a->from} team</p>';
-$string['message_new_certificate'] = 'Hallo {$a->fullname},
+$string['message_new_certificate'] = 'Hello {$a->fullname},
 
-Sie haben ein digitales Zertifikat erhalten.
+You have received a digital certificate.
 
-Hier können Sie sich Ihr Zertifikat ansehen: {$a->url}.
+Here you can view your certificate: {$a->url}.
 
-Viele Grüße
-Ihr {$a->from} Team';
-$string['message_new_certificate_html'] = '<p>Hallo {$a->fullname},</p>
-<p>Sie haben ein digitales Zertifikat erhalten.</p>
-<p>Hier können Sie sich Ihr Zertifikat ansehen: <a href="{$a->url}">{$a->url}</a>.</p>
-<p>Viele Grüße</p>
-<p>Ihr {$a->from} Team</p>';
-$string['message_new_digital_certificate'] = 'Hallo {$a->fullname},
+Kind regards
+Your {$a->from} team';
+$string['message_new_certificate_html'] = '<p>Hello {$a->fullname},</p>
+<p>You have received a digital certificate.</p>
+<p>Here you can view your certificate: <a href="{$a->url}">{$a->url}</a>.</p>
+<p>Kind regards</p>
+<p>Your {$a->from} team</p>';
+$string['message_new_digital_certificate'] = 'Hello {$a->fullname},
 
-Ihr digitales Zertifikat wurde in der Blockchain registriert und signiert.
+Your digital certificate was signed and registered in the blockchain.
 
-Hier können Sie sich Ihr Zertifikat ansehen: {$a->url}.
+Here you can view your certificate: {$a->url}.
 
-Viele Grüße
-Ihr {$a->from} Team';
-$string['message_new_digital_certificate_html'] = '<p>Hallo {$a->fullname},</p>
-<p>Ihr digitales Zertifikat wurde in der Blockchain registriert und signiert.</p>
-<p>Hier können Sie sich Ihr Zertifikat ansehen: <a href="{$a->url}">{$a->url}</a>.</p>
-<p>Viele Grüße</p>
-<p>Ihr {$a->from} Team</p>';
-$string['message_generate_pk'] = 'Hallo {$a->fullname},
+Kind regards
+Your {$a->from} team';
+$string['message_new_digital_certificate_html'] = '<p>Hello {$a->fullname},</p>
+<p>Your digital certificate was signed and registered in the blockchain.</p>
+<p>Here you can view your certificate: <a href="{$a->url}">{$a->url}</a>.</p>
+<p>Kind regards</p>
+<p>Your {$a->from} team</p>';
+$string['message_generate_pk'] = 'Hello {$a->fullname},
 
-Sie wurden als neuer Zertifizierer auf {$a->url} hinzugefügt.
+You were added as a new certifier on {$a->url}
 
-Um digitale Zertifikate in der Blockchain zu registrieren und zu signieren, benötigen Sie einen Private Key.
+To sign and register digital certificates in the blockchain you need a private key.
 
-Ihren persönlichen Private Key können Sie unter folgendem Link generieren.
+You can generate your own private key by following this link.
 
 {$a->token_link}
 
-Viele Grüße
-Ihr {$a->from} Team';
-$string['message_html_generate_pk'] = '<p>Hallo {$a->fullname},</p>
+Kind regards
+Your {$a->from} team';
+$string['message_html_generate_pk'] = '<p>Hello {$a->fullname},</p>
 <p>&nbsp;</p>
-<p>Sie wurden als neuer Zertifizierer auf {$a->url} hinzugefügt.</p>
+<p>You were added as a new certifier on {$a->url}</p>
 <p>&nbsp;</p>
-<p>Um digitale Zertifikate in der Blockchain zu registrieren und zu signieren, benötigen Sie einen Private Key</p>
+<p>To sign and register digital certificates in the blockchain you need a private key.</p>
 <p>&nbsp;</p>
-<p>Ihren persönlichen Private Key können Sie unter folgendem Link generieren.</p>
+<p>You can generate your own private key by following this link.</p>
 <p>&nbsp;</p>
 <p><a href="{$a->token_link}">{$a->token_link}</a></p>
 <p>&nbsp;</p>
-<p>Viele Grüße</p>
-<p>Ihr {$a->from} Team</p>';
+<p>Kind regards</p>
+<p>Your {$a->from} team</p>';
+$string['message_sendtowallet_subject'] = 'your digital certifiacat';
+$string['message_sendtowallet_body'] = 'Attached to this message you receive your digital certificate. You can also find your certificate in the folder "Files".';
 $string['missingcertid'] = 'Certificate id is missing';
 $string['msg_send_error'] = 'Error while sending message';
-$string['new_certifier_message'] = 'Hallo {$a->fullname}
+$string['new_certifier_message'] = 'Hello {$a->fullname}
 
-Sie wurden als neuer Zertifizierer für die Zertifizierungsstelle {$a->institution} auf {$a->url} hinzugefügt.
+You were added as a new certifier for the issuing institution {a->institution} on {$a->url}
 
-Viele Grüße
+Kind regards
 {$a->from}';
-$string['new_certifier_message_html'] = 'Hallo {$a->fullname}
+$string['new_certifier_message_html'] = 'Hello {$a->fullname}
 
-Sie wurden als neuer Zertifizierer für die Zertifizierungsstelle {$a->institution} auf {$a->url} hinzugefügt.
+You were added as a new certifier for the issuing institution {a->institution} on {$a->url}
 
-Viele Grüße
+Kind regards
 {$a->from}';
-$string['new_certifier_message_pk'] = 'Hallo {$a->fullname}
+$string['new_certifier_message_pk'] = 'Hello {$a->fullname}
 
-Sie wurden als neuer Zertifizierer für die Zertifizierungsstelle {$a->institution} auf {$a->url} hinzugefügt.
+You were added as a new certifier for the issuing institution {a->institution} on {$a->url}
 
-Viele Grüße
+Kind regards
 {$a->from}';
-$string['new_certifier_message_pk_html'] = 'Hallo {$a->fullname}
+$string['new_certifier_message_pk_html'] = 'Hello {$a->fullname}
 
-Sie wurden als neuer Zertifizierer für die Zertifizierungsstelle {$a->institution} auf {$a->url} hinzugefügt.
+You were added as a new certifier for the issuing institution {a->institution} on {$a->url}
 
-Viele Grüße
+Kind regards
 {$a->from}';
-$string['new_certifier_subject'] = 'Sie wurden als Zertifizierer hinzugefügt';
-$string['new_pk_generated'] = '<p>Herzlichen Glückwunsch!</p>
-<p>Für Sie wurde ein neuer Private Key erstellt.</p>
-<p>Ihr Private Key: {$a->pk}</p>
-<p>Behandeln Sie Ihren Private Key wie ein wichtiges Passwort und geben Sie ihn nicht weiter.</p>
-<p>Mit Ihrem Private Key registrieren und signieren Sie Digitale Zertifikate in der Blockchain.</p>
-<p>Schließen Sie diese Seite nicht und laden Sie sie nicht neu, bevor Sie Ihren Private Key gesichert haben!</p>';
+$string['new_certifier_subject'] = 'You were added as a certifier';
+$string['new_pk_generated'] = '<p>Congratulations!</p>
+<p>A new private key was issued for you.</p>
+<p>Your private key: {$a->pk}</p>
+<p>Treat your private key as an important password and never pass it on to another person.</p>
+<p>With your private key you can now sign and register digital certificates in the blockchain.</p>
+<p>Do not close or reload this page before you have\'nt stored your private key safely.</p>';
 $string['no_certifier'] = 'No suitable certifiers found';
 $string['No_institution_found_in_IPFS'] = 'No issuer information found in IPFS';
 $string['no_pref_found'] = 'No user preference "mod_ilddigitalcert_certifier" found for user {$a->fullname}.
 Please check if you are logged in correctly.';
-$string['not_installed_correctly'] = 'Das Plugin "Digitale Zertifikate" wurde nicht vollständig installiert.
-Lesen Sie die Datei README.md oder wenden Sie sich an den Moodle Administrator';
+$string['not_installed_correctly'] = 'The plugin "Digital Certificate" was not installed completely.
+Please read the file README.md or contact the site administrator.';
 $string['not_logged_in'] = 'You are not logged in.';
 $string['only_blockchain'] = 'Registered certificates';
 $string['only_nonblockchain'] = 'Unregistered certificates';
@@ -263,35 +267,35 @@ $string['send_issuedcerts_report'] = 'Reports issued certs waiting to be signed.
 $string['send_to_wallet'] = 'Send to wallet';
 $string['send_certificate_to_wallet'] = 'Send the digital certificate to your wallet. Afterwards you can find it in your app on your smartphone and share it with other institutions.';
 $string['send_certificate_to_wallet_success'] = 'The certificate has been sent to your wallet. You can find it in your app on your smartphone.';
-$string['settings_descconfig'] = '<p>Diese Parameter werden benötigt um eine Verbindung zur Blockchain aufzubauen und
-um die Smart Contracts auszuführen, die verwendet werden um Zertifikate und Zertifizierer zu verwalten.</p>
-<p><strong>Es können einfach die voreingestellten Default-Parameter verwendet werden um die DigiCerts Blockchain zu benutzen.</strong></p>
-<p>Nähere Informationen finden Sie hier <a href="https://www.digicerts.de">DigiCerts</a>.</p>';
-$string['settings_headerconfig'] = 'Blockchain Einstellungen';
-$string['settings_headerconfig_general'] = 'Allgemeine Einstellungen';
-$string['sign_add_certifier_with_pk'] = 'Hinzufügen eines neuen Zertifizierers mit Private Key signieren';
+$string['settings_descconfig'] = '<pThese parameters are needed to establish a connection to the blockchain and
+to execute the smart contracts that are used to manage certificates and certifiers.</p>
+<p><strong>The default parameters can easily be used to use the DigiCerts-blockchain.</strong></p>
+<p>For further informations visit <a href="https://www.digicerts.de">DigiCerts</a>.</p>';
+$string['settings_headerconfig'] = 'Blockchain settings';
+$string['settings_headerconfig_general'] = 'General settings';
+$string['sign_add_certifier_with_pk'] = 'Sign with your private key to execute adding a certifier';
 $string['sign_cert'] = 'Sign and register certificate in the blockchain';
 $string['sign_confirmation'] = 'Do you want to sing and register following certificates?';
-$string['sign_delete_certifier_with_pk'] = 'Um den Zertifizierer aus der Blockchain zu entfernen, muss dieser Vorgang mit dem Private Key einer Zertifizierungsstelle signiert werden.';
+$string['sign_delete_certifier_with_pk'] = 'To remove the certifier from the blockchain, this action has to be signed by the private key of an issuing institution.';
 $string['sign_error_already_signed'] = 'Couldn\'t sign {$a} certificat(s), because they where already signed and registered in the blockchain.';
 $string['sign_with_pk'] = 'To register a certificate in the blockchain the certificate has to be signed with the private key of a qualified certifier.';
 $string['startdate'] = 'Date of issue';
-$string['subject_generate_pk'] = 'Generieren Sie Ihren Private Key als Zertifizierer';
+$string['subject_generate_pk'] = 'Generate your private key to become a certifier';
 $string['template'] = 'HTML Template';
 $string['title'] = 'Certificate';
 $string['toblockchain'] = 'Register and sign';
-$string['to_many_enrolments'] = 'Das Zertifikat kann aufgrund mehrerer paralleler Einschreibungen in diesen Kurs nicht ausgestellt werden.';
+$string['to_many_enrolments'] = 'Because of multiple parallel enrolements in this course the digital certificate couldn\'t be issued.';
 $string['unknown'] = 'Certificate could not be found in the Blockchain';
 $string['upload'] = 'Upload certificate';
 $string['upload_again'] = 'Upload new certificate';
-$string['use_address'] = 'Bereits vorhandene Blockchain Adresse eines Zertifizierers verwenden';
+$string['use_address'] = 'Use an already existing blochchain address of a certifier';
 $string['valid'] = 'Valid certificate';
 $string['validation'] = 'Valid';
-$string['verify'] = 'Zertifikate überprüfen';
-$string['verify_authenticity'] = 'Echtheit überprüfen';
-$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter
-<a href="{$a->url}">{$a->url}</a> hoch.
-<br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.';
+$string['verify'] = 'Verify certificates';
+$string['verify_authenticity'] = 'Verify authenticity';
+$string['verify_authenticity_descr'] = 'To validate the authenticity of a certificate, upload the PDF-file at
+<a href="{$a->url}">{$a->url}</a>.
+<br />You can verify the authenticity of the printed out certificate, by scanning the nearby QR-Code.';
 $string['verify_description'] = 'Verify your digital certificates here in the blockchain.';
 $string['waiting_for_pk_generation'] = 'Waiting for user to generate private key';
 $string['waiting_for_request'] = 'Waiting for request';

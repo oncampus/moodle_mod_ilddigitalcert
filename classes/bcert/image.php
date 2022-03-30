@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A image object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
@@ -26,34 +24,54 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class image
-{
+class image {
+
 
     /**
      * @var string Name of the edci xml node.
      */
-    private $name = "";
+    private $name;
 
     /**
      * @var string URI that represents the filetype of the image in the edci certificate.
      */
-    private $type_uri = "http://publications.europa.eu/resource/authority/file-type/";
+    private $typeuri = "http://publications.europa.eu/resource/authority/file-type/";
 
     /**
      * @var string File type.
      */
-    private $type_name = "";
+    private $typename;
 
     /**
      * @var string base64 encoded image data.
      */
-    private $content = "";
+    private $content;
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+    }
+
+    /**
+     * Creates an image object base on a given moodle file.
+     *
+     * @param \file $file
+     * @param string $name
+     * @return \stored_file
+     */
+    public static function new($file, $name) {
+        if (!isset($file)) {
+            return null;
+        }
+
+        $new = new self();
+
+        $new->name = $name;
+        $new->content = base64_encode($file->get_content());
+        $new->typename = strtoupper($file->get_mimetype());
+
+        return $new;
     }
 
     /**
@@ -62,17 +80,16 @@ class image
      * @param mySimpleXMLElement $xml Contains the certificate image in edci format.
      * @return image
      */
-    public static function from_edci($xml)
-    {
-        if(empty($xml)) {
+    public static function from_edci($xml) {
+        if (empty($xml)) {
             return null;
         }
-        
+
         $image = new image();
 
         $image->name = $xml->getName();
-        $image->type_uri = $xml->contentType['uri'];
-        $image->type_name = $xml->contentType->targetName->text;
+        $image->typeuri = $xml->contentType['uri'];
+        $image->typename = $xml->contentType->targetName->text;
         $image->content = $xml->content;
 
         return $image;
@@ -85,21 +102,20 @@ class image
      * @param string $image_data base64 encoded image data.
      * @return image
      */
-    public static function from_ob($name, $image_data)
-    {
-        if(empty($image_data)) {
+    public static function from_ob($name, $imagedata) {
+        if (empty($imagedata)) {
             return null;
         }
 
         $image = new image();
 
-        // searching for file type and content of the image data
+        // Search for file type and content of the image data.
         $match = [];
-        preg_match('/data:image\/(.+);base64,(.+)/', $image_data, $match);
+        preg_match('/data:image\/(.+);base64,(.+)/', $imagedata, $match);
 
         $image->name = $name;
-        $image->type_name = strtoupper($match[1]);
-        $image->type_uri .= $image->type_name;
+        $image->typename = strtoupper($match[1]);
+        $image->typeuri .= $image->typename;
         $image->content .= $match[2];
         return $image;
     }
@@ -110,9 +126,8 @@ class image
      *
      * @return string
      */
-    public function get_ob()
-    {
-        return 'data:image/' . strtolower($this->type_name) . ';base64,' . $this->content;
+    public function get_ob() {
+        return 'data:image/' . strtolower($this->typename) . ';base64,' . $this->content;
     }
 
 
@@ -121,22 +136,21 @@ class image
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty($this->name);
 
-        $content_type = $root->addChild('contentType');
-        $content_type->addAttribute('targetFrameworkUrl', 'http://publications.europa.eu/resource/authority/file-type');
-        $content_type->addAttribute('targetNotation', 'file-type');
-        $content_type->addAttribute('uri', $this->type_uri);
-        $content_type->addTextNode('targetName', $this->type_name, 'en');
-        $content_type->addTextNode('targetFrameworkName', 'File type', 'en');
+        $contenttype = $root->addChild('contentType');
+        $contenttype->addAttribute('targetFrameworkUrl', 'http://publications.europa.eu/resource/authority/file-type');
+        $contenttype->addAttribute('targetNotation', 'file-type');
+        $contenttype->addAttribute('uri', $this->typeuri);
+        $contenttype->addtextnode('targetName', $this->typename, 'en');
+        $contenttype->addtextnode('targetFrameworkName', 'File type', 'en');
 
-        $content_encoding = $root->addChild('contentEncoding');
-        $content_encoding->addAttribute('targetFrameworkUrl', 'http://data.europa.eu/snb/encoding/25831c2');
-        $content_encoding->addAttribute('uri', 'http://data.europa.eu/snb/encoding/6146cde7dd');
-        $content_encoding->addTextNode('targetName', 'Base64', 'en');
-        $content_encoding->addTextNode('targetFrameworkName', 'Europass Standard List of Content Encoding Types', 'en');
+        $contentencoding = $root->addChild('contentEncoding');
+        $contentencoding->addAttribute('targetFrameworkUrl', 'http://data.europa.eu/snb/encoding/25831c2');
+        $contentencoding->addAttribute('uri', 'http://data.europa.eu/snb/encoding/6146cde7dd');
+        $contentencoding->addtextnode('targetName', 'Base64', 'en');
+        $contentencoding->addtextnode('targetFrameworkName', 'Europass Standard List of Content Encoding Types', 'en');
 
         $root->addChild('content', $this->content);
 

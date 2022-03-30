@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = array (
 
-    // Motivational intervention notification.
+    // Report about issued certificates that still need to be signed.
     'ilddigitalcert_issuedcerts_report' => array (
         'defaults' => array(
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
@@ -37,6 +37,7 @@ $messageproviders = array (
         'capability'  => 'mod/ilddigitalcert:addinstance',
     ),
 
+    // Report about automatically signed certificates.
     'ilddigitalcert_automation_report' => array (
         'defaults' => array(
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,

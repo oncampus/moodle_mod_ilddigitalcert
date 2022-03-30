@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 use SimpleXMLElement;
 
 /**
@@ -28,16 +26,15 @@ use SimpleXMLElement;
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mySimpleXMLElement extends SimpleXMLElement
-{
+class mySimpleXMLElement extends SimpleXMLElement {
+
     /**
      * Creates a mySimpleXMLElement including only a root tag of name $name.
      *
      * @param string $name name of xml root tag.
      * @return mySimpleXMLElement
      */
-    public static function create_empty(string $name)
-    {
+    public static function create_empty(string $name) {
         return new static("<$name/>");
     }
 
@@ -47,15 +44,12 @@ class mySimpleXMLElement extends SimpleXMLElement
      * @param SimpleXMLElement $append SimpleXMLElement that is supposed to be
      * appended to the current element as a child.
      */
-    public function appendXML($append)
-    {
+    public function appendxml($append) {
         if ($append) {
             // If the xml node $append has no text content, add empty child node.
             if (strlen(trim((string)$append)) == 0) {
                 $xml = $this->addChild($append->getName());
-            }
-            // else create node cotaining the text content.
-            else {
+            } else { // Else create node cotaining the text content.
                 $xml = $this->addChild($append->getName(), manager::xml_escape((string)$append));
             }
 
@@ -63,7 +57,7 @@ class mySimpleXMLElement extends SimpleXMLElement
                 $xml->addAttribute($n, $v);
             }
 
-            // recursive call for every child node of $append.
+            // Recursive call for every child node of $append.
             foreach ($append->children() as $child) {
                 $xml->appendXML($child);
             }
@@ -75,10 +69,10 @@ class mySimpleXMLElement extends SimpleXMLElement
      *
      * @param string $name name ist the name of the outer node.
      * @param string $content is the text cotent of the inner 'text' node.
-     * @param string $language decribes the value of a the 'lang' attribute of the text node, defaults to 'de'.
+     * @param string|null $language decribes the value of a the 'lang' attribute of the text node, defaults to 'de'.
+     * @return void
      */
-    public function addTextNode($name, $content, $language = 'de')
-    {
+    public function addtextnode($name, $content, $language = 'de') {
         $child = $this->addChild($name, '');
         $text = $child->addChild('text', $content);
         $text->addAttribute('content-type', 'text/plain');

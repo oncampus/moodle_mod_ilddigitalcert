@@ -81,6 +81,7 @@ $string['data'] = 'Zertifikatsdaten';
 $string['dcxapikey'] = 'API Key';
 $string['dcconnectorid'] = 'Connector ID';
 $string['dcconnectorsettings'] = 'Connector-Einstellungen';
+$string['dcconnector_pdfuploaddesc'] = 'PDF Zertifikatsdatei mit eingebetteten Zertifikats-Metadaten.';
 $string['dchost'] = 'Domain';
 $string['delete_certifier'] = 'Aus Blockchain entfernen';
 $string['descconfig'] = 'Angaben zur Zertifizierungsstelle';
@@ -93,6 +94,7 @@ $string['error_choose'] = 'Wählen Sie eine Zertifizierungsstelle';
 $string['error_choose_certifier'] = 'Wählen Sie eine:n Zertizierer:in';
 $string['error_register_cert'] = 'Fehler beim Speichern in der Blockchain';
 $string['error_revoke_cert'] = 'Fehler beim Wiederrufen';
+$string['error_novalidblockchainurl'] = 'Es konnte keine valide oder aktive Blockchain-Url gefunden werden. Bitte überprüfen Sie die Plugin-Einstellungen und geben eine gültige Blockchain-Url an.';
 $string['examination_end'] = 'Prüfungsende';
 $string['examination_place'] = 'Prüfungsort';
 $string['examination_start'] = 'Prüfungsstart';
@@ -197,6 +199,8 @@ $string['message_html_generate_pk'] = '<p>Hallo {$a->fullname},</p>
 <p>&nbsp;</p>
 <p>Viele Grüße</p>
 <p>Ihr {$a->from} Team</p>';
+$string['message_sendtowallet_subject'] = 'Ihr digitales Zertifikat';
+$string['message_sendtowallet_body'] = 'Im Anhang dieser Nachricht erhalten Sie Ihr digitales Zertifikat zur weiteren Verwendung. Sie finden es außerdem im Ordner Dateien.';
 $string['missingcertid'] = 'Zertifikat ID fehlt';
 $string['msg_send_error'] = 'Fehler beim Senden der Nachricht';
 $string['new_certifier_message'] = 'Hallo {$a->fullname}

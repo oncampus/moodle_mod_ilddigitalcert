@@ -113,7 +113,7 @@ async function dropZoneChange(e) {
             data: formData,
             contentType: false,
             cache: false,
-            processData:false
+            processData: false
         }).responseText;
         await sleep(sleepTime);
         processMeta(meta);
@@ -121,7 +121,7 @@ async function dropZoneChange(e) {
     else if (file.type == 'application/json' || file.name.match('.bcrt')) { // JSON!
         var reader = new FileReader();
 
-        reader.onload = async function(e) {
+        reader.onload = async function (e) {
             meta = reader.result;
             await sleep(sleepTime);
             processMeta(meta);
@@ -164,7 +164,7 @@ async function dateiauswahl(evt) {
                 data: formData,
                 contentType: false,
                 cache: false,
-                processData:false
+                processData: false
             }).responseText;
         }
         else if (gewaehlteDateien[0].type == 'application/json' || gewaehlteDateien[0].name.match('.bcrt')) { // JSON!
@@ -178,7 +178,7 @@ async function dateiauswahl(evt) {
                 data: formData,
                 contentType: false,
                 cache: false,
-                processData:false
+                processData: false
             }).responseText;
             console.log(result);
         }
@@ -193,7 +193,7 @@ async function dateiauswahl(evt) {
                 data: formData,
                 contentType: false,
                 cache: false,
-                processData:false
+                processData: false
             }).responseText;
             console.log(result);
         }
@@ -431,7 +431,7 @@ function scaleIFrame() {
     assertionPage.style.webkitTransformOrigin = "0 0";
 }
 
-window.onresize = function() {
+window.onresize = function () {
     // TODO: scaleIFrame(); // TODO.
 }
 
@@ -442,11 +442,11 @@ function processHashFromUrlParam(hashParam) {
             verifydiv.scrollIntoView();
             h_1.style.display = "block";
             p_hash.style.display = "block";
-            p_hash.innerHTML = 'Hash: <span style="color:#106F6F;">' + hashParam + '</span>';
+            p_hash.innerHTML = 'Hash: <span style="color:#106F6F;">' + hashParam + '</span>'; // TODO Add missing lang string.
             processHash(hashParam);
         }
         else {
-            textbox.innerHTML = 'Hash parameter: wrong format';
+            textbox.innerHTML = 'Hash parameter: wrong format'; // TODO Add missing lang string.
         }
     }
 }

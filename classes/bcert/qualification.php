@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A qualification object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
@@ -26,12 +24,13 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qualification
-{
+class qualification {
+
     /**
      * @var string XML that has to be included in the edci to describe the type of the qualification.
      */
-    const QUAL_TYPE = '<type targetFrameworkUrl="http://data.europa.eu/snb/learning-opportunity/25831c2" uri="http://data.europa.eu/snb/learning-opportunity/05053c1cbe">
+    const QUAL_TYPE = '<type targetFrameworkUrl="http://data.europa.eu/snb/learning-opportunity/25831c2"
+                        uri="http://data.europa.eu/snb/learning-opportunity/05053c1cbe">
                             <targetName>
                                 <text content-type="text/plain" lang="en">Course</text>
                             </targetName>
@@ -52,25 +51,33 @@ class qualification
     /**
      * @var string used as an unique identifier for the qualification.
      */
-    private $id = "";
-
-    // private $ects;
+    private $id;
 
     /**
      * Returns the id.
      *
      * @return string
      */
-    public function get_id()
-    {
+    public function get_id() {
         return $this->id;
     }
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+        self::$count += 1;
+    }
+
+    /**
+     * Creates a qualification object. This is only needed for the edci version of a certificate.
+     *
+     * @return qualification
+     */
+    public static function new() {
+        $new = new self();
+        $new->id = 'urn:bcert:qualification:' . self::$count;
+        return $new;
     }
 
     /**
@@ -79,26 +86,20 @@ class qualification
      * @param mySimpleXMLElement $xml Contains the qualification information in edci format.
      * @return qualification
      */
-    public static function from_edci($xml)
-    {
+    public static function from_edci($xml) {
         $new = new qualification();
         $new->id = $xml->learningSpecificationReferences->qualification['id'];
-        // $this->ects = $data->->ects;
         return $new;
     }
 
     /**
      * Creates a qualification Object based on an openBadge certificate.
      *
-     * @param mySimpleXMLElement $json Contains the qualification information in openBadge format.
      * @return qualification
      */
-    public static function from_ob($json)
-    {
+    public static function from_ob() {
         $new = new qualification();
-        self::$count += 1;
         $new->id = 'urn:bcert:qualification:' . self::$count;
-        // $this->ects = $data->->ects;
         return $new;
     }
 
@@ -107,15 +108,12 @@ class qualification
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty('qualification');
         $root->addAttribute('id', $this->id);
 
-        $root->appendXML(new mySimpleXMLElement(qualification::QUAL_TYPE));
-        $root->appendXML(new mySimpleXMLElement(qualification::QUAL_TITLE));
-
-        // $root->addChild('hasECTSCreditPoints', $this->ects);
+        $root->appendXML(new mySimpleXMLElement(self::QUAL_TYPE));
+        $root->appendXML(new mySimpleXMLElement(self::QUAL_TITLE));
 
         return $root;
     }

@@ -59,7 +59,7 @@ if ($action == 'meta' and $meta != '') {
     $json = \mod_ilddigitalcert\bcert\certificate::from_edci($edci)->get_ob();
     echo $json;
 } else if ($action == 'pdf' and !empty($_FILES['file']['name']) and $_FILES['file']['type'] == 'application/pdf') {
-    // Verifing validity of a pdf file
+    // Verifing validity of a pdf file.
     $file = $_FILES['file'];
     $pdf = $file['tmp_name'];
     // Get Attachments.
@@ -68,30 +68,29 @@ if ($action == 'meta' and $meta != '') {
     $attachments = array();
     $n = -1;
 
-    $bcrt_index = -1;
-    $xml_index = -1;
+    $bcrtindex = -1;
+    $xmlindex = -1;
     $error = '';
 
-    // Check if there is only one file per permitted file type, else generate error
+    // Check if there is only one file per permitted file type, else generate error.
     foreach ($attachmentlist as $attachment) {
         $n++;
 
         $entry = explode(': ', $attachment);
-        // $key = $entry[0];
         $value = $entry[1];
 
         $filename = basename($entry[1]);
 
         // More than 1 attachment per allowed file type .bcrt and .xml? -> error.
         if (substr($filename, -5) === '.bcrt') {
-            if ($bcrt_index === -1) {
-                $bcrt_index = $n;
+            if ($bcrtindex === -1) {
+                $bcrtindex = $n;
             } else {
                 $error = 'error: too many .bcrt attachements detected';
             }
-        } else if (substr($filename, -4) ==='.xml') {
-            if ($xml_index === -1) {
-                $xml_index = $n;
+        } else if (substr($filename, -4) === '.xml') {
+            if ($xmlindex === -1) {
+                $xmlindex = $n;
             } else {
                 $error = 'error: too many .xml attachements detected';
             }
@@ -100,11 +99,10 @@ if ($action == 'meta' and $meta != '') {
     if ($error !== '') {
         echo $error;
     } else {
-        // echo file contents of both .bcrt and edci .xml attachements as json
-        // $result = new stdClass();
-        // $result->metadata = get_attachement_content($bcrt_index, $pdf);
-        // $result->edci = get_attachement_content($xml_index, $pdf);
-        echo get_attachement_content($bcrt_index, $pdf);
+        // TODO: Also return the edci attachement for verification.
+        // Currently only the .bcrt attachemeent is valdiated when a pdf validation is requested.
+        // Returns the openBadge certificate/.bcrt file attachement content.
+        echo get_attachement_content($bcrtindex, $pdf);
     }
 } else if ($action == 'baseString' and $base64string != '') {
     echo base64_decode($base64string);

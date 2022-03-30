@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A achievement object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards
@@ -26,83 +24,80 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class achievement
-{
-    /**
-     * @var  int counter that gets incremented with every achievement object that gets created, used to generate a unique id.
-     */
+class achievement {
+
+    /** @var int counter that gets incremented with every achievement object that gets created, used to generate a unique id. */
     private static $count = 0;
 
-    /**
-     * @var string Unique identifier.
-     */
-    private $id = "";
+    /** @var string Unique identifier. */
+    private $id;
 
-    /**
-     * @var string Title.
-     */
-    private $title = "";
+    /** @var string Title. */
+    private $title;
 
-    /**
-     * @var assessment assessment.
-     */
-    private $assessment;
 
-    /**
-     * @var qualification qualification.
-     */
-    private $qualification;
+    /** @var certifiacte $certificate Refernece to parent certificate object. */
+    private $certificate;
 
     /**
      * Returns title.
      *
      * @return string
      */
-    public function get_expertise()
-    {
+    public function get_expertise() {
         return $this->title;
     }
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+        self::$count += 1;
+    }
+
+    /**
+     * Creates an achievement object based on a given expertise that the certificate_subject has achieved.
+     *
+     * @param certificate $cert
+     * @param string $competence
+     * @return achievement
+     */
+    public static function new($cert, $expertise) {
+        $new = new self();
+        $new->certificate = $cert;
+        $new->id = 'urn:bcert:learningAchievement:' . self::$count;
+        $new->title = $expertise;
+        return $new;
     }
 
 
     /**
      * Creates an achievement Object based on an edci certificate.
      *
-     * @param certificate $bcert certificate object that references this achievement.
+     * @param certificate $cert certificate object that references this achievement.
      * @param mySimpleXMLElement $xml Contains the achievement information in edci format.
      * @return achievement
      */
-    public static function from_edci($bcert, $xml)
-    {
-        $new = new achievement();
+    public static function from_edci($cert, $xml) {
+        $new = new self();
+        $new->certificate = $cert;
         $new->id = $xml['id'];
         $new->title = (string) $xml->title->text;
-        $new->assessment = $bcert->get_assessment();
-        $new->qualification = $bcert->get_qualification();
         return $new;
     }
 
     /**
      * Creates an achievement Object based on an openBadge certificate.
      *
-     * @param certificate $bcert certificate object that references this achievement.
-     * @param mySimpleXMLElement $json Contains the achievement information in openBadge format.
+     * @param certificate $cert certificate object that references this achievement.
+     * @param \stdClass $json Contains the achievement information in openBadge format.
      * @return assessment
      */
-    public static function from_ob($bcert, $title)
-    {
-        $new = new achievement();
-        self::$count += 1;
+    public static function from_ob($cert, $title) {
+        $new = new self();
+        $new->certificate = $cert;
         $new->id = 'urn:bcert:learningAchievement:' . self::$count;
         $new->title = $title;
-        $new->assessment = $bcert->get_assessment();
-        $new->qualification = $bcert->get_qualification();
         return $new;
     }
 
@@ -111,15 +106,14 @@ class achievement
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty('learningAchievement');
         $root->addAttribute('id', $this->id);
-        $root->addTextNode('title', $this->title);
+        $root->addtextnode('title', $this->title);
 
-        $root->appendXML($this->assessment->get_edci());
+        $root->appendXML($this->certificate->get_assessment()->get_edci());
 
-        $root->addChild('specifiedBy')->addAttribute('idref', $this->qualification->get_id());
+        $root->addChild('specifiedBy')->addAttribute('idref', $this->certificate->get_qualification()->get_id());
 
         return $root;
     }

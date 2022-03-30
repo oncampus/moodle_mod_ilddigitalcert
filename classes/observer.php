@@ -15,15 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Observer
- *
- * @package    mod_ilddigitalcert
- * @category   observer
- * @copyright  2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-/**
  * Observer for resetting course progress when users are unenrolled.
  *
  * @package    mod_ilddigitalcert
@@ -32,15 +23,21 @@
  */
 class mod_ilddigitalcert_observer {
 
+    /**
+     * Resets the course progress of a user in a course when they unenrol.
+     *
+     * @param \core\event\user_enrolment_deleted $event
+     * @return void
+     */
     public static function user_unenrolled(\core\event\user_enrolment_deleted $event) {
-        global $CFG, $USER, $DB;
+        global $CFG, $DB;
 
         // Check if course contains instances of mod_ilddigitalcert.
         $courseid = $event->courseid;
 
         $sql = "SELECT 0, COUNT(*) as 'count'
-                  FROM {modules} m, {course_modules} cm
-                 WHERE cm.module = m.id
+                FROM {modules} m, {course_modules} cm
+                WHERE cm.module = m.id
                    AND cm.course = :course
                    AND m.name = 'ilddigitalcert'
                    AND cm.deletioninprogress = 0 ";
@@ -48,9 +45,10 @@ class mod_ilddigitalcert_observer {
         $params = array('course' => $courseid);
 
         $result = $DB->get_records_sql($sql, $params);
-
+        // Reset only if the course contains an active ilddigitalcert activity.
         if ($result[0]->count > 0) {
             require_once($CFG->dirroot.'/mod/ilddigitalcert/locallib.php');
+            // Reset course progress for the unenroled user.
             reset_user($courseid, $event->relateduserid);
         }
         return;

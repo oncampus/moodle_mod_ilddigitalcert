@@ -14,19 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Utility functions that provide en- and decryption functionalities
- *
- * @package    mod_ilddigitalcert
- * @copyright  2021 ISy TH Lübeck <dev.ild@th-luebeck.de>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_ilddigitalcert;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/../../../config.php');
+require_login();
 require($CFG->dirroot . '/mod/ilddigitalcert/vendor/autoload.php');
 
 use Defuse\Crypto\Key;
@@ -40,7 +33,7 @@ use Defuse\Crypto\Crypto;
  * $decrypted_data = crypto_manager::decrypt($cipher);
  *
  * @package    mod_ilddigitalcert
- * @copyright  2021 ISy TH Lübeck <dev.ild@th-luebeck.de>
+ * @copyright  2022 ISy TH Lübeck <dev.ild@th-luebeck.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class crypto_manager {
@@ -49,13 +42,15 @@ class crypto_manager {
      *
      * @return string Encryption key.
      */
-    public static function loadEncryptionKeyFromConfig()
-    {
+    public static function loadencryptionkeyfromconfig() {
         global $CFG;
-        $key_file = $CFG->dataroot . '/filedir/ilddigitalcert-secret_key.txt';
-        if(!file_exists($key_file)) throw new \coding_exception("Encryption key file is missing. A programmer has to generate a key first! See plugin installation guide for more infos.");
-        $keyAscii = file_get_contents($key_file);
-        return Key::loadFromAsciiSafeString($keyAscii);
+        $keyfile = $CFG->dataroot . '/filedir/ilddigitalcert-secret_key.txt';
+        if (!file_exists($keyfile)) {
+            throw new \coding_exception("Encryption key file is missing. A programmer has to generate a key first!
+                See plugin installation guide for more infos.");
+        }
+        $keyascii = file_get_contents($keyfile);
+        return Key::loadFromAsciiSafeString($keyascii);
     }
 
     /**
@@ -64,9 +59,9 @@ class crypto_manager {
      * @param string $secret_data Secret to be encrypted.
      * @return string Encrypted data.
      */
-    public static function encrypt($secret_data) {
+    public static function encrypt($secretdata) {
         $key = self::loadEncryptionKeyFromConfig();
-        return Crypto::encrypt($secret_data, $key);
+        return Crypto::encrypt($secretdata, $key);
     }
 
     /**
@@ -82,7 +77,7 @@ class crypto_manager {
         try {
             return Crypto::decrypt($ciphertext, $key);
         } catch (\Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $ex) {
-            echo($ex->get_message());
+            throw $ex;
         }
     }
 }

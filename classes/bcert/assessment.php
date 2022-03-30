@@ -16,8 +16,6 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * An assessment object represents data that is essential for both
  * openbadge and edci certificats and helps convert beween the two standards.
@@ -26,142 +24,157 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class assessment
-{
-    /**
-     * @var  int counter that gets incremented with every assessment object that gets created, used to generate a unique id.
-     */
+class assessment {
+
+    /** @var  int counter that gets incremented with every assessment object that gets created, used to generate a unique id. */
     private static $count = 0;
 
-    /**
-     * @var string Unique identifier.
-     */
-    private $id = "";
+    /**  @var string Unique identifier. */
+    private $id;
 
-    /**
-     * @var string Title.
-     */
-    private $title = "";
+    /** @var string Title. */
+    private $title;
 
-    /**
-     * @var string Grade.
-     */
+    /** @var string Grade. */
     private $grade = "bestanden";
 
-    /**
-     * @var string Datetime the assessment started.
-     */
-    private $startdate = "";
+    /** @var string Datetime the assessment started. Optional attribute. */
+    private $startdate;
 
-    /**
-     * @var string Datetime the assessment ended.
-     */
-    private $enddate = "";
+    /** @var string Datetime the assessment ended. Optional attribute. */
+    private $enddate;
 
-    /**
-     * @var string Place where the assessment took place.
-     */
-    private $place = "";
+    /** @var string Place where the assessment took place. Optional attribute. */
+    private $place;
 
-    /**
-     * @var string id of the organization that assessed the assessment.
-     */
-    private $assessed_by = "";
-
-    /**
-     * @var assessmentSpec Further specifications.
-     */
+    /** @var assessment_spec Further specifications. */
     private $spec;
 
     /**
      * Returns assessment Specification.
      *
-     * @return assessmentSpec
+     * @return assessment_spec
      */
-    public function get_spec()
-    {
+    public function get_spec() {
         return $this->spec;
     }
 
     /**
      * Constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
+        self::$count += 1;
+    }
+
+    /**
+     * Creates an assessment object based on the examination info set in an ilddigitalcert course module.
+     *
+     * @param certificate $cert
+     * @param \stdClass $ilddigitalcert
+     * @return assessment
+     */
+    public static function new($cert, $ilddigitalcert) {
+        $new = new self();
+        $new->certificate = $cert;
+        $new->id = 'urn:bcert:assessment:' . self::$count;
+        $new->title = $ilddigitalcert->name;
+        if (isset($ilddigitalcert->examination_start) && $ilddigitalcert->examination_start > 0) {
+            $new->startdate = date('c', $ilddigitalcert->examination_start);
+        }
+        if (isset($ilddigitalcert->examination_end) && $ilddigitalcert->examination_end > 0) {
+            $new->enddate = date('c', $ilddigitalcert->examination_end);
+        }
+        $new->place = manager::get_if_key_exists($ilddigitalcert, 'examination_place');
+
+        $new->spec = assessment_spec::new($ilddigitalcert);
+        return $new;
     }
 
     /**
      * Creates an assessment Object based on an edci certificate.
      *
+     * @param certificate $cert certificate object that references this assessment.
      * @param mySimpleXMLElement $xml Contains the assessment information in edci format.
      * @return assessment
      */
-    public static function from_edci($xml)
-    {
-        $assessment = new assessment();
-        $ass_xml = $xml->credentialSubject->achievements->learningAchievement[0]->wasDerivedFrom;
-        $assessment->id = $ass_xml['id'];
+    public static function from_edci($cert, $xml) {
+        $new = new self();
+        $new->certificate = $cert;
 
-        $assessment->title = (string) $ass_xml->title->text;
+        $assxml = $xml->credentialSubject->achievements->learningAchievement[0]->wasDerivedFrom;
 
-        $assessment->grade = (string) $ass_xml->grade;
-        $assessment->startdate = (string) $ass_xml->startdate;
-        $assessment->enddate = (string) $ass_xml->enddate;
-        $assessment->place = (string) $ass_xml->place;
-        $assessment->assessed_by = $ass_xml->assessedBy['idref'];
+        $new->id = $assxml['id'];
 
-        $assessment->spec = assessmentSpec::from_edci($xml);
-        return $assessment;
+        $new->title = (string) $assxml->title->text;
+
+        $new->grade = (string) $assxml->grade;
+
+        if (isset($assxml->startDate)) {
+            $new->startdate = (string) $assxml->startDate;
+        }
+        if (isset($assxml->endDate)) {
+            $new->enddate = (string) $assxml->endDate;
+        }
+        if (isset($assxml->place)) {
+            $new->place = (string) $assxml->place->text;
+        }
+
+        $new->assessedby = $assxml->assessedBy['idref'];
+
+        $new->spec = assessment_spec::from_edci($xml);
+        return $new;
     }
 
     /**
      * Creates an assessment Object based on an openBadge certificate.
      *
-     * @param certificate $bcert certificate object that references this assessment.
-     * @param mySimpleXMLElement $json Contains the assessment information in openBadge format.
+     * @param certificate $cert certificate object that references this assessment.
+     * @param \stdClass $json Contains the assessment information in openBadge format.
      * @return assessment
      */
-    public static function from_ob($bcert, $json)
-    {
-        $assessment = new assessment();
-        self::$count += 1;
-        $assessment->id = 'urn:bcert:assessment:' . self::$count;
+    public static function from_ob($cert, $json) {
+        $new = new self();
+        $new->certificate = $cert;
+        $new->id = 'urn:bcert:assessment:' . self::$count;
         if (isset($json->{'extensions:examinationB4E'}->title)) {
-            $assessment->title = $json->{'extensions:examinationB4E'}->title;
+            $new->title = $json->{'extensions:examinationB4E'}->title;
         } else {
-            $assessment->title = $json->badge->name;
+            $new->title = $json->badge->name;
         }
 
-        // TODO: get grade
-        $assessment->startdate = manager::get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'startdate');
-        $assessment->enddate = manager::get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'endate');
-        $assessment->place = manager::get_if_object_key_exists($json->{'extensions:examinationB4E'}, 'place');
-        $assessment->assessed_by = $bcert->get_issuer()->get_id();
+        // TODO: get grade.
 
-        $assessment->spec = assessmentSpec::from_ob($json);
-        return $assessment;
+        $new->startdate = manager::get_if_key_exists($json->{'extensions:examinationB4E'}, 'startdate');
+        $new->enddate = manager::get_if_key_exists($json->{'extensions:examinationB4E'}, 'enddate');
+        $new->place = manager::get_if_key_exists($json->{'extensions:examinationB4E'}, 'place');
+        $new->assessedby = $cert->get_issuer()->get_id();
+
+        $new->spec = assessment_spec::from_ob($json);
+        return $new;
     }
 
     /**
      * Returns a default Object containing assessment data in openBadge format.
      *
-     * @return object
+     * @return \stdClass
      */
-    public function get_ob()
-    {
+    public function get_ob() {
         $assessment = new \stdClass();
-        // if(isset($this->title) && !empty($this->title)) {
-        //     $assessment->title = $this->title;
-        // }
-        if(isset($this->startdate) && !empty($this->startdate)) {
+        $assessment->{'@context'} = \mod_ilddigitalcert\bcert\manager::CONTEXT_B4E_EXAMINATION;
+        $assessment->type = ["Extension", "ExaminationB4E"];
+
+        // TODO: set grade.
+
+        if (isset($this->startdate)) {
             $assessment->startdate = $this->startdate;
         }
-        if(isset($this->enddate) && !empty($this->enddate)) {
+        if (isset($this->enddate)) {
             $assessment->enddate = $this->enddate;
         }
-        $assessment->{'@context'} = 'https://perszert.fit.fraunhofer.de/publicSchemaB4E/ExaminationB4E/context.json';
-        $assessment->type = ["Extension", "ExaminationB4E"];
-        $assessment->place = $this->place;
+        if (isset($this->place)) {
+            $assessment->place = $this->place;
+        }
+
         return $assessment;
     }
 
@@ -170,17 +183,22 @@ class assessment
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci()
-    {
+    public function get_edci() {
         $root = mySimpleXMLElement::create_empty('wasDerivedFrom');
         $root->addAttribute('id', $this->id);
-        $root->addTextNode('title', $this->title);
+        $root->addtextnode('title', $this->title);
         $root->addChild('grade', $this->grade);
-        $root->addChild('assessedBy')->addAttribute('idref', $this->assessed_by);
+        $root->addChild('assessedBy')->addAttribute('idref', $this->certificate->get_issuer()->get_id());
         $root->addChild('specifiedBy')->addAttribute('idref', $this->spec->get_id());
-        $root->addChild('startdate', $this->startdate);
-        $root->addChild('enddate', $this->enddate);
-        $root->addChild('place', $this->place);
+        if (isset($this->startdate)) {
+            $root->addChild('startDate', $this->startdate);
+        }
+        if (isset($this->enddate)) {
+            $root->addChild('endDate', $this->enddate);
+        }
+        if (isset($this->place)) {
+            $root->addtextnode('place', $this->place);
+        }
 
         return $root;
     }
