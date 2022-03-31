@@ -55,7 +55,7 @@ echo $OUTPUT->header();
 
 $host = get_config('mod_ilddigitalcert', 'dchost');
 $xapikey = get_config('mod_ilddigitalcert', 'dcxapikey');
-$dcconnectorid = get_config('mod_ilddigitalcert', 'dcconnectorid');
+// $dcconnectorid = get_config('mod_ilddigitalcert', 'dcconnectorid');
 $walletid = get_user_preferences('mod_ilddigitalcert_wallet_id', 'error', $USER->id);
 $relationshipid = get_user_preferences('mod_ilddigitalcert_relationship_id', 'error', $USER->id);
 
@@ -66,17 +66,18 @@ if ($walletid != 'error' and $relationshipid != 'error') {
         // Check if relationship exists between our dcconnectorid and wallet id.
         $relresult = callAPI('GET', $host.'/api/v1/Relationships/'.$relationshipid, false, $xapikey);
         $relresult = json_decode($relresult);
-        if (isset($relresult->result->from) and
-                $relresult->result->from == $walletid and
-                $relresult->result->to == $dcconnectorid
+        if (isset($relresult->result->peer) and
+                $relresult->result->peer == $walletid
                 ) {
             // Upload pdf.
             $modulecontext = context_module::instance($id);
-            $filename = new moodle_url(
-                '/mod/ilddigitalcert/download.php',
-                array('icid' => $issuedcert->id, 'cmid' => $id, 'download' => 'pdf')
-            );
+            /*
+            $filename = $CFG->wwwroot.'/mod/ilddigitalcert/download.php?id='.$modulecontext->id.
+            '&icid='.$issuedcert->id.'&cmid='.$id.'&download=pdf';
             $fileid = uploadpdf($filename, $issuedcert->name);
+            */
+            $pdfcontent = get_pdfcontent($modulecontext->id, $issuedcert->id);
+            $fileid = uploadpdf($pdfcontent, $issuedcert->name);
             if (!$fileid) {
                 throw new moodle_exception(get_string('file_upload_error', 'mod_ilddigitalcert'));
             }
@@ -91,7 +92,17 @@ if ($walletid != 'error' and $relationshipid != 'error') {
             $messagedata = json_encode($messagedata, JSON_PRETTY_PRINT);
             $msgresult = callAPI('POST', $host.'/api/v1/Messages', $messagedata, $xapikey);
             $msgresult = json_decode($msgresult);
+            if (isset($msgresult->error)) {
+                throw new coding_exception(get_string('msg_send_error', 'mod_ilddigitalcert'));
+            }
             // TODO Display success and link back to cert.
+
+            // send attribute THL.FLL.study_field to user wallet
+            $courseid = $issuedcert->courseid;
+            $value = get_subjectarea($courseid);
+            $reason = get_string('study_field', 'mod_ilddigitalcert');
+            $msgresult = send_attribute('THL.FLL.study_field', $value, $walletid, $reason, $host, $xapikey);
+            $msgresult = json_decode($msgresult);
             if (isset($msgresult->error)) {
                 throw new coding_exception(get_string('msg_send_error', 'mod_ilddigitalcert'));
             }
@@ -115,7 +126,7 @@ if ($walletid != 'error' and $relationshipid != 'error') {
         // If template id exists.
         echo '<p>'.get_string('scan_qr_code', 'mod_ilddigitalcert').'</p>';
         // ... /RelationshipTemplates/<templateid>/Token [image] (siehe Header).
-        $image = callAPI('POST', $host.'/api/v1/RelationshipTemplates/'.$templateid.'/Token', '{}', $xapikey, true);
+        $image = callAPI('POST', $host.'/api/v1/RelationshipTemplates/Own/'.$templateid.'/Token', '{}', $xapikey, true);
         $image = base64_encode($image);
         echo '<p><img src="data:image/png;base64,'.$image.'"/></p>';
         // Polling...
@@ -127,7 +138,7 @@ if ($walletid != 'error' and $relationshipid != 'error') {
         $data = json_decode($data);
         $data->expiresAt = date('c', time() + 60 * 60 * 24);
         $data = json_encode($data);
-        $result = callAPI('POST', $host.'/api/v1/RelationshipTemplates', $data, $xapikey);
+        $result = callAPI('POST', $host.'/api/v1/RelationshipTemplates/Own', $data, $xapikey);
         $result = json_decode($result);
         set_user_preference('mod_ilddigitalcert_template_id', $result->result->id, $USER->id);
         redirect($CFG->wwwroot.'/mod/ilddigitalcert/send_to_wallet.php?id='.$id);

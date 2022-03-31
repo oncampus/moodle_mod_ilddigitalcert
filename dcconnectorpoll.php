@@ -37,27 +37,31 @@ if (isguestuser()) {
 
 $host = get_config('mod_ilddigitalcert', 'dchost');
 $xapikey = get_config('mod_ilddigitalcert', 'dcxapikey');
-$apiresult = callAPI('GET', $host.'/api/v1/RelationshipRequests/OpenIncoming', false, $xapikey);
+callAPI('POST', $host.'/api/v1/Account/Sync', false, $xapikey);
+$apiresult = callAPI('GET', $host.'/api/v1/Relationships', false, $xapikey);
 $apiresult = json_decode($apiresult);
 $templateid = get_user_preferences('mod_ilddigitalcert_template_id', 'error', $USER->id);
 foreach ($apiresult->result as $ar) {
-    if ($templateid == $ar->relationshipTemplateId) {
-        if (checkrequest($ar)) {
-            // Accept request.
-            $data = '{"content": {}}';
-            $acceptresult = callAPI('PUT', $host.'/api/v1/RelationshipRequests/'.$ar->id.'/Accept', $data, $xapikey);
-            $accept = json_decode($acceptresult);
-            if (isset($accept->result->relationshipId)) {
-                set_user_preference('mod_ilddigitalcert_relationship_id', $accept->result->relationshipId, $USER->id);
-                unset_user_preference('mod_ilddigitalcert_template_id', $USER->id);
-                // Get relationship.
-                $relresult = callAPI('GET', $host.'/api/v1/Relationships/'.$accept->result->relationshipId, false, $xapikey);
-                $relresult = json_decode($relresult);
-                if (isset($relresult->result->from)) {
-                    // Save wallet id in userpref.
-                    set_user_preference('mod_ilddigitalcert_wallet_id', $relresult->result->from, $USER->id);
+    if ($templateid == $ar->template->id) {
+        if (count($ar->changes) == 1) {
+            if (checkrequest($ar)) {
+                // Accept request.
+                $data = '{"content": {}}';
+                $acceptresult = callAPI(
+                    'PUT',
+                    $host.'/api/v1/Relationships/'.$ar->id.'/Changes/'.$ar->changes[0]->id.'/Accept',
+                    $data,
+                    $xapikey
+                );
+                $accept = json_decode($acceptresult);
+                if (isset($accept->result->id)) {
+                    set_user_preference('mod_ilddigitalcert_relationship_id', $accept->result->id, $USER->id);
+                    unset_user_preference('mod_ilddigitalcert_template_id', $USER->id);
+                    set_user_preference('mod_ilddigitalcert_wallet_id', $accept->result->peer, $USER->id);
+                    $result->status = 'request_accepted';
                 }
-                $result->status = 'request_accepted';
+            } else {
+                $result->status = 'bad_request';
             }
         } else {
             $result->status = 'bad_request';

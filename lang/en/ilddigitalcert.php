@@ -55,6 +55,8 @@ $string['block_summary'] = '<p>Verify the authenticity of your digital certifica
 <p>Simply drag and drop your certificate (PDF or BCRT file) into the field.</ p>
 <p>You can check your printed version of the certificate by scanning the QR code below.
 </p>';
+$string['body_new_attribute'] = 'With this message you received a new attribute to complete your personal data.';
+$string['cert_file_description'] = 'PDF certificate file with embedded certificate metadata.';
 $string['cert_waiting_for_registration'] = 'This certificate is waiting to be signed by an accredited certifier and to be registered in the blockchain.';
 $string['certhash'] = 'Certificate hash';
 $string['certificate'] = 'Certificate';
@@ -141,6 +143,7 @@ $string['issuerdescription'] = 'Description';
 
 
 $string['json'] = 'Metadata';
+$string['subject_new_attribute'] = 'New attribute';
 $string['subject_certificate_revoked'] = 'Your Certificate was revoked';
 $string['subject_new_certificate'] = 'New digital certificate';
 $string['subject_new_digital_certificate'] = 'New digital certificate in the blockchain';
@@ -151,27 +154,11 @@ $string['message_certificate_revoked'] = '<p>Hi {$a->fullname},</p>
 <p>Here you can view your certificate: <a href="{$a->url}">{$a->url}</a>.</p>
 <p>Kind regards</p>
 <p>Your {$a->from} team</p>';
-$string['message_new_certificate'] = 'Hello {$a->fullname},
-
-You have received a digital certificate.
-
-Here you can view your certificate: {$a->url}.
-
-Kind regards
-Your {$a->from} team';
 $string['message_new_certificate_html'] = '<p>Hello {$a->fullname},</p>
 <p>You have received a digital certificate.</p>
 <p>Here you can view your certificate: <a href="{$a->url}">{$a->url}</a>.</p>
 <p>Kind regards</p>
 <p>Your {$a->from} team</p>';
-$string['message_new_digital_certificate'] = 'Hello {$a->fullname},
-
-Your digital certificate was signed and registered in the blockchain.
-
-Here you can view your certificate: {$a->url}.
-
-Kind regards
-Your {$a->from} team';
 $string['message_new_digital_certificate_html'] = '<p>Hello {$a->fullname},</p>
 <p>Your digital certificate was signed and registered in the blockchain.</p>
 <p>Here you can view your certificate: <a href="{$a->url}">{$a->url}</a>.</p>
@@ -201,7 +188,7 @@ $string['message_html_generate_pk'] = '<p>Hello {$a->fullname},</p>
 <p>&nbsp;</p>
 <p>Kind regards</p>
 <p>Your {$a->from} team</p>';
-$string['message_sendtowallet_subject'] = 'your digital certifiacat';
+$string['message_sendtowallet_subject'] = 'Your digital certificate';
 $string['message_sendtowallet_body'] = 'Attached to this message you receive your digital certificate. You can also find your certificate in the folder "Files".';
 $string['missingcertid'] = 'Certificate id is missing';
 $string['msg_send_error'] = 'Error while sending message';
@@ -280,6 +267,7 @@ $string['sign_delete_certifier_with_pk'] = 'To remove the certifier from the blo
 $string['sign_error_already_signed'] = 'Couldn\'t sign {$a} certificat(s), because they where already signed and registered in the blockchain.';
 $string['sign_with_pk'] = 'To register a certificate in the blockchain the certificate has to be signed with the private key of a qualified certifier.';
 $string['startdate'] = 'Date of issue';
+$string['study_field'] = 'Study field';
 $string['subject_generate_pk'] = 'Generate your private key to become a certifier';
 $string['template'] = 'HTML Template';
 $string['title'] = 'Certificate';

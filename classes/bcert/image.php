@@ -69,7 +69,7 @@ class image {
 
         $new->name = $name;
         $new->content = base64_encode($file->get_content());
-        $new->typename = strtoupper($file->get_mimetype());
+        $new->typename = str_replace('IMAGE/', '', strtoupper($file->get_mimetype()));
 
         return $new;
     }
@@ -88,7 +88,6 @@ class image {
         $image = new image();
 
         $image->name = $xml->getName();
-        $image->typeuri = $xml->contentType['uri'];
         $image->typename = $xml->contentType->targetName->text;
         $image->content = $xml->content;
 
@@ -115,7 +114,6 @@ class image {
 
         $image->name = $name;
         $image->typename = strtoupper($match[1]);
-        $image->typeuri .= $image->typename;
         $image->content .= $match[2];
         return $image;
     }
@@ -142,7 +140,7 @@ class image {
         $contenttype = $root->addChild('contentType');
         $contenttype->addAttribute('targetFrameworkUrl', 'http://publications.europa.eu/resource/authority/file-type');
         $contenttype->addAttribute('targetNotation', 'file-type');
-        $contenttype->addAttribute('uri', $this->typeuri);
+        $contenttype->addAttribute('uri', $this->typeuri . $this->typename);
         $contenttype->addtextnode('targetName', $this->typename, 'en');
         $contenttype->addtextnode('targetFrameworkName', 'File type', 'en');
 

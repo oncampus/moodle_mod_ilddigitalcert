@@ -34,7 +34,6 @@ $download = optional_param('download', 'json', PARAM_RAW);
 
 if ($icid != 0) {
     download_json($icid, $download);
-
 } else {
     redirect(new moodle_url('/mod/ilddigitalcert/view.php', array('id' => $cmid)));
 }

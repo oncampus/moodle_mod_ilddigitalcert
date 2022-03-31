@@ -2,7 +2,6 @@
 	"maxNumberOfRelationships": 1,
 	"expiresAt": "2020-12-24T13:30:38.284",
 	"content": {
-		"@type": "RelationshipTemplateContent",
 		"attributes": [
 			{
 				"name": "Thing.name",
@@ -11,6 +10,14 @@
 			{
 				"name": "Corporation.legalName",
 				"value": "Technische Hochschule Lübeck"
+			},
+			{
+				"name": "Comm.phone",
+				"value": "+49 451 300 6"
+			},
+			{
+				"name": "Comm.email",
+				"value": "kontakt@th-luebeck.de"
 			},
 			{
 				"name": "Comm.website",

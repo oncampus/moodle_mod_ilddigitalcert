@@ -32,78 +32,94 @@ use mod_ilddigitalcert\bcert\certificate;
  * @param string $download Controls what kind of file gets sent to the user. Expected values are 'json', 'edci' and 'pdf'.
  */
 function download_json($icid, $download) {
-    global $DB, $CFG;
+    global $DB;
 
     // Prepare certificate data for download.
-    $issuedcertificate = $DB->get_record('ilddigitalcert_issued', array('id' => $icid), '*', MUST_EXIST);
-    $metacertificate = certificate::from_ob($issuedcertificate->metadata);
+    $certificaterecord = $DB->get_record('ilddigitalcert_issued', array('id' => $icid), '*', MUST_EXIST);
+    $metacertificate = certificate::from_ob($certificaterecord->metadata);
 
-    list($storedbcrt, $storededci) = get_certificate_files($issuedcertificate, $metacertificate);
+    list($storedbcrt, $storededci) = get_certificate_files($certificaterecord, $metacertificate);
 
     if ($download == 'json') {
         send_stored_file($storedbcrt, null, 0, true);
     } else if ($download == 'edci') {
         send_stored_file($storededci, null, 0, true);
     } else if ($download == 'pdf') {
-        $content = $storedbcrt->get_content();
-
-        require_once(__DIR__ . '/vendor/autoload.php');
-
-        $certificate = new \Mpdf\Mpdf([
-            'mode' => 'utf-8',
-            'margin_top' => 0,
-            'margin_left' => 0,
-            'margin_right' => 0,
-            'margin_bottom' => 0,
-            'format' => [210, 297]
-        ]);
-        $certificate->showImageErrors = true;
-
-        // Decode the assertionpage info included in the ob certificate and write it as html to the pdf.
-        $html = '<h1>Error</h1>';
-
-        if (isset($content) and $content != '') {
-            $jsonobj = json_decode($content);
-            $html = base64_decode($jsonobj->{'extensions:assertionpageB4E'}->assertionpage);
-        }
-
-        $certificate->WriteHTML($html);
-
-        // Generate hash.
-        // Add salt to openBadge cert.
-        $salt = get_token($issuedcertificate->institution_token);
-        $hash = $metacertificate->get_ob_hash($salt);
-        // Generate pdf footer section including the hash value of the ob certificate.
-        $certificate->WriteHTML(get_pdf_footerhtml($hash));
-
-        // Add openBadge and edci files as attachements to the pdf.
-        $associatedfiles = [
-            [
-                'name' => $filename.'.bcrt',
-                'mime' => 'application/json',
-                'description' => 'some description',
-                'AFRelationship' => 'Alternative',
-                'path' => $CFG->wwwroot . '/mod/ilddigitalcert/download_pdf.php?id=' . $storedbcrt->get_id(),
-            ]
-        ];
-
-        if ($storededci) {
-            array_push($associatedfiles, [
-                'name' => $filename.'.xml',
-                'mime' => 'application/xml',
-                'description' => 'some description',
-                'AFRelationship' => 'Alternative',
-                'path' => new moodle_url('/mod/ilddigitalcert/download_pdf.php', array('id' => $storededci->get_id())),
-            ]);
-        }
-
-        $certificate->SetAssociatedFiles($associatedfiles);
-
+        $pdf = create_pdf_certificate($certificaterecord, $metacertificate);
         // Start download of the pdf file.
-        $certificate->Output($filename.'.pdf', 'I');
+        $pdf->Output(get_certificate_name($certificaterecord, $metacertificate) .'.pdf', 'I');
 
         return;
     }
+}
+/**
+ * Retrieves the .bcrt and .xml files containing the OpenBadge and EDCI certificate metadata from the filesystem.
+ *
+ * @param stdClass $certificaterecord
+ * @param certificate $metacertificate
+ * @return Mpdf\Mpdf
+ */
+function create_pdf_certificate($certificaterecord, $metacertificate) {
+    // Get stored certificate metadata.
+    list($storedbcrt, $storededci) = get_certificate_files($certificaterecord, $metacertificate);
+
+    // Read file content.
+    $content = $storedbcrt->get_content();
+
+    require_once(__DIR__ . '/vendor/autoload.php');
+
+    $pdf = new Mpdf\Mpdf([
+        'mode' => 'utf-8',
+        'margin_top' => 0,
+        'margin_left' => 0,
+        'margin_right' => 0,
+        'margin_bottom' => 0,
+        'format' => [210, 297]
+    ]);
+    $pdf->showImageErrors = true;
+
+    // Decode the assertionpage info included in the ob certificate and write it as html to the pdf.
+    $html = '<h1>Error</h1>';
+
+    if (isset($content) and $content != '') {
+        $jsonobj = json_decode($content);
+        $html = base64_decode($jsonobj->{'extensions:assertionpageB4E'}->assertionpage);
+    }
+
+    $pdf->WriteHTML($html);
+
+    // Generate hash.
+    // Add salt to openBadge cert.
+    $salt = get_token($certificaterecord->institution_token);
+    $hash = $metacertificate->get_ob_hash($salt);
+    // Generate pdf footer section including the hash value of the ob certificate.
+    $pdf->WriteHTML(get_pdf_footerhtml($hash));
+
+    $filename = get_certificate_name($certificaterecord, $metacertificate);
+
+    // Add openBadge and edci files as attachements to the pdf.
+    $associatedfiles = [
+        [
+            'name' => $filename.'.bcrt',
+            'mime' => 'application/json',
+            'description' => 'some description',
+            'AFRelationship' => 'Alternative',
+            'path' => new moodle_url('/mod/ilddigitalcert/download_pdf.php', array('id' => $storedbcrt->get_id())),
+        ]
+    ];
+
+    if ($storededci) {
+        array_push($associatedfiles, [
+            'name' => $filename.'.xml',
+            'mime' => 'application/xml',
+            'description' => 'some description',
+            'AFRelationship' => 'Alternative',
+            'path' => new moodle_url('/mod/ilddigitalcert/download_pdf.php', array('id' => $storededci->get_id())),
+        ]);
+    }
+
+    $pdf->SetAssociatedFiles($associatedfiles);
+    return $pdf;
 }
 
 /**
@@ -218,10 +234,10 @@ function to_blockchain($issuedcertificate, $certifier, $pk) {
             $subject = get_string('subject_new_digital_certificate', 'mod_ilddigitalcert');
             $a = new stdClass();
             $a->fullname = $receiver->firstname . ' ' . $receiver->lastname;
-            $a->url = new \moodle_url('/mod/ilddigitalcert/view.php', array('id' => $issuedcertificate->cmid));
+            $a->url = (new \moodle_url('/mod/ilddigitalcert/view.php', array('id' => $issuedcertificate->cmid)))->out();
             $a->from = $SITE->fullname;
-            $message = get_string('message_new_digital_certificate', 'mod_ilddigitalcert', $a);
             $messagehtml = get_string('message_new_digital_certificate_html', 'mod_ilddigitalcert', $a);
+            $message = html_to_text($messagehtml);
             email_to_user($receiver, $fromuser, $subject, $message, $messagehtml);
         }
         return true;
@@ -606,8 +622,8 @@ function issue_certificate($certificate, $cm) {
     $a->fullname = $recipient->firstname . ' ' . $recipient->lastname;
     $a->url = $CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $cm->id;
     $a->from = $SITE->fullname;
-    $message = get_string('message_new_certificate', 'mod_ilddigitalcert', $a);
     $messagehtml = get_string('message_new_certificate_html', 'mod_ilddigitalcert', $a);
+    $message = html_to_text($messagehtml);
     email_to_user($recipient, $fromuser, $subject, $message, $messagehtml);
 
     return $issued->metadata;
@@ -987,7 +1003,7 @@ function has_content($metadataobj) {
 }
 
 /**
- * Sends a file identified by its id to the current $USER.
+ * Sends a file identified by its id to the current user's browser.
  *
  * @param int $fileid
  * @return void

@@ -23,6 +23,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/locallib.php');
+
  /**
   * Checks wether request information matches the info of the current user.
   *
@@ -84,7 +88,7 @@ function callapi($method, $url, $data, $xapikey, $image = false) {
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     $result = curl_exec($curl);
     if (!$result) {
-        die("Connection Failure");
+        throw new moodle_exception("Connection Failure");
     }
     curl_close($curl);
     return $result;
@@ -137,18 +141,18 @@ function callapipdfupload($filename, $title, $description, $url, $xapikey) {
 /**
  * Sends a pdf specified by its $filename to the DC-connector.
  *
- * @param string $filename File to be uploaded.
+ * @param string $pdf_content File content to be uploaded.
  * @param string $certname The name of the certificate store in the file.
  * @return int|boolean On successful upload returns the id by witch the certificate file is identified by the connector.
  * Returns false if the process was unsuccessful.
  */
-function uploadpdf($filename, $certname) {
+function uploadpdf($pdfcontent, $certname) {
     global $CFG;
     $host = get_config('mod_ilddigitalcert', 'dchost');
     $xapikey = get_config('mod_ilddigitalcert', 'dcxapikey');
     $title = $certname;
-    $description = get_string('dcconnector_pdfuploaddesc', 'mod_ilddigitalcert');
-    $filecontent = file_get_contents($filename);
+    $description = get_string('cert_file_description', 'mod_ilddigitalcert');
+    $filecontent = $pdfcontent;
     if (!is_dir($CFG->dataroot.'/temp/ilddigitalcert')) {
         mkdir($CFG->dataroot.'/temp/ilddigitalcert', 0775);
     }
@@ -157,7 +161,7 @@ function uploadpdf($filename, $certname) {
     }
     $filename = $CFG->dataroot.'/temp/ilddigitalcert/dcconnector/'.$certname.'_'.uniqid().'.pdf';
     file_put_contents($filename, $filecontent);
-    $uploadresult = callAPIpdfUpload($filename, $title, $description, $host.'/api/v1/Files', $xapikey);
+    $uploadresult = callAPIpdfUpload($filename, $title, $description, $host.'/api/v1/Files/Own', $xapikey);
     unlink($filename);
     $resultobj = json_decode($uploadresult);
     if (isset($resultobj->result->id)) {
@@ -165,4 +169,82 @@ function uploadpdf($filename, $certname) {
         return $newfileid;
     }
     return false;
+}
+
+/**
+ * Creates a pdf certificate and returns the pdf as a string.
+ *
+ * @param int $icid Id of an issued certificate record.
+ * @return string PDF certificate.
+ */
+function get_pdfcontent($icid) {
+    global $DB;
+
+    // Prepare certificate data for download.
+    $certificaterecord = $DB->get_record('ilddigitalcert_issued', array('id' => $icid), '*', MUST_EXIST);
+    $metacertificate = mod_ilddigitalcert\bcert\certificate::from_ob($certificaterecord->metadata);
+
+    $pdf = create_pdf_certificate($certificaterecord, $metacertificate);
+
+    // Return the content of the pdf file to send it to wallet.
+    return $pdf->Output('', 'S');
+}
+
+/**
+ * Send an attribute change request to a dc wallet.
+ *
+ * @param string $name Name of attribute.
+ * @param string $value Value of attribute.
+ * @param string $walletid Id of a DC wallet.
+ * @param string $reason Reason for the attribute change request.
+ * @param string $url The url of the DC Connector.
+ * @param string $xapikey API Key.
+ * @return string Returns the response of the http request.
+ */
+function send_attribute($name, $value, $walletid, $reason, $url, $xapikey) {
+    $attribute = new stdClass();
+    $attribute->{'@type'} = 'Attribute';
+    $attribute->name = $name;
+    $attribute->value = $value;
+    $attribute->validFrom = date('Y-m-d', time());
+
+    $request = new stdClass();
+    $request->{'@type'} = 'AttributesChangeRequest';
+    $request->reason = $reason;
+    $request->attributes[] = $attribute;
+    $request->applyTo = $walletid;
+
+    $messagedata = new stdClass();
+    $messagedata->recipients = array($walletid);
+    $messagedata->content->{'@type'} = 'RequestMail';
+    $messagedata->content->to = array($walletid);
+    $messagedata->content->subject = get_string('subject_new_attribute', 'mod_ilddigitalcert');
+    $messagedata->content->body = get_string('body_new_attribute', 'mod_ilddigitalcert');
+    $messagedata->content->requests[] = $request;
+
+    $messagedata = json_encode($messagedata, JSON_PRETTY_PRINT);
+    $msgresult = callAPI('POST', $url.'/api/v1/Messages', $messagedata, $xapikey);
+    return $msgresult;
+}
+
+/**
+ * Gets the subjectarea of a course.
+ *
+ * @param int $courseid
+ * @return string
+ */
+function get_subjectarea($courseid) {
+    global $DB;
+    $subjectarea = 'Not defined';
+    if ($result = $DB->get_record('user_info_field', array('shortname' => 'subjectareas'))) {
+        $subjectareas = explode(PHP_EOL, $result->param1);
+        if (count($subjectareas) > 0) {
+            if ($result = $DB->get_record('ildmeta', array('courseid' => $courseid))) {
+                if ($result->subjectarea < count($subjectareas)) {
+                    $subjectarea = $subjectareas[$result->subjectarea];
+                }
+            }
+        }
+    }
+    return $subjectarea;
 }

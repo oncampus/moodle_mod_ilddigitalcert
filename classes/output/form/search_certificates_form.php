@@ -16,6 +16,10 @@
 
 namespace mod_ilddigitalcert\output\form;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once("$CFG->libdir/formslib.php");
+
 /**
  * Form that lets users search for specific cerificats.
  *
