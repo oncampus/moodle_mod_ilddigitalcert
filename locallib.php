@@ -598,7 +598,7 @@ function issue_certificate($certificate, $cm) {
                           JOIN {ilddigitalcert} cert
                             ON cm.instance = cert.id
                          WHERE cm.id = :cmid;";
-    $certsettings = $DB->get_record_sql($certsettingssql, array('id' => $cm->id), IGNORE_MISSING);
+    $certsettings = $DB->get_record_sql($certsettingssql, array('cmid' => $cm->id), IGNORE_MISSING);
 
     // If automation is enabled, issued certificate will be signed and written
     // to the blockchain using the pk of the selected certifier.

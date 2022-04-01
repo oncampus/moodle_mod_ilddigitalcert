@@ -36,12 +36,21 @@ require_once(__DIR__ . '/locallib.php');
 function checkrequest($request) {
     global $USER;
     // Check if firstname, lastname and email match with moodle user.
+    /*
     $firstname = $request->content->content->attributes->{'Person.givenName'}->value;
     $lastname = $request->content->content->attributes->{'Person.familyName'}->value;
     $email = $request->content->content->attributes->{'Comm.email'}->value;
-    if ($USER->firstname == $firstname and
-       $USER->lastname == $lastname and
-       $USER->email == $email) {
+    */
+    $firstname = $request->changes[0]->request->content->attributes->{'Person.givenName'}->value;
+    $lastname = $request->changes[0]->request->content->attributes->{'Person.familyName'}->value;
+    $email = $request->changes[0]->request->content->attributes->{'Comm.email'}->value;
+    /*
+    print_object('$USER: '.$USER->firstname.' '.$USER->lastname.' '.$USER->email);
+    print_object('$request: '.$firstname.' '.$lastname.' '.$email);
+    */
+    if (strtolower($USER->firstname) == strtolower($firstname) and
+       strtolower($USER->lastname) == strtolower($lastname) and
+       strtolower($USER->email) == strtolower($email)) {
         return true;
     }
     return false;
@@ -177,9 +186,8 @@ function uploadpdf($pdfcontent, $certname) {
  * @param int $icid Id of an issued certificate record.
  * @return string PDF certificate.
  */
-function get_pdfcontent($icid) {
+function get_pdfcontent($modulecontextid, $icid) {
     global $DB;
-
     // Prepare certificate data for download.
     $certificaterecord = $DB->get_record('ilddigitalcert_issued', array('id' => $icid), '*', MUST_EXIST);
     $metacertificate = mod_ilddigitalcert\bcert\certificate::from_ob($certificaterecord->metadata);
