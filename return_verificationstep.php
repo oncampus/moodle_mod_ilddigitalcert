@@ -107,26 +107,23 @@ if ($action == 'meta' and $meta != '') {
 } else if ($action == 'baseString' and $base64string != '') {
     echo base64_decode($base64string);
 } else if ($action == 'institution_profile' and $institutionprofile != '') {
+    $institution = new stdClass();
     $ipfshash = get_ipfs_hash($institutionprofile);
     $institution = get_institution($ipfshash);
     // TODO return object with image and url.
     if (isset($institution->url)) {
         $institution->description = $institution->name;
-        echo json_encode($institution);
     } else {
         if ($meta != '') {
             $metaobj = json_decode($meta);
-            $institution = new stdClass();
             $institution->url = $metaobj->badge->issuer->url;
             $institution->name = $metaobj->badge->issuer->name;
             $institution->description = $metaobj->badge->issuer->description;
             $institution->image = $metaobj->badge->issuer->image;
-            echo json_encode($institution);
-        } else {
-            echo null;
+            $institution->meta = $meta;
         }
     }
-
+    echo json_encode($institution);
 } else if ($action == 'cert' and $hash != '') {
 
     if ($result = $DB->get_record('ilddigitalcert_issued', array('certhash' => $hash))) {
@@ -136,6 +133,7 @@ if ($action == 'meta' and $meta != '') {
         $metabadge->issuer = $metadata->badge->issuer;
         $metaresult = new stdClass();
         $metaresult->badge = $metabadge;
+        $metaresult->{'extensions:assertionpageB4E'}->assertionpage = $metadata->{'extensions:assertionpageB4E'}->assertionpage;
         $metadata = json_encode($metaresult);
         echo $metadata;
     } else {

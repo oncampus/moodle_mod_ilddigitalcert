@@ -1,51 +1,51 @@
-var botti_1 = document.getElementById('botti_blockchain_check_1');
-var botti_2 = document.getElementById('botti_blockchain_check_2');
-var botti_3 = document.getElementById('botti_blockchain_check_3');
-var botti_4 = document.getElementById('botti_blockchain_check_4');
-var botti_5 = document.getElementById('botti_blockchain_check_5');
-var botti_6 = document.getElementById('botti_blockchain_check_6');
-var h_1 = document.getElementById('h1');
-var p_hash = document.getElementById('p-hash');
-var p_1 = document.getElementById('p1');
-var p_2 = document.getElementById('p2');
-var p_3 = document.getElementById('p3');
-var p_4 = document.getElementById('p4');
-var p_5 = document.getElementById('p5');
-var p_6 = document.getElementById('p6');
-var textbox = document.getElementById('textbox');
-var assertionPage = document.getElementById('certpageiframe');
-var sleepTime = 1000;
+let botti_1 = document.getElementById('botti_blockchain_check_1');
+let botti_2 = document.getElementById('botti_blockchain_check_2');
+let botti_3 = document.getElementById('botti_blockchain_check_3');
+let botti_4 = document.getElementById('botti_blockchain_check_4');
+let botti_5 = document.getElementById('botti_blockchain_check_5');
+let botti_6 = document.getElementById('botti_blockchain_check_6');
+let h_1 = document.getElementById('h1');
+let p_hash = document.getElementById('p-hash');
+let p_1 = document.getElementById('p1');
+let p_2 = document.getElementById('p2');
+let p_3 = document.getElementById('p3');
+let p_4 = document.getElementById('p4');
+let p_5 = document.getElementById('p5');
+let p_6 = document.getElementById('p6');
+let textbox = document.getElementById('textbox');
+let assertionPage = document.getElementById('certpageiframe');
+let sleepTime = 1000;
 
-var dropZone = document.getElementById('dropzone');
-var verifydiv = document.getElementById('verifydiv');
+let dropZone = document.getElementById('dropzone');
+let verifydiv = document.getElementById('verifydiv');
 
-var imgError1 = document.getElementById('img-error-1');
-var imgCheckLoad1 = document.getElementById('img-check-load-1');
-var imgCheckLoad2 = document.getElementById('img-check-load-2');
-var imgCheckLoad3 = document.getElementById('img-check-load-3');
-var imgCheckLoad4 = document.getElementById('img-check-load-4');
-var imgCheckLoad1Url = imgCheckLoad1.src;
-var imgCheckLoad2Url = imgCheckLoad2.src;
-var imgCheckLoad3Url = imgCheckLoad3.src;
-var imgCheckLoad4Url = imgCheckLoad4.src;
+let imgError1 = document.getElementById('img-error-1');
+let imgCheckLoad1 = document.getElementById('img-check-load-1');
+let imgCheckLoad2 = document.getElementById('img-check-load-2');
+let imgCheckLoad3 = document.getElementById('img-check-load-3');
+let imgCheckLoad4 = document.getElementById('img-check-load-4');
+let imgCheckLoad1Url = imgCheckLoad1.src;
+let imgCheckLoad2Url = imgCheckLoad2.src;
+let imgCheckLoad3Url = imgCheckLoad3.src;
+let imgCheckLoad4Url = imgCheckLoad4.src;
 
-var divCertData = document.getElementById('certdata');
-var spanResultHash = document.getElementById('span-result-hash');
-var spanResultStart = document.getElementById('span-result-start');
-var prespanResultEnd = document.getElementById('prespan-result-end');
-var spanResultEnd = document.getElementById('span-result-end');
-var spanResultInstitution = document.getElementById('span-result-institution');
+let divCertData = document.getElementById('certdata');
+let spanResultHash = document.getElementById('span-result-hash');
+let spanResultStart = document.getElementById('span-result-start');
+let prespanResultEnd = document.getElementById('prespan-result-end');
+let spanResultEnd = document.getElementById('span-result-end');
+let spanResultInstitution = document.getElementById('span-result-institution');
 
-var imgLoader = document.getElementById('loader');
-var asText = document.getElementById('asText');
+let imgLoader = document.getElementById('loader');
+let asText = document.getElementById('asText');
 
-var verificationStepUrl = 'return_verificationstep.php';
+let verificationStepUrl = 'return_verificationstep.php';
 url = window.location.href;
 if (url.includes('course/view.php')) {
-    var verificationStepUrl = url.substr(0, url.indexOf('course/view.php')) + 'mod/ilddigitalcert/return_verificationstep.php';
+    verificationStepUrl = url.substr(0, url.indexOf('course/view.php')) + 'mod/ilddigitalcert/return_verificationstep.php';
 }
 else {
-    var verificationStepUrl = url.substr(0, url.indexOf('mod/ilddigitalcert')) + 'mod/ilddigitalcert/return_verificationstep.php';
+    verificationStepUrl = url.substr(0, url.indexOf('mod/ilddigitalcert')) + 'mod/ilddigitalcert/return_verificationstep.php';
 }
 
 function getUrlParameterByName(name, url) {
@@ -53,7 +53,7 @@ function getUrlParameterByName(name, url) {
         url = window.location.href;
     }
     name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
+    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
     if (!results) {
         return null;
     }
@@ -91,12 +91,38 @@ function activateDropZone(activate = true) {
     }
 }
 
+async function postData(url, data, jsonResponse = false) {
+    const response = await fetch(url, {
+        method: 'POST',
+        body: new URLSearchParams(data)
+    }).catch((error) => {
+        console.error('Error:', error);
+    });
+    if (jsonResponse) {
+        return response.json();
+    }
+    return response.text();
+}
+
+async function postFormData(url, formdata, jsonResponse = false) {
+    const response = await fetch(url, {
+        method: 'POST',
+        body: formdata
+    }).catch((error) => {
+        console.error('Error:', error);
+    });
+    if (jsonResponse) {
+        return response.json();
+    }
+    return response.text();
+}
+
 async function dropZoneChange(e) {
     console.log('dropZoneChange');
     resetBotti();
     verifydiv.scrollIntoView();
-    var file = asText.files[0];
-    var meta = '';
+    let file = asText.files[0];
+    let meta = '';
     botti_1.style.display = "block";
     h_1.style.display = "block";
     h_1.innerHTML += ' ' + file.name;
@@ -106,20 +132,13 @@ async function dropZoneChange(e) {
         formData.append('action', 'pdf');
         formData.append('file', file, file.name);
         console.log('verificationStepUrl: ' + verificationStepUrl);
-        meta = $.ajax({
-            type: 'POST',
-            async: false,
-            url: verificationStepUrl,
-            data: formData,
-            contentType: false,
-            cache: false,
-            processData: false
-        }).responseText;
+        meta = await postFormData(verificationStepUrl, formData);
+        console.log(meta);
         await sleep(sleepTime);
         processMeta(meta);
     }
     else if (file.type == 'application/json' || file.name.match('.bcrt')) { // JSON!
-        var reader = new FileReader();
+        let reader = new FileReader();
 
         reader.onload = async function (e) {
             meta = reader.result;
@@ -144,8 +163,8 @@ async function dateiauswahl(evt) {
     evt.stopPropagation();
     evt.preventDefault();
 
-    var result = 'error';
-    var gewaehlteDateien = evt.dataTransfer.files; // FileList Objekt.
+    let result = 'error';
+    let gewaehlteDateien = evt.dataTransfer.files; // FileList Objekt.
 
     if (gewaehlteDateien.length == 0) {
         console.log('Error: no file!');
@@ -153,50 +172,20 @@ async function dateiauswahl(evt) {
     else {
         h_1.innerHTML += ' ' + gewaehlteDateien[0].name;
 
+        let formData = new FormData();
         if (gewaehlteDateien[0].type == 'application/pdf') { // PDF!
-            let formData = new FormData();
             formData.append('action', 'pdf');
             formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-            result = $.ajax({
-                type: 'POST',
-                async: false,
-                url: verificationStepUrl,
-                data: formData,
-                contentType: false,
-                cache: false,
-                processData: false
-            }).responseText;
-        }
-        else if (gewaehlteDateien[0].type == 'application/json' || gewaehlteDateien[0].name.match('.bcrt')) { // JSON!
-            let formData = new FormData();
+        } else if (gewaehlteDateien[0].type == 'application/json' || gewaehlteDateien[0].name.match('.bcrt')) { // JSON!
             formData.append('action', 'validateJSON');
             formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-            result = $.ajax({
-                type: 'POST',
-                async: false,
-                url: verificationStepUrl,
-                data: formData,
-                contentType: false,
-                cache: false,
-                processData: false
-            }).responseText;
-            console.log(result);
-        }
-        else if (gewaehlteDateien[0].type == 'application/xml' || gewaehlteDateien[0].name.match('.xml')) { // JSON!
-            let formData = new FormData();
+        } else if (gewaehlteDateien[0].type == 'application/xml' || gewaehlteDateien[0].name.match('.xml')) { // XML!
             formData.append('action', 'validateEDCI');
             formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-            result = $.ajax({
-                type: 'POST',
-                async: false,
-                url: verificationStepUrl,
-                data: formData,
-                contentType: false,
-                cache: false,
-                processData: false
-            }).responseText;
-            console.log(result);
         }
+
+        result = await postFormData(verificationStepUrl, formData);
+        console.log(result);
     }
     if (result == 'error') {
         await sleep(sleepTime);
@@ -260,19 +249,16 @@ function resetBotti() {
     dropZone.style.border = '2px dashed #bfbfbf';
 }
 
-function showCert(meta) {
-    metaJSON = JSON.parse(meta);
-    base64String = metaJSON['extensions:assertionpageB4E'].assertionpage;
+async function showCert(meta) {
+    console.log(meta);
+    console.log(meta['extensions:assertionpageB4E']);
+    base64String = meta['extensions:assertionpageB4E'].assertionpage;
 
-    result = $.ajax({
-        type: 'POST',
-        async: false,   // Important!
-        url: verificationStepUrl,
-        data: ({
-            action: 'baseString',
-            base64String: base64String
-        })
-    }).responseText;
+    result = await postData(verificationStepUrl, {
+        action: 'baseString',
+        base64String: base64String,
+    });
+    console.log(result);
     assertionPage.style.display = "block";
     window.frames[0].document.body.innerHTML = result;
     scaleIFrame();
@@ -281,23 +267,17 @@ function showCert(meta) {
     assertionPage.style.height = heightPx + 'px';
 }
 
-async function processHash(hash, meta = null) {
-    var result = '';
+async function processHash(hash, meta = '') {
+    let result = '';
     botti_2.style.display = "none";
     botti_3.style.display = "block";
     p_3.style.display = "block";
     // Search hash in blockchain.
-    result = $.ajax({
-        type: 'POST',
-        async: false,   // Important!
-        url: verificationStepUrl,
-        data: ({
-            action: 'hash',
-            hash: hash
-        })
-    }).responseText;
-    console.log(result);
-    cert = JSON.parse(result);
+    cert = await postData(verificationStepUrl, {
+        action: 'hash',
+        hash: hash,
+    }, true);
+    console.log(cert);
     await sleep(sleepTime);
     if (cert.institution == '0x0000000000000000000000000000000000000000') {
         // Hash not found in blockchain!
@@ -320,8 +300,7 @@ async function processHash(hash, meta = null) {
         p_6.style.display = "block";
         botti_4.style.display = "none";
         botti_6.style.display = "block";
-    }
-    else {
+    } else {
         // Valid!
         p_5.style.display = "block";
         botti_4.style.display = "none";
@@ -337,45 +316,32 @@ async function processHash(hash, meta = null) {
             spanResultEnd.innerHTML = cert.endingDate;
         }
         spanResultInstitution.innerHTML = imgLoader.outerHTML;
-        institution = $.ajax({
-            type: 'POST',
-            async: false,   // Important!
-            url: verificationStepUrl,
-            data: ({
-                action: 'institution_profile',
-                institution_profile: cert.institutionProfile,
-                meta: meta
-            })
-        }).responseText;
-        if (!institution) {
-            // TODO: spanResultInstitution.innerHTML = '<span>Not found in IPFS!</span>'; // TODO.
-        }
-        else {
-            institution = JSON.parse(institution);
+        institution = await postData(verificationStepUrl, {
+            action: 'institution_profile',
+            institution_profile: cert.institutionProfile,
+            meta: meta,
+        }, true);
+        console.log(institution);
+        if (institution) {
             spanResultInstitution.innerHTML = '<a href="' + institution.url + '"><img title="' + institution.name + '" alt="' + institution.description + '" height="50px" src="' + institution.image + '"/></a>';
         }
         divCertData.scrollIntoView();
         // TODO onhold, expired.
         await sleep(sleepTime);
-        if (meta) { // If metadata available, show certificate.
-            showCert(meta);
-        }
-        else { // Look for cert in DB.
-            result = $.ajax({
-                type: 'POST',
-                async: false,   // Important!
-                url: verificationStepUrl,
-                data: ({
-                    action: 'cert',
-                    hash: hash
-                })
-            }).responseText;
+        if (meta != '') { // If metadata available, show certificate.
+            showCert(JSON.parse(meta));
+        } else { // Look for cert in DB.
+            result = await postData(verificationStepUrl, {
+                action: 'cert',
+                hash: hash,
+            }, true);
+            console.log(result);
+
             if (result) {
                 console.log('found metadata');
                 if (!institution) {
                     // Get institution from Metadata.
-                    resultJSON = JSON.parse(result);
-                    spanResultInstitution.innerHTML = '<a href="' + resultJSON.badge.issuer.url + '"><img title="' + resultJSON.badge.issuer.name + '" alt="' + resultJSON.badge.issuer.description + '" height="50px" src="' + resultJSON.badge.issuer.image + '"/></a>';
+                    spanResultInstitution.innerHTML = '<a href="' + result.badge.issuer.url + '"><img title="' + result.badge.issuer.name + '" alt="' + result.badge.issuer.description + '" height="50px" src="' + result.badge.issuer.image + '"/></a>';
                 }
                 // Show cert.
                 showCert(result);
@@ -392,7 +358,6 @@ async function processHash(hash, meta = null) {
 }
 
 async function processMeta(meta) {
-    var result = '';
     // TODO: Validate!!!
     if (!IsJsonString(meta)) {
         console.log('Invalid JSON!');
@@ -406,17 +371,11 @@ async function processMeta(meta) {
     botti_1.style.display = "none";
     botti_2.style.display = "block";
     p_2.style.display = "block";
-    result = $.ajax({
-        type: 'POST',
-        async: false,   // Important!
-        url: verificationStepUrl,
-        data: ({
-            action: 'meta',
-            meta: meta
-        })
-    }).responseText;
+    hash = await postData(verificationStepUrl, {
+        action: 'meta',
+        meta: meta,
+    });
     await sleep(sleepTime);
-    var hash = result;
     console.log(hash);
     processHash(hash, meta);
 }

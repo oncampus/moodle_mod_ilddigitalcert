@@ -38,7 +38,7 @@ class assessment_spec {
     /** @var string Title. Optional attribute. */
     private $title;
 
-    /** @var string Url to leading to further assessment info if available. Optional attribute. */
+    /** @var string Url leading to further assessment info. Optional attribute. */
     private $homepage;
 
     /** @var string Datetime the assessment took place. Optional attribute. */
@@ -69,10 +69,15 @@ class assessment_spec {
     public static function new($ilddigitalcert) {
         $new = new self();
         $new->id = 'urn:bcert:asssessmentspec:' . self::$count;
-
-        $new->identifier = manager::get_if_key_exists($ilddigitalcert, 'examination_regulations_id');
-        $new->title = manager::get_if_key_exists($ilddigitalcert, 'examination_regulations');
-        $new->homepage = manager::get_if_key_exists($ilddigitalcert, 'examination_regulations_url');
+        if (!isset($ilddigitalcert->examination_regulations_id)) {
+            $new->identifier = $ilddigitalcert->examination_regulations_id;
+        }
+        if (!isset($ilddigitalcert->examination_regulations)) {
+            $new->title = $ilddigitalcert->examination_regulations;
+        }
+        if (!isset($ilddigitalcert->examination_regulations_url)) {
+            $new->homepage = $ilddigitalcert->examination_regulations_url;
+        }
         if ($ilddigitalcert->examination_regulations_date > 0) {
             $new->date = date('c', $ilddigitalcert->examination_regulations_date);
         }
@@ -90,15 +95,16 @@ class assessment_spec {
         $specxml = $xml->assessmentSpecificationReferences->assessmentSpecification;
         $new->id = $specxml['id'];
 
-        if (isset($specxml->title)) {
+        if (isset($specxml->title->text)) {
             $new->title = (string) $specxml->title->text;
         }
-        if (isset($specxml->homepage)) {
+        if (isset($specxml->homepage['uri'])) {
             $new->homepage = (string) $specxml->homepage['uri'];
         }
         if (isset($specxml->identifier)) {
             $new->identifier = (string) $specxml->identifier;
         }
+
         if (isset($specxml->date)) {
             $new->date = (string) $specxml->date;
         }

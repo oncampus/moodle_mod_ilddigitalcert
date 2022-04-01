@@ -46,7 +46,7 @@ class manager {
      *
      * @param \stdClass $haystack Object
      * @param string $key Key
-     * @return *
+     * @return mixed
      */
     public static function get_if_key_exists($haystack, $key) {
         if (is_array($haystack) && array_key_exists($key, $haystack)) {
@@ -64,7 +64,7 @@ class manager {
      *
      * @param array $array Array
      * @param string $key Key
-     * @return *|null
+     * @return mixed|null
      */
     public static function get_if_array_key_exists($array, $key) {
         if (array_key_exists($key, $array)) {

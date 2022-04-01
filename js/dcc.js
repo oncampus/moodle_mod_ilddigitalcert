@@ -1,15 +1,10 @@
-var  pollinfo = document.getElementById('poll-info');
+var pollinfo = document.getElementById('poll-info');
 
 // TODO nach vorgegebener Zeit abbrechen
-setInterval(function(){
-    result = $.ajax({
-        type: "POST",
-        async: false,
-        url: "dcconnectorpoll.php",
-        data: ({
-            action: "poll"
-        })
-    }).responseText;
+setInterval(async function () {
+    result = await postData('dcconnectorpoll.php', {
+        action: "poll"
+    });
     if (result != '') {
         check = JSON.parse(result);
         if (check.status == 'polling') {
@@ -23,3 +18,16 @@ setInterval(function(){
         }
     }
 }, 5000);
+
+async function postData(url, data, jsonResponse = false) {
+    const response = await fetch(url, {
+        method: 'POST',
+        body: new URLSearchParams(data)
+    }).catch((error) => {
+        console.error('Error:', error);
+    });
+    if (jsonResponse) {
+        return response.json();
+    }
+    return response.text();
+}
