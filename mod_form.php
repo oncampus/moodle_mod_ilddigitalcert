@@ -35,6 +35,10 @@ require_once('locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_ilddigitalcert_mod_form extends moodleform_mod {
+    /**
+     * Used to prefix an encrypted private key.
+     */
+    const ENCRYPTED_PREFIX = 'encrypted';
 
     /**
      * Defines forms elements
@@ -231,7 +235,7 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $mform->setDefault('auto_certifier', 'a');
 
         // Sets the private key for the set certifier.
-        $mform->addElement('passwordunmask', 'auto_pk', get_string('auto_pk', 'mod_ilddigitalcert'));
+        $mform->addElement('password', 'auto_pk', get_string('auto_pk', 'mod_ilddigitalcert'));
         $mform->addHelpButton('auto_pk', 'auto_pk', 'mod_ilddigitalcert');
 
         // Enable weekly automation report.
@@ -257,7 +261,8 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
 
             // Decrypts the pk if already set to prevent double encryption on save.
             if ($defaultvalues['auto_pk']) {
-                $defaultvalues['auto_pk'] = \mod_ilddigitalcert\crypto_manager::decrypt($defaultvalues['auto_pk']);
+                $this->pk = $defaultvalues['auto_pk'];
+                $defaultvalues['auto_pk'] = self::ENCRYPTED_PREFIX;
             }
         }
     }
@@ -284,7 +289,11 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
 
         // If pk is set, encrypt it to protect from non trustworthy db user.
         if (!empty($data->auto_pk)) {
-            $data->auto_pk = \mod_ilddigitalcert\crypto_manager::encrypt($data->auto_pk);
+            if ($data->auto_pk == self::ENCRYPTED_PREFIX) {
+                $data->auto_pk = $this->pk;
+            } else {
+                $data->auto_pk = \mod_ilddigitalcert\crypto_manager::encrypt($data->auto_pk);
+            }
         }
 
         return $data;
