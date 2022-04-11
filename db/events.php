@@ -28,5 +28,20 @@ $observers = array (
     array (
         'eventname' => '\core\event\user_enrolment_deleted',
         'callback' => 'mod_ilddigitalcert_observer::user_unenrolled',
-    )
+    ),
+    array (
+        'eventname' => '\mod_ilddigitalcert\event\certificate_issued'
+    ),
+    array (
+        'eventname' => '\mod_ilddigitalcert\event\certificate_reissued'
+    ),
+    array (
+        'eventname' => '\mod_ilddigitalcert\event\certificate_registered'
+    ),
+    array (
+        'eventname' => '\mod_ilddigitalcert\event\certificate_revoked'
+    ),
+    array (
+        'eventname' => '\mod_ilddigitalcert\event\verification_completed'
+    ),
 );

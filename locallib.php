@@ -22,6 +22,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once('web3lib.php');
+require_once(__DIR__ . '/vendor/autoload.php');
+
 use mod_ilddigitalcert\bcert\certificate;
 
 /**
@@ -65,8 +70,6 @@ function create_pdf_certificate($certificaterecord, $metacertificate) {
 
     // Read file content.
     $content = $storedbcrt->get_content();
-
-    require_once(__DIR__ . '/vendor/autoload.php');
 
     $pdf = new Mpdf\Mpdf([
         'mode' => 'utf-8',
@@ -167,7 +170,7 @@ function get_pdf_footerhtml($hash) {
 function to_blockchain($issuedcertificate, $certifier, $pk) {
     global $DB, $SITE;
 
-    require_once('web3lib.php');
+    $context = context_module::instance($issuedcertificate->cmid);
     $pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $certifier);
     if (!$pref) {
         throw new moodle_exception('not_a_certifier', 'mod_ilddigitalcert');
@@ -223,7 +226,19 @@ function to_blockchain($issuedcertificate, $certifier, $pk) {
         $issuedcertificate->edci = $metacertificate->get_edci();
         $issuedcertificate->institution_token = $tokenid;
 
+        // Update db record.
         $DB->update_record('ilddigitalcert_issued', $issuedcertificate);
+
+        // Log certificate_registered event.
+        $event = \mod_ilddigitalcert\event\certificate_registered::create(
+            array(
+                'context' => $context,
+                'objectid' => $issuedcertificate->id,
+                'userid' => $certifier->id,
+                'relateduserid' => $issuedcertificate->userid,
+            )
+        );
+        $event->trigger();
 
         if ($receiver = $DB->get_record('user', array('id' => $issuedcertificate->userid))) {
             // Email to user.
@@ -321,8 +336,6 @@ function calculate_hash($metadatajson) {
  * @return object|bool Returns a hash or false, if the hash couldn't be stored.
  */
 function save_hash_in_blockchain($hash, $startdate, $enddate, $pk) {
-    require_once('web3lib.php');
-
     $hashes = store_certificate($hash, $startdate, $enddate, $pk);
 
     if (isset($hashes->txhash)) {
@@ -445,9 +458,11 @@ function is_issued($userid, $cmid, $ueid) {
  */
 function reissue_certificate($certificate, $cm) {
     global $DB;
+
     $recipientid = $certificate->get_subjectid();
-    $cm = $DB->get_record('course_modules', array('id' => $cm->id), '*', MUST_EXIST);
     $courseid = $DB->get_field('course_modules', 'course', array('id' => $cm->id));
+    $context = context_module::instance($cm->id);
+
     // Get enrolmentid.
     $sql = 'SELECT ue.id FROM {user_enrolments} ue, {enrol} e
              WHERE ue.enrolid = e.id
@@ -517,7 +532,15 @@ function reissue_certificate($certificate, $cm) {
     $issued->metadata = $certificate->get_ob();
     $issued->edci = $certificate->get_edci();
 
+    // Update db record.
     $DB->update_record('ilddigitalcert_issued', $issued);
+
+    // Log certificate_reissued event.
+    $event = \mod_ilddigitalcert\event\certificate_reissued::create(
+        array('context' => $context, 'objectid' => $issued->id, 'relateduserid' => $issued->userid)
+    );
+    $event->trigger();
+
     return true;
 }
 
@@ -533,6 +556,7 @@ function issue_certificate($certificate, $cm) {
 
     $recipient = $DB->get_record('user', array('id' => $certificate->get_subjectid()));
     $courseid = $DB->get_field('course_modules', 'course', array('id' => $cm->id));
+    $context = context_module::instance($cm->id);
 
     // Get enrolmentid.
     $sql = 'SELECT ue.id FROM {user_enrolments} ue, {enrol} e
@@ -591,6 +615,12 @@ function issue_certificate($certificate, $cm) {
 
     // Update record.
     $DB->update_record('ilddigitalcert_issued', $issued);
+
+    // Log certificate_issued event.
+    $event = \mod_ilddigitalcert\event\certificate_issued::create(
+        array('context' => $context, 'objectid' => $issued->id, 'relateduserid' => $issued->userid)
+    );
+    $event->trigger();
 
     // Get ilddigitalcert settings.
     $certsettingssql = "SELECT cert.automation, cert.auto_certifier, cert.auto_pk
@@ -736,7 +766,6 @@ function get_institution($ipfshash) {
  * @return boolean True if the certifier was added sucessfully, else false.
  */
 function add_certifier($userid, $useraddress, $adminpk) {
-    require_once('web3lib.php');
     global $DB;
     // Check if user already exists in user_preferences.
     if ($userpref = $DB->get_record('user_preferences', array('name' => 'mod_ilddigitalcert_certifier', 'userid' => $userid))) {

@@ -33,6 +33,7 @@ $meta = optional_param('meta', '', PARAM_RAW);
 $hash = optional_param('hash', '', PARAM_RAW);
 $base64string = optional_param('base64String', '', PARAM_RAW);
 $institutionprofile = optional_param('institution_profile', '', PARAM_RAW);
+$verificationmethod = optional_param('verificationMethod', 'hash', PARAM_RAW);
 
 if ($action == 'meta' and $meta != '') {
     $certhash = calculate_hash($meta);
@@ -46,6 +47,21 @@ if ($action == 'meta' and $meta != '') {
         $cert->endingDate = 'false';
     }
     echo json_encode($cert);
+
+    // If the value of $cert->institution equals the 0x00... value,
+    // the hash could not be found in the blockchain.Therefore it is invalid.
+
+    // Log verification_completed event.
+    $event = \mod_ilddigitalcert\event\verification_completed::create(
+        array(
+            'context' => context_system::instance(),
+            'other' => array(
+                'verification_result' => filter_var($cert->valid, FILTER_VALIDATE_BOOLEAN),
+                'verification_method' => $verificationmethod,
+            )
+        )
+    );
+    $event->trigger();
 } else if ($action == 'validateJSON' and !empty($_FILES['file']['name']) and
     ($_FILES['file']['type'] == 'application/json' or strpos($_FILES['file']['name'], '.bcrt') !== false)) {
     $file = $_FILES['file'];
