@@ -52,7 +52,7 @@ $string['auto_pk_help'] = 'Set the private key of the selected certifier here.';
 $string['auto_certifier_help'] = 'Specify the certifier, on whose beahlf the certificates will be automatically signed.';
 $string['block_heading'] = 'Digital certificates in the blockchain';
 $string['block_summary'] = '<p>Verify the authenticity of your digital certificates here.</ p>
-<p>Simply drag and drop your certificate (PDF or BCRT file) into the field.</ p>
+<p>Simply drag and drop your certificate (PDF, XML or BCRT file) into the field.</ p>
 <p>You can check your printed version of the certificate by scanning the QR code below.
 </p>';
 $string['body_new_attribute'] = 'With this message you received a new attribute to complete your personal data.';
@@ -108,8 +108,10 @@ $string['examination_regulations_date'] = 'Examination regulations date';
 $string['expertise'] = 'Competences';
 $string['expiredate'] = 'Expire date';
 $string['expireperiod'] = 'Expire period';
+$string['extractmetadata'] = 'Extract metadata';
 $string['file_upload_error'] = 'Error while sending file';
 $string['generate_adr_from_pk'] = 'Generate blockchain adress and private key';
+$string['generatehash'] = 'Generate hash';
 $string['generate_pk'] = 'Send E-Mail including a link for generating a private key';
 $string['headerconfig'] = 'Issuer';
 $string['html'] = 'Certificate';
@@ -117,6 +119,7 @@ $string['image'] = 'Image';
 $string['institution_pk'] = 'Private key of the issuer';
 $string['invalid'] = 'Invalid certificate';
 $string['invalid_format'] = 'Invalid file format';
+$string['invalid_hash_format'] = 'Invalid hash format';
 $string['invalid_pk_format'] = 'The given private key is invalid';
 
 $string['issued'] = 'The certificate was issued, but still needs to be signed and registered in the blockchain.';
@@ -279,12 +282,15 @@ $string['upload_again'] = 'Upload new certificate';
 $string['use_address'] = 'Use an already existing blochchain address of a certifier';
 $string['valid'] = 'Valid certificate';
 $string['validation'] = 'Valid';
-$string['verify'] = 'Verify certificates';
+$string['validfrom'] = 'Valid from';
+$string['validuntil'] = 'Valid until';
+$string['verify'] = 'Verify certificate';
 $string['verify_authenticity'] = 'Verify authenticity';
 $string['verify_authenticity_descr'] = 'To validate the authenticity of a certificate, upload the PDF-file at
 <a href="{$a->url}">{$a->url}</a>.
 <br />You can verify the authenticity of the printed out certificate, by scanning the nearby QR-Code.';
 $string['verify_description'] = 'Verify your digital certificates here in the blockchain.';
+$string['verify_hash'] = 'Verifiy hash';
 $string['waiting_for_pk_generation'] = 'Waiting for user to generate private key';
 $string['waiting_for_request'] = 'Waiting for request';
 $string['waiting_for_registration'] = 'Waiting for registration in Blockchain';

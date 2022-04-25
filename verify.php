@@ -43,18 +43,14 @@ echo '<div style="background-color: rgba(16,111,111,.7);margin:-15px -20px 80px 
       <img style="width: 240px;float:left;" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/blockchain.jpg">
     </div>
     <div style="padding:15px 6px;float: left;width: calc(100% - 350px);min-width: 300px;max-width: 700px;padding-left: 30px;">
-      <h3 style="color: white;">Digitale Zertifikate in der Blockchain</h3>
-      <b style="color: white;">
-        <p>Überprüfe hier die Echtheit Deiner digitalen Zertifikate.</p>
-        <p>Ziehe dazu einfach Dein Zertifikat (PDF oder XML oder BCRT-Datei) per Drag and Drop in das Feld.</p>
-        <p>Deine ausgedruckte Version des Zertifikates kannst Du überprüfen indem Du
-        den untenstehenden QR-Code einscannst.
-        </p>
-        <p></p>
+      <h3 style="color: white;">' . get_string('block_heading', 'mod_ilddigitalcert') . '</h3>
+      <b style="color: white;">' .
+        get_string('block_summary', 'mod_ilddigitalcert') .
+        '<p></p>
       </b>
     </div>
     <div style="clear:both;height: 0px;"></div>
-  </div>'; // TODO Add missing lang string.
+  </div>';
 
 $imgurls = array($CFG->wwwroot.'/mod/ilddigitalcert/pix/botti_blockchain_check_1.png',
           $CFG->wwwroot.'/mod/ilddigitalcert/pix/botti_blockchain_check_2.png',
@@ -75,7 +71,7 @@ echo '  </div>';
 echo '  <div id="list" style="display:none;padding:20px;width:300px;height:100px;margin:0px auto;"></div>';
 echo '</p>';
 
-echo '<p id="textbox" align="center"></p>';
+echo '<p id="textbox" align="center">' . get_string('invalid_hash_format', 'mod_ilddigitalcert') . '</p>';
 echo '<p style="display:none"><img id="loader" src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/loader.gif"
   style="height: 10px;float: inherit;position: inherit;"/></p>';
 
@@ -100,51 +96,52 @@ echo '<div id="verifydiv" align="center">
         src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check.png'.'" />
     </div>
     <div align="left" style="padding: 10px;float:left;width:50%;max-width: 250px;">
-      <h3 id="h1" style="display:none;word-wrap: break-word;">Verifiziere</h3>
-      <p id="p-hash" style="font-size: 10pt;word-wrap: break-word;display:none"></p>
+      <h3 id="h1" style="display:none;word-wrap: break-word;">' . get_string('verify_authenticity', 'mod_ilddigitalcert') . '</h3>
+      <p id="p-hash" style="font-size: 10pt;word-wrap: break-word;display:none">' . get_string('certhash', 'mod_ilddigitalcert') . '</p>
       <p id="p1" style="display:none; margin:0px;clear: both;">
         <img id="img-check-load-1" width="16px" style="margin-right:5px; vertical-align:top; float:left;clear:left;"
-          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />
-        Metadaten extrahieren
-      </p>
+          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />' .
+        get_string('extractmetadata', 'mod_ilddigitalcert') .
+      '</p>
       <p id="p2" style="display:none; margin:0px;clear: both;">
         <img id="img-check-load-2" width="16px" style="margin-right:5px; vertical-align:top; float:left;clear:left;"
-          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />
-        Hash generieren
-      </p>
+          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />' .
+        get_string('generatehash', 'mod_ilddigitalcert') .
+      '</p>
       <p id="p3" style="display:none; margin:0px;clear: both;">
         <img id="img-check-load-3" width="16px" style="margin-right:5px; vertical-align:top; float:left;clear:left;"
-          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />
-        Hash prüfen
-      </p>
+          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />' .
+        get_string('verify_hash', 'mod_ilddigitalcert') .
+      '</p>
       <p id="p4" style="display:none; margin:0px;clear: both;">
         <img id="img-check-load-4" width="16px" style="margin-right:5px; vertical-align:top; float:left;clear:left;"
-          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />
-        Gültigkeit prüfen
-      </p>
+          src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_load.gif'.'" />' .
+        get_string('verify_authenticity', 'mod_ilddigitalcert') .
+      '</p>
       <p id="p5" style="display:none;color:#106F6F; margin:0px;clear: both;">
         <img id="img-check-1" width="16px" style="margin-right: 5px;vertical-align:top; float:left;clear:left;"
           src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_check_all.png'.'" />
-        <b>Gültig!</b>
+        <b>' . get_string('validation', 'mod_ilddigitalcert') . '!</b>
       </p>
       <p id="p6" style="display:none;color:#B21E1E; margin:0px;clear: both;">
         <img id="img-error-1" width="16px" style="margin-right: 5px;vertical-align:top; float:left;clear:left;"
           src="'.$CFG->wwwroot.'/mod/ilddigitalcert/pix/icon_error.png'.'" />
-        <b>Ungültig</b>
+        <b>' . get_string('invalid', 'mod_ilddigitalcert') . '</b>
       </p>
     </div>
-  </div>'; // TODO Add missing lang string.
+  </div>';
 
 echo '<p id="assertionPage" style="clear: both;"></p>';
 
-// TODO Use language files for text.
 echo '<div id="certdata" align="center"
         style="display:none;padding:20px;min-width:300px;width:100%;max-width:650px;margin:30px auto;border: 0px solid #bfbfbf;">';
-echo '<p align="left" style="margin: 0 auto;max-width: 610px;">
-        Hash: <span id="span-result-hash" style="color:#106F6F;word-wrap: break-word;"></span><br/>'; // TODO Add missing lang string.
-echo 'Gültig ab <span id="span-result-start" style="color:#106F6F;"></span> '; // TODO Add missing lang string.
-echo '<span id="prespan-result-end" style="display:none;">bis <span id="span-result-end" style="color:#106F6F;"></span></span>'; // TODO Add missing lang string.
-echo 'Zertifizierungsstelle: <br/><span id="span-result-institution"></span></p>'; // TODO Add missing lang string.
+echo '<p align="left" style="margin: 0 auto;max-width: 610px;">' .
+  get_string('certhash', 'mod_ilddigitalcert') . ': <span id="span-result-hash" style="color:#106F6F;word-wrap: break-word;"></span><br/>';
+echo get_string('validfrom', 'mod_ilddigitalcert') . ': <span id="span-result-start" style="color:#106F6F;"></span> ';
+echo '<span id="prespan-result-end" style="display:none;">' .
+  get_string('validuntil', 'mod_ilddigitalcert') . ': <span id="span-result-end" style="color:#106F6F;"></span></span>';
+echo get_string('issuer', 'mod_ilddigitalcert') . ': <br/><span id="span-result-institution">' .
+  get_string('No_institution_found_in_IPFS', 'mod_ilddigitalcert') . '</span></p>';
 echo '</div>';
 
 // Backup: zoom: 0.75; -moz-transform: scale(0.75); -moz-transform-origin: 0 0; -o-transform: scale(0.75);//!
@@ -154,7 +151,5 @@ echo '</div>';
 echo '<iframe id="certpageiframe"
         style="display:none;border: 0px solid #bfbfbf;padding:15px;margin: 20px auto;width:100%;max-width: 800px;"></iframe>';
 $PAGE->requires->js(new moodle_url('/mod/ilddigitalcert/js/verify.js'));
-$PAGE->requires->string_for_js('verify', 'mod_ilddigitalcert');
-$PAGE->requires->string_for_js('No_institution_found_in_IPFS', 'mod_ilddigitalcert');
 
 echo $OUTPUT->footer();

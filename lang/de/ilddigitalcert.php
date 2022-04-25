@@ -50,7 +50,7 @@ $string['auto_pk'] = 'Privater Schlüssel des Zertifizierers';
 $string['auto_pk_help'] = 'Geben Sie hier den privaten Schlüssel des oben angegebenen Zertifizierers an.';
 $string['block_heading'] = 'Digitale Zertifikate in der Blockchain';
 $string['block_summary'] = '<p>Überprüfe hier die Echtheit Deiner digitalen Zertifikate.</p>
-<p>Ziehe dazu einfach Dein Zertifikat (PDF oder BCRT-Datei) per Drag and Drop in das Feld.</p>
+<p>Ziehe dazu einfach Dein Zertifikat (PDF, XML oder BCRT-Datei) per Drag and Drop in das Feld.</p>
 <p>Deine ausgedruckte Version des Zertifikates kannst Du überprüfen indem Du
 den untenstehenden QR-Code einscannst.
 </p>';
@@ -107,8 +107,10 @@ $string['examination_regulations_date'] = 'Prüfungsordnung Datum';
 $string['expertise'] = 'Kenntnisse';
 $string['expiredate'] = 'Ablaufdatum';
 $string['expireperiod'] = 'Ablaufzeitraum';
+$string['extractmetadata'] = 'Metadaten extrahieren';
 $string['file_upload_error'] = 'Fehler beim senden der Datei';
 $string['generate_adr_from_pk'] = 'Blockchain Adresse und Private Key ermitteln';
+$string['generatehash'] = 'Hash generieren';
 $string['generate_pk'] = 'Link zum generieren des Private Key per E-Mail versenden';
 $string['headerconfig'] = 'Aussteller / Zertifizierungsstelle';
 $string['html'] = 'Zertifikat';
@@ -116,6 +118,7 @@ $string['image'] = 'Bild';
 $string['institution_pk'] = 'Private Key der Zertifizierungsstelle';
 $string['invalid'] = 'Das Zertifikat ist ungültig';
 $string['invalid_format'] = 'Ungültiges Dateiformat';
+$string['invalid_hash_format'] = 'Ungültiges Hash-Format';
 $string['invalid_pk_format'] = 'Der gegebene Private Key ist ungültig.';
 
 $string['issued'] = 'Das Zertifikat wurde ausgestellt, muss jedoch noch signiert und in der Blockchain registriert werden.';
@@ -288,12 +291,15 @@ $string['upload_again'] = 'Neues Zertifikat hochladen';
 $string['use_address'] = 'Bereits vorhandene Blockchain Adresse eines Zertifizierers verwenden';
 $string['valid'] = 'Das Zertifikat ist gültig';
 $string['validation'] = 'Gültig';
-$string['verify'] = 'Zertifikate überprüfen';
-$string['verify_authenticity'] = 'Echtheit überprüfen';
-$string['verify_authenticity_descr'] = 'Um die Echtheit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter
+$string['validfrom'] = 'Gültig ab';
+$string['validuntil'] = 'Gültig bis';
+$string['verify'] = 'Zertifikat überprüfen';
+$string['verify_authenticity'] = 'Gültigkeit prüfen';
+$string['verify_authenticity_descr'] = 'Um die Gültigkeit des Zertifikates zu überprüfen, laden Sie die PDF-Datei unter
 <a href="{$a->url}">{$a->url}</a> hoch.
 <br />Ihre ausgedruckte Version des Zertifikates können Sie überprüfen indem Sie nebenstehenden QR-Code einscannen.';
 $string['verify_description'] = 'Überprüfen Sie hier Ihre digitalen Zertifikate in der Blockchain';
+$string['verify_hash'] = 'Hash prüfen';
 $string['waiting_for_pk_generation'] = 'Warte auf Erstellung eines Private Key durch Nutzer/in';
 $string['waiting_for_registration'] = 'Warte auf Registrierung in der Blockchain';
 $string['waiting_for_request'] = 'Warte auf Anfrage';

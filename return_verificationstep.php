@@ -38,7 +38,11 @@ if ($action == 'meta' and $meta != '') {
     $certhash = calculate_hash($meta);
     echo $certhash;
 } else if ($action == 'hash' and $hash != '') {
-    $cert = get_certificate($hash);
+    try {
+        $cert = get_certificate($hash);
+    } catch (InvalidArgumentException $e) {
+        $cert = new stdClass();
+    }
     $cert->startingDate = date('d.m.Y', intval($cert->startingDate));
     if (intval($cert->endingDate) != 0) {
         $cert->endingDate = date('d.m.Y', intval($cert->endingDate));

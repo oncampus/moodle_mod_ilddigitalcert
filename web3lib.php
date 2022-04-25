@@ -24,22 +24,22 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if (!file_exists('vendor/autoload.php')) {
-    require_once(__DIR__.'/../../config.php');
+// if (!file_exists('vendor/autoload.php')) {
+// require_once(__DIR__.'/../../config.php');
 
-    require_login();
-    $context = context_system::instance();
+// require_login();
+// $context = context_system::instance();
 
-    $PAGE->set_context($context);
-    $PAGE->set_url('/mod/ilddigitalcert/web3lib.php');
-    $PAGE->set_title('web3lib.php error');
-    $PAGE->set_heading('web3lib.php error');
+// $PAGE->set_context($context);
+// $PAGE->set_url('/mod/ilddigitalcert/web3lib.php');
+// $PAGE->set_title('web3lib.php error');
+// $PAGE->set_heading('web3lib.php error');
 
-    echo $OUTPUT->header();
-    \core\notification::error(get_string('not_installed_correctly', 'mod_ilddigitalcert'));
-    echo $OUTPUT->footer();
-    die();
-}
+// echo $OUTPUT->header();
+// \core\notification::error(get_string('not_installed_correctly', 'mod_ilddigitalcert'));
+// echo $OUTPUT->footer();
+// die();
+// }
 
 require('vendor/autoload.php');
 
@@ -234,7 +234,6 @@ function store_certificate($hash, $startdate, $enddate, $pk) {
  * @return bool True if revocation was successful, else false
  */
 function revoke_certificate($certhash, $pk) {
-    // TODO: testen.
     $url = get_contract_url('CertMgmt');
     $account = get_address_from_pk($pk);
     $contractabi = get_contract_abi('CertMgmt');

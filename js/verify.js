@@ -5,7 +5,9 @@ let botti_4 = document.getElementById('botti_blockchain_check_4');
 let botti_5 = document.getElementById('botti_blockchain_check_5');
 let botti_6 = document.getElementById('botti_blockchain_check_6');
 let h_1 = document.getElementById('h1');
+const h_1_default = h_1.innerHTML;
 let p_hash = document.getElementById('p-hash');
+const p_hash_default = p_hash.innerHTML;
 let p_1 = document.getElementById('p1');
 let p_2 = document.getElementById('p2');
 let p_3 = document.getElementById('p3');
@@ -35,6 +37,7 @@ let spanResultStart = document.getElementById('span-result-start');
 let prespanResultEnd = document.getElementById('prespan-result-end');
 let spanResultEnd = document.getElementById('span-result-end');
 let spanResultInstitution = document.getElementById('span-result-institution');
+let spanResultInstitution_default = spanResultInstitution.innerHTML;
 
 let imgLoader = document.getElementById('loader');
 let asText = document.getElementById('asText');
@@ -220,11 +223,11 @@ function resetBotti() {
     imgCheckLoad3.src = imgCheckLoad3Url + "?a=" + Math.random();
     imgCheckLoad4.src = imgCheckLoad4Url + "?a=" + Math.random();
 
-    textbox.innerHTML = '';
+    textbox.style.display = "none";
     botti_1.style.display = "none";
     h_1.style.display = "none";
     p_hash.style.display = "none";
-    h_1.innerHTML = "Verifiziere" // TODO: Get text from moodle language files.
+    h_1.textContent = h_1_default
     p_1.style.display = "none";
     botti_2.style.display = "none";
     p_2.style.display = "none";
@@ -273,13 +276,14 @@ async function processHash(hash, meta = '') {
     botti_3.style.display = "block";
     p_3.style.display = "block";
     // Search hash in blockchain.
+
     cert = await postData(verificationStepUrl, {
         action: 'hash',
         hash: hash,
     }, true);
     console.log(cert);
     await sleep(sleepTime);
-    if (cert.institution == '0x0000000000000000000000000000000000000000') {
+    if (!('institution' in cert) || cert.institution == '0x0000000000000000000000000000000000000000') {
         // Hash not found in blockchain!
         p_6.style.display = "block";
         botti_3.style.display = "none";
@@ -329,7 +333,11 @@ async function processHash(hash, meta = '') {
         // TODO onhold, expired.
         await sleep(sleepTime);
         if (meta != '') { // If metadata available, show certificate.
-            showCert(JSON.parse(meta));
+            if (IsJsonString(meta)) {
+                showCert(JSON.parse(meta));
+            } else {
+                showCert(meta);
+            }
         } else { // Look for cert in DB.
             result = await postData(verificationStepUrl, {
                 action: 'cert',
@@ -347,9 +355,7 @@ async function processHash(hash, meta = '') {
                 showCert(result);
             }
             else {
-                if (!institution) {
-                    spanResultInstitution.innerHTML = '<span>Not found in IPFS!</span>'; // TODO language files.
-                }
+                spanResultInstitution.innerHTML = spanResultInstitution_default;
                 console.log('no metadata');
             }
         }
@@ -401,11 +407,11 @@ function processHashFromUrlParam(hashParam) {
             verifydiv.scrollIntoView();
             h_1.style.display = "block";
             p_hash.style.display = "block";
-            p_hash.innerHTML = 'Hash: <span style="color:#106F6F;">' + hashParam + '</span>'; // TODO Add missing lang string.
+            p_hash.innerHTML = p_hash_default + ' <span style="color:#106F6F;">' + hashParam + '</span>';
             processHash(hashParam);
         }
         else {
-            textbox.innerHTML = 'Hash parameter: wrong format'; // TODO Add missing lang string.
+            textbox.style.disply = "block";
         }
     }
 }

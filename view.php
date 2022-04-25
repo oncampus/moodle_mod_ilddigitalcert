@@ -155,13 +155,13 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         if (isset($issuedcertificate->txhash)) {
             // QR-Code anzeigen.
             echo '<br />';
-            echo '<h3>Zertifikat in der Blockchain überprüfen</h3>'; // TODO sprachpaket!
+            echo '<h3>' . get_string('verify_authenticity', 'mod_ilddigitalcert') . '</h3>';
 
             $salt = get_token($issuedcertificate->institution_token);
             $hash = $metacertificate->get_ob_hash($salt);
             $url = new moodle_url('/mod/ilddigitalcert/verify.php', array('hash' => $hash));
             $img = '<img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=' . $url . '&choe=UTF-8"
-                title="Zertifikat überprüfen" />'; // TODO Add missing lang string.
+                title="' . get_string('verify_authenticity', 'mod_ilddigitalcert') . '" />';
             echo html_writer::link($url, $img);
         }
     }
@@ -280,13 +280,13 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         if (isset($issuedcertificate->txhash)) {
             // Show QR-Code.
             echo '<br />';
-            echo '<h3>Zertifikat in der Blockchain überprüfen</h3>'; // TODO Add missing lang string.
+            echo '<h3>' . get_string('verify_authenticity', 'mod_ilddigitalcert') . '</h3>';
 
             $salt = get_token($issuedcertificate->institution_token);
             $hash = $metacertificate->get_ob_hash($salt);
             $url = new moodle_url('/mod/ilddigitalcert/verify.php', array('hash' => $hash));
             $img = '<img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=' .
-                $url . '&choe=UTF-8" title="Zertifikat überprüfen" />'; // TODO Add missing lang string.
+                $url . '&choe=UTF-8" title="' . get_string('verify_authenticity', 'mod_ilddigitalcert') . '" />';
             echo html_writer::link($url, $img);
         }
     }

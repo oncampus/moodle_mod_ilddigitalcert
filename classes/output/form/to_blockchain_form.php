@@ -109,12 +109,12 @@ class to_blockchain_form extends \moodleform {
             $recipient = json_decode($issuedcertificate->metadata)->{'extensions:recipientB4E'};
             $recipientname = $recipient->givenname . ' ' . $recipient->surname;
             $message = '<div><p>' . get_string('registered_and_signed', 'mod_ilddigitalcert') . '</p>';
-            $message .= '<p>Recipient: <b>' . $recipientname . '</b><br/>';
-            $message .= 'Hash: <b>' . $issuedcertificate->certhash . '</b><br/>';
-            $message .= 'Startdate: <b>' . json_decode($issuedcertificate->metadata)->issuedOn . '</b><br/>';
+            $message .= '<p>' . get_string('recipient', 'mod_ilddigitalcert') . ': <b>' . $recipientname . '</b><br/>';
+            $message .= get_string('certhash', 'mod_ilddigitalcert') . ': <b>' . $issuedcertificate->certhash . '</b><br/>';
+            $message .= get_string('validfrom', 'mod_ilddigitalcert') . ': <b>' . json_decode($issuedcertificate->metadata)->issuedOn . '</b><br/>';
 
             if (isset(json_decode($issuedcertificate->metadata)->expires)) {
-                $message .= 'Enddate: <b>' . json_decode($issuedcertificate->metadata)->expires . '</b></p></div>';
+                $message .= get_string('validuntil', 'mod_ilddigitalcert') . ': <b>' . json_decode($issuedcertificate->metadata)->expires . '</b></p></div>';
             }
 
             \core\notification::success($message);
