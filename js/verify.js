@@ -51,6 +51,8 @@ else {
     verificationStepUrl = url.substr(0, url.indexOf('mod/ilddigitalcert')) + 'mod/ilddigitalcert/return_verificationstep.php';
 }
 
+let verificationMethod = 'hash';
+
 function getUrlParameterByName(name, url) {
     if (!url) {
         url = window.location.href;
@@ -150,6 +152,16 @@ async function dropZoneChange(e) {
         }
         reader.readAsText(file);
     }
+    else if (file.type == 'application/xml' || file.name.match('.xml')) { // XML!
+        let reader = new FileReader();
+
+        reader.onload = async function (e) {
+            meta = reader.result;
+            await sleep(sleepTime);
+            processMeta(meta);
+        }
+        reader.readAsText(file);
+    }
     else {
         await sleep(sleepTime);
         p_6.style.display = "block";
@@ -171,34 +183,34 @@ async function dateiauswahl(evt) {
 
     if (gewaehlteDateien.length == 0) {
         console.log('Error: no file!');
-    }
-    else {
-        h_1.innerHTML += ' ' + gewaehlteDateien[0].name;
-
-        let formData = new FormData();
-        if (gewaehlteDateien[0].type == 'application/pdf') { // PDF!
-            formData.append('action', 'pdf');
-            formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-        } else if (gewaehlteDateien[0].type == 'application/json' || gewaehlteDateien[0].name.match('.bcrt')) { // JSON!
-            formData.append('action', 'validateJSON');
-            formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-        } else if (gewaehlteDateien[0].type == 'application/xml' || gewaehlteDateien[0].name.match('.xml')) { // XML!
-            formData.append('action', 'validateEDCI');
-            formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
-        }
-
-        result = await postFormData(verificationStepUrl, formData);
-        console.log(result);
-    }
-    if (result == 'error') {
         await sleep(sleepTime);
         p_6.style.display = "block";
         activateDropZone();
+        return;
     }
-    else {
-        await sleep(sleepTime);
-        processMeta(result);
+
+    h_1.innerHTML += ' ' + gewaehlteDateien[0].name;
+
+    let formData = new FormData();
+    if (gewaehlteDateien[0].type == 'application/pdf') { // PDF!
+        formData.append('action', 'pdf');
+        formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
+        verificationMethod = 'pdf';
+    } else if (gewaehlteDateien[0].type == 'application/json' || gewaehlteDateien[0].name.match('.bcrt')) { // JSON!
+        formData.append('action', 'validateJSON');
+        formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
+        verificationMethod = 'json';
+    } else if (gewaehlteDateien[0].type == 'application/xml' || gewaehlteDateien[0].name.match('.xml')) { // XML!
+        formData.append('action', 'validateEDCI');
+        formData.append('file', gewaehlteDateien[0], gewaehlteDateien[0].name);
+        verificationMethod = 'xml';
     }
+
+    result = await postFormData(verificationStepUrl, formData);
+    console.log(result);
+
+    await sleep(sleepTime);
+    processMeta(result);
 }
 
 function handleDragOver(evt) {
@@ -280,6 +292,7 @@ async function processHash(hash, meta = '') {
     cert = await postData(verificationStepUrl, {
         action: 'hash',
         hash: hash,
+        verificationMethod: verificationMethod,
     }, true);
     console.log(cert);
     await sleep(sleepTime);
@@ -408,6 +421,7 @@ function processHashFromUrlParam(hashParam) {
             h_1.style.display = "block";
             p_hash.style.display = "block";
             p_hash.innerHTML = p_hash_default + ' <span style="color:#106F6F;">' + hashParam + '</span>';
+            verificationMethod = 'hash';
             processHash(hashParam);
         }
         else {

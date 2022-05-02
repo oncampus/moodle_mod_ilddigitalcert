@@ -34,16 +34,17 @@ class manager {
      * Revokes a certificate and send an email to the former subject of the certificate.
      *
      * @param \stdClass $issuedcertificate Object that contains the certificate that should dbe revoked.
-     * @param \core_user $fromuser Moodle user/certifier that revokes the certificate.
+     * @param \core_user $certifier Moodle user/certifier that revokes the certificate.
      * @param string $pk private key of the certifier.
      *
      * @return bool Returns false if the cert couldn´t be revoked, else true.
      */
-    public static function revoke($issuedcertificate, $fromuser, $pk) {
+    public static function revoke($issuedcertificate, $certifier, $pk) {
         global $DB, $CFG, $SITE;
 
-        require_once('web3lib.php');
-        $pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $fromuser);
+        $context = \context_module::instance($issuedcertificate->cmid);
+
+        $pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $certifier);
         if (!$pref) {
             \core\notification::error(get_string('not_a_certifier', 'mod_ilddigitalcert'));
             return false;
@@ -81,6 +82,17 @@ class manager {
         $issuedcertificate->edci = null;
 
         $DB->update_record('ilddigitalcert_issued', $issuedcertificate);
+
+        // Log certificate_registered event.
+        $event = \mod_ilddigitalcert\event\certificate_revoked::create(
+            array(
+                'context' => $context,
+                'objectid' => $issuedcertificate->id,
+                'userid' => $certifier->id,
+                'relateduserid' => $issuedcertificate->userid,
+            )
+        );
+        $event->trigger();
 
         if ($receiver = $DB->get_record('user', array('id' => $issuedcertificate->userid))) {
             // Email to user.
