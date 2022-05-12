@@ -40,14 +40,12 @@ class dcconnectorsettings_form extends \moodleform {
         $mform->addElement('text', 'dchost', get_string('dchost', 'mod_ilddigitalcert'), $attributes);
         $mform->addRule('dchost', null, 'required', null, 'client');
         $mform->setType('dchost', PARAM_RAW);
+        $mform->setDefault('dchost', '0');
 
         $mform->addElement('text', 'dcxapikey', get_string('dcxapikey', 'mod_ilddigitalcert'), $attributes);
         $mform->addRule('dcxapikey', null, 'required', null, 'client');
         $mform->setType('dcxapikey', PARAM_RAW);
-
-        $mform->addElement('text', 'dcconnectorid', get_string('dcconnectorid', 'mod_ilddigitalcert'), $attributes);
-        $mform->addRule('dcconnectorid', null, 'required', null, 'client');
-        $mform->setType('dcconnectorid', PARAM_RAW);
+        $mform->setDefault('dcxapikey', '0');
 
         $this->add_action_buttons(true, get_string('save'));
     }

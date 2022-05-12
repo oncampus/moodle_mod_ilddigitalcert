@@ -129,8 +129,7 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         }
         if (
             '0' != get_config('mod_ilddigitalcert', 'dchost') and
-            '0' != get_config('mod_ilddigitalcert', 'dcxapikey') and
-            '0' != get_config('mod_ilddigitalcert', 'dcconnectorid')
+            '0' != get_config('mod_ilddigitalcert', 'dcxapikey')
         ) {
             echo ' | ';
             echo html_writer::link(
@@ -253,8 +252,7 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         }
         if (
             '0' != get_config('mod_ilddigitalcert', 'dchost') and
-            '0' != get_config('mod_ilddigitalcert', 'dcxapikey') and
-            '0' != get_config('mod_ilddigitalcert', 'dcconnectorid')
+            '0' != get_config('mod_ilddigitalcert', 'dcxapikey')
         ) {
             create_certificate_files($issuedcertificate, $metacertificate);
 
