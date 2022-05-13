@@ -82,6 +82,7 @@ $string['configdesc_demo_mode'] = 'For demo or testing purposes enable this opti
 $string['criteria'] = 'Criteria';
 $string['data'] = 'Certificate data';
 $string['dcattributes'] = 'Digital campus attributes';
+$string['dcbirdid'] = 'BIRD id';
 $string['dcxapikey'] = 'API key';
 $string['dcconnectorid'] = 'Connector id';
 $string['dcconnectorsettings'] = 'Connector settings';

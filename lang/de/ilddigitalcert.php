@@ -81,6 +81,7 @@ $string['configdesc_demo_mode'] = 'Zum Ausprobieren und Testen des Plugins könn
 $string['criteria'] = 'Kriterien';
 $string['data'] = 'Zertifikatsdaten';
 $string['dcattributes'] = 'Digital Campus Attribute';
+$string['dcbirdid'] = 'BIRD ID';
 $string['dcxapikey'] = 'API Key';
 $string['dcconnectorid'] = 'Connector ID';
 $string['dcconnectorsettings'] = 'Connector-Einstellungen';

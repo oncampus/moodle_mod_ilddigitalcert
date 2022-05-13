@@ -234,6 +234,19 @@ function send_attributes($attributes, $walletid, $reason, $url, $xapikey) {
     $messagedata->content->body = get_string('body_new_attribute', 'mod_ilddigitalcert');
     $messagedata->content->requests[] = $request;
 
+    $dcbirdid = get_config('mod_ilddigitalcert', 'dcbirdid');
+    if (isset($dcbirdid) and $dcbirdid != '') {
+        $sharerequest = new stdClass();
+        $sharerequest->{'@type'} = 'AttributesShareRequest';
+        foreach ($attributes as $name => $value) {
+            $sharerequest->attributes[] = $name;
+        }
+        $sharerequest->recipients = array($dcbirdid);
+        $sharerequest->reason = $reason;
+
+        $messagedata->content->requests[] = $sharerequest;
+    }
+
     $messagedata = json_encode($messagedata, JSON_PRETTY_PRINT);
     $msgresult = callAPI('POST', $url.'/api/v1/Messages', $messagedata, $xapikey);
     return $msgresult;

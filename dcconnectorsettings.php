@@ -47,6 +47,7 @@ if (has_capability('moodle/site:config', $context)) {
         // get_config($plugin, $name) set_config($name, $value, $plugin)
         set_config('dchost', $fromform->dchost, 'mod_ilddigitalcert');
         set_config('dcxapikey', $fromform->dcxapikey, 'mod_ilddigitalcert');
+        set_config('dcbirdid', $fromform->dcbirdid, 'mod_ilddigitalcert');
         redirect($url);
     }
     echo $OUTPUT->header();
@@ -54,6 +55,7 @@ if (has_capability('moodle/site:config', $context)) {
     $toform = new stdClass();
     $toform->dchost = get_config('mod_ilddigitalcert', 'dchost');
     $toform->dcxapikey = get_config('mod_ilddigitalcert', 'dcxapikey');
+    $toform->dcbirdid = get_config('mod_ilddigitalcert', 'dcbirdid');
     $mform->set_data($toform);
     $mform->display();
 
