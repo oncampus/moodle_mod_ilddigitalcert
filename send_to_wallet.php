@@ -90,6 +90,7 @@ if ($walletid != 'error' and $relationshipid != 'error') {
             $messagedata->content->to = array($walletid);
             $messagedata->attachments = array($fileid);
             $messagedata = json_encode($messagedata, JSON_PRETTY_PRINT);
+
             $msgresult = callAPI('POST', $host.'/api/v1/Messages', $messagedata, $xapikey);
             $msgresult = json_decode($msgresult);
             if (isset($msgresult->error)) {
@@ -97,14 +98,18 @@ if ($walletid != 'error' and $relationshipid != 'error') {
             }
             // TODO Display success and link back to cert.
 
-            // send attribute THL.FLL.study_field to user wallet
-            $courseid = $issuedcert->courseid;
-            $value = get_subjectarea($courseid);
-            $reason = get_string('study_field', 'mod_ilddigitalcert');
-            $msgresult = send_attribute('THL.FLL.study_field', $value, $walletid, $reason, $host, $xapikey);
-            $msgresult = json_decode($msgresult);
-            if (isset($msgresult->error)) {
-                throw new coding_exception(get_string('msg_send_error', 'mod_ilddigitalcert'));
+            // send attributes (THL.FLL.study_field) to user wallet
+            //$courseid = $issuedcert->courseid;
+            //$value = get_subjectarea($courseid);
+            $attributes = get_dcattributes($id);
+            if (count($attributes) > 0) {
+                $reason = get_string('study_field', 'mod_ilddigitalcert');
+                //$msgresult = send_attributes('THL.FLL.study_field', $value, $walletid, $reason, $host, $xapikey);
+                $msgresult = send_attributes($attributes, $walletid, $reason, $host, $xapikey);
+                $msgresult = json_decode($msgresult);
+                if (isset($msgresult->error)) {
+                    throw new coding_exception(get_string('msg_send_error', 'mod_ilddigitalcert'));
+                }
             }
             echo '<p>'.get_string('send_certificate_to_wallet_success', 'mod_ilddigitalcert').'</p>';
             echo '<p>'.html_writer::link(

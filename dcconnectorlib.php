@@ -209,17 +209,21 @@ function get_pdfcontent($modulecontextid, $icid) {
  * @param string $xapikey API Key.
  * @return string Returns the response of the http request.
  */
-function send_attribute($name, $value, $walletid, $reason, $url, $xapikey) {
-    $attribute = new stdClass();
-    $attribute->{'@type'} = 'Attribute';
-    $attribute->name = $name;
-    $attribute->value = $value;
-    $attribute->validFrom = date('Y-m-d', time());
+function send_attributes($attributes, $walletid, $reason, $url, $xapikey) {
+    $dcattributes = array();
+    foreach ($attributes as $name => $value) {
+        $attribute = new stdClass();
+        $attribute->{'@type'} = 'Attribute';
+        $attribute->name = trim($name);
+        $attribute->value = trim($value);
+        $attribute->validFrom = date('Y-m-d', time());
+        $dcattributes[] = $attribute;
+    }
 
     $request = new stdClass();
     $request->{'@type'} = 'AttributesChangeRequest';
     $request->reason = $reason;
-    $request->attributes[] = $attribute;
+    $request->attributes = $dcattributes;
     $request->applyTo = $walletid;
 
     $messagedata = new stdClass();
@@ -255,4 +259,26 @@ function get_subjectarea($courseid) {
         }
     }
     return $subjectarea;
+}
+
+/**
+ * Gets additional course attributes for sending to enmeshed wallet.
+ *
+ * @param int $cmid
+ * @return array
+ */
+function get_dcattributes($cmid) {
+    global $DB;
+    $cm = get_coursemodule_from_id('ilddigitalcert', $cmid, 0, false, MUST_EXIST);
+    $moduleinstance = $DB->get_record('ilddigitalcert', array('id' => $cm->instance), '*', MUST_EXIST);
+    $attributes = $moduleinstance->dcattributes;
+    $lines = explode(PHP_EOL, $attributes);
+    $dcattributes = array();
+    foreach ($lines as $line) {
+        $attribute = explode(':', $line);
+        if (count($attribute) > 1) {
+            $dcattributes[$attribute[0]] = $attribute[1];
+        }
+    }
+    return $dcattributes;
 }

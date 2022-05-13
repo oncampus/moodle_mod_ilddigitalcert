@@ -422,5 +422,20 @@ function xmldb_ilddigitalcert_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2022030913, 'ilddigitalcert');
     }
 
+    if ($oldversion < 2022051200) {
+
+        // Define field dcattributes to be added to ilddigitalcert.
+        $table = new xmldb_table('ilddigitalcert');
+        $field = new xmldb_field('dcattributes', XMLDB_TYPE_TEXT, null, null, null, null, null, 'automation_report');
+
+        // Conditionally launch add field dcattributes.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Ilddigitalcert savepoint reached.
+        upgrade_mod_savepoint(true, 2022051200, 'ilddigitalcert');
+    }
+
     return true;
 }
