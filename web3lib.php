@@ -80,6 +80,9 @@ function get_contract_name($contractname) {
  * @return boolean True if the node is active, else false;
  */
 function check_node($url) {
+    if (PHPUNIT_TEST) {
+        return true;
+    }
     $web3 = new Web3(new HttpProvider(new HttpRequestManager($url, 30)));
     $success = false;
     $web3->eth->blockNumber(function ($err, $blocknumber) use (&$success) {
@@ -156,7 +159,7 @@ function get_contract_url($contractname) {
  * @param string $hash
  * @param int $startdate
  * @param int $enddate
- * @param string $pk Provate key.
+ * @param string $pk Private key.
  * @return stdClass Object containing transaction and certificate hashes.
  */
 function store_certificate($hash, $startdate, $enddate, $pk) {
@@ -448,7 +451,7 @@ function get_address_from_pk($pk) {
 }
 
 /**
- * Get the blockchain address of the institution a certifier identified by $address
+ * Get the blockchain address of an institution the certifier, that is identified by $address, belongs to.
  *
  * @param string $address
  * @return string

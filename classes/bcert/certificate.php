@@ -30,6 +30,8 @@ namespace mod_ilddigitalcert\bcert;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certificate {
+
+
     /** w3c verifiable credentials namespace. */
     const CRED_NAMESPACE = 'http://data.europa.eu/europass/model/credentials/w3c#';
 
@@ -48,7 +50,7 @@ class certificate {
     /** @var credential_subject The credential subject or holder. */
     private $credentialsubject;
 
-    /** @var string An openBadge requirement, that is cuurently left empty. Optional attribute. */
+    /** @var string Prerequisites for entering a course. Optional attribute.*/
     private $criteria;
 
     /** @var string Description. Optional attribute. */
@@ -69,14 +71,14 @@ class certificate {
     /** @var organization The issuing institution. */
     private $issuer;
 
-    /** @var qualification qualification info about the subject. */
+    /** @var qualification Qualification info about the subject. */
     private $qualification;
 
-    /** @var signature signature of the certifier. */
+    /** @var signature Signature of the certifier. */
     private $signature;
 
-    /**  @var array An openBadge requirement, that is cuurently left empty. Optional attribute. */
-    private $tags = [];
+    /**  @var array Tags for searchability of moodle courses. Optional attribute.*/
+    private $tags;
 
     /** @var string Title. */
     private $title;
@@ -188,9 +190,14 @@ class certificate {
         $new->qualification = qualification::new();
         $new->title = $ilddigitalcert->name;
         $new->validuntil = get_expiredate($ilddigitalcert->expiredate, $ilddigitalcert->expireperiod);
-        // TODO: Descide wether to use tags and criteria. Currently they're not, because the edci format does'nt support them yet.
-        $new->criteria = $ilddigitalcert->criteria;
-        $new->tags = $ilddigitalcert->tags;
+        // TODO: Implement tags and criteria in the ob and edci versions of the certificate
+        // TODO: Extend the edci-schema with tags and criteria.
+        if (!empty($ilddigitalcert->tags)) {
+            $new->tags = $ilddigitalcert->tags;
+        }
+        if (!empty($ilddigitalcert->criteria)) {
+            $new->criteria = $ilddigitalcert->criteria;
+        }
         return $new;
     }
 
@@ -241,6 +248,18 @@ class certificate {
             $cert->institutiontoken = (string) $xml->institutionToken;
         }
 
+        if (isset($xml->tags)) {
+            foreach ($xml->tags as $tag) {
+                if (!empty($tag)) {
+                    $cert->tags[] = (string) $tag->text;
+                }
+            }
+        }
+
+        if (isset($xml->criteria)) {
+            $cert->criteria = (string) $xml->criteria->text;
+        }
+
         return $cert;
     }
 
@@ -265,9 +284,17 @@ class certificate {
         $cert->agents[] = $cert->issuer;
 
         $cert->credentialsubject = credential_subject::from_ob($cert, $data);
+
         if (isset($data->badge->image)) {
             $cert->image = image::from_ob('image', $data->badge->image);
         }
+        if (isset($data->badge->tags)) {
+            $cert->tags = $data->badge->tags;
+        }
+        if (isset($data->badge->criteria)) {
+            $cert->criteria = $data->badge->criteria;
+        }
+
         if (isset($data->{'extensions:assertionpageB4E'})) {
             $cert->assertionpage = $data->{'extensions:assertionpageB4E'}->assertionpage;
         }
@@ -362,6 +389,14 @@ class certificate {
             '@context' => \mod_ilddigitalcert\bcert\manager::CONTEXT_B4E_BADGETEMPLATE,
             'type' => ["Extension", "BadgeTemplateB4E"]
         ];
+
+        if (isset($this->tags)) {
+            $badge->tags = $this->tags;
+        }
+        if (isset($this->criteria)) {
+            $badge->criteria = $this->criteria;
+        }
+
         if (isset($this->image)) {
             $badge->image = $this->image->get_ob();
         }
@@ -384,7 +419,7 @@ class certificate {
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                         xsdVersion="0.10.0"
                         xsi:schemaLocation="http://data.europa.eu/snb ' .
-                        'https://raw.githubusercontent.com/ild-thl/edci-schema-extensions/main/bc_edci_credential.xsd">
+            'https://raw.githubusercontent.com/ild-thl/edci-schema-extensions/main/bc_edci_credential.xsd">
                     </europassCredential>';
         $root = new mySimpleXMLElement($rootnode);
         $root->addAttribute('cred:id', $this->identifier, self::CRED_NAMESPACE);
@@ -444,6 +479,18 @@ class certificate {
         }
         if (isset($this->institutiontoken)) {
             $root->addChild('institutionToken', $this->institutiontoken);
+        }
+
+        if (isset($this->tags)) {
+            $tags = mySimpleXMLElement::create_empty('tags');
+            foreach ($this->tags as $tag) {
+                $tags->addtextnode('tag', $tag);
+            }
+            $root->addChild('tags', $tags);
+        }
+
+        if (isset($this->criteria)) {
+            $root->addtextnode('criteria', $this->criteria);
         }
 
         if (!$asstring) {

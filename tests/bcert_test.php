@@ -135,7 +135,9 @@ class bcert_test extends \advanced_testcase {
         $obfromob = $certfromob->get_ob();
         $this->assertEquals($openbadge, $obfromob);
 
-        $ob = json_decode($openbadge);
+        $json = json_decode($openbadge);
+        $ob = json_decode($obfromob);
+
         $this->assertIsString($ob->id);
         $this->assertIsString($ob->issuedOn);
         $this->assertIsString($ob->{'extensions:assertionpageB4E'}->assertionpage);
@@ -191,6 +193,26 @@ class bcert_test extends \advanced_testcase {
         } else {
             $this->assertObjectNotHasAttribute('date', $ob->{'extensions:examinationRegulationsB4E'});
         }
+        if (isset($json->badge->criteria)) {
+            $this->assertObjectHasAttribute('criteria', $ob->badge);
+        }
+        if (!isset($ilddigitalcert->criteria) || empty($ilddigitalcert->criteria)) {
+            $this->assertObjectNotHasAttribute('criteria', $ob->badge);
+        } else {
+            $this->assertIsString($ob->badge->criteria);
+            $this->assertNotEmpty($ob->badge->criteria);
+        }
+        if (isset($json->badge->tags)) {
+            $this->assertObjectHasAttribute('tags', $ob->badge);
+            $this->assertIsArray($ob->badge->tags);
+        }
+        if (!isset($ilddigitalcert->tags) || empty($ilddigitalcert->tags)) {
+            $this->assertObjectNotHasAttribute('tags', $ob->badge);
+        } else {
+            $this->assertIsArray($ob->badge->tags);
+            $this->assertNotEmpty($ob->badge->tags);
+            $this->assertEquals($ob->badge->tags[0], $ilddigitalcert->tags[0]);
+        }
 
         $edci = $cert->get_edci();
         $certfromedci = certificate::from_edci($edci);
@@ -233,6 +255,17 @@ class bcert_test extends \advanced_testcase {
             'With criteria' => [
                 'certdata' => [
                     'criteria' => 'criteria, criteria, criteria, criteria',
+                ]
+            ],
+            'With tags' => [
+                'certdata' => [
+                    'tags' => ["tag1", "tag2" , "tag3"],
+                ]
+            ],
+            'With criteria and tags' => [
+                'certdata' => [
+                    'criteria' => 'criteria, criteria, criteria, criteria',
+                    'tags' => ["tag1", "tag2" , "tag3"],
                 ]
             ],
             'With empty expertise' => [

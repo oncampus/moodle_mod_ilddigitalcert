@@ -69,13 +69,13 @@ class assessment_spec {
     public static function new($ilddigitalcert) {
         $new = new self();
         $new->id = 'urn:bcert:asssessmentspec:' . self::$count;
-        if (!isset($ilddigitalcert->examination_regulations_id)) {
+        if (isset($ilddigitalcert->examination_regulations_id)) {
             $new->identifier = $ilddigitalcert->examination_regulations_id;
         }
-        if (!isset($ilddigitalcert->examination_regulations)) {
+        if (isset($ilddigitalcert->examination_regulations)) {
             $new->title = $ilddigitalcert->examination_regulations;
         }
-        if (!isset($ilddigitalcert->examination_regulations_url)) {
+        if (isset($ilddigitalcert->examination_regulations_url)) {
             $new->homepage = $ilddigitalcert->examination_regulations_url;
         }
         if ($ilddigitalcert->examination_regulations_date > 0) {

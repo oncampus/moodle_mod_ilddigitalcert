@@ -56,6 +56,12 @@ class mod_ilddigitalcert_generator extends testing_module_generator {
         if (!isset($record->examination_place)) {
             $record->examination_place = 'Online';
         }
+        if (!isset($record->criteria)) {
+            $record->criteria = "";
+        }
+        if (!isset($record->tags)) {
+            $record->tags = [];
+        }
 
         return parent::create_instance($record, (array)$options);
     }
