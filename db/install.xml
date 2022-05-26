@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/ilddigitalcert/db" VERSION="20191018" COMMENT="XMLDB file for Moodle mod/ilddigitalcert"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+<XMLDB PATH="mod/ilddigitalcert/db" VERSION="20220512" COMMENT="XMLDB file for Moodle mod/ilddigitalcert"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
   <TABLES>
     <TABLE NAME="ilddigitalcert" COMMENT="Defines ilddigitalcert">
       <FIELDS>
@@ -29,6 +31,7 @@
         <FIELD NAME="auto_certifier" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="auto_pk" TYPE="char" LENGTH="512" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="automation_report" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="dcattributes" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for ilddigitalcert"/>

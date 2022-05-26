@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_ilddigitalcert';
 $plugin->release = '0.1.0';
-$plugin->version = 2022050215;
+$plugin->version = 2022051200;
 $plugin->requires = 2018051701;
 $plugin->maturity = MATURITY_BETA;

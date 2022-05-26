@@ -244,6 +244,16 @@ class mod_ilddigitalcert_mod_form extends moodleform_mod {
         $mform->addHelpButton('automation_report', 'automation_report:enable', 'mod_ilddigitalcert');
         $mform->setDefault('automation_report', 1);
 
+        // DC connector settings
+        $mform->addElement('header', 'dcconnectorheader', get_string('dcconnectorsettings', 'mod_ilddigitalcert'));
+
+        $mform->addElement(
+            'textarea',
+            'dcattributes',
+            get_string('dcattributes', 'mod_ilddigitalcert'),
+            'wrap="virtual" rows="5" cols="50"'
+        );
+
         // Add standard elements.
         $this->standard_coursemodule_elements();
 
