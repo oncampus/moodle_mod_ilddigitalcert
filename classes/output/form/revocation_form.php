@@ -100,8 +100,10 @@ class revocation_form extends \moodleform {
 
         // Write selected certs to the blockchain with the given private key.
         foreach ($certificates as $issuedcertificate) {
-            if (\mod_ilddigitalcert\manager::revoke($issuedcertificate, $USER, $data->pk)) {
+            if (\mod_ilddigitalcert\certificate_manager::revoke($issuedcertificate, $USER, $data->pk)) {
                 \core\notification::success(get_string('revoked', 'mod_ilddigitalcert'));
+            } else {
+                \core\notification::error(get_string('error_revoke_cert', 'mod_ilddigitalcert'));
             }
         }
 

@@ -16,9 +16,8 @@
 
 namespace mod_ilddigitalcert\bcert;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/mod/ilddigitalcert/web3lib.php');
+use mod_ilddigitalcert\web3_manager;
+use moodle_exception;
 
 /**
  * A verification object represents data that is essential for both
@@ -52,9 +51,16 @@ class contract {
     public static function new() {
         $new = new self();
 
-        $new->abi = get_contract_abi('CertMgmt');
-        $new->address = get_contract_address('CertMgmt');
-        $new->node = get_contract_url('CertMgmt');
+        $contract = web3_manager::get_certificate_contract();
+        $node = web3_manager::get_node();
+
+        if (!isset($contract) || !isset($node)) {
+            throw new moodle_exception('Could\'nt get contract and node from API');
+        }
+
+        $new->abi = json_encode($contract->contract_abi);
+        $new->address = $contract->contract_address;
+        $new->node = $node->url;
 
         return $new;
     }

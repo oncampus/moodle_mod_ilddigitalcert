@@ -20,6 +20,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 
+use mod_ilddigitalcert\certificate_manager;
+
 /**
  * Form that lets sign and register certificates in the blockchain.
  *
@@ -102,8 +104,9 @@ class to_blockchain_form extends \moodleform {
 
         // Write selected certs to the blockchain with the given private key.
         foreach ($certificates as $issuedcertificate) {
-            if (!to_blockchain($issuedcertificate, $USER, $data->pk)) {
+            if (!certificate_manager::to_blockchain($issuedcertificate, $USER, $data->pk)) {
                 \core\notification::error(get_string('error_register_cert', 'mod_ilddigitalcert'));
+                return;
             }
 
             $recipient = json_decode($issuedcertificate->metadata)->{'extensions:recipientB4E'};

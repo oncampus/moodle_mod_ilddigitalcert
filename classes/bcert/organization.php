@@ -24,7 +24,8 @@ namespace mod_ilddigitalcert\bcert;
  * @copyright   2020 ILD TH Lübeck <dev.ild@th-luebeck.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class organization {
+class organization
+{
 
     /** @var  int counter that gets incremented with every organization object that gets created, used to generate a unique id. */
     private static $count = 0;
@@ -59,7 +60,7 @@ class organization {
     /** @var string Post office box number. Optional attribute. */
     private $pob;
 
-    /** @var string Adress including location, zip and street. */
+    /** @var string Address including location, zip and street. */
     private $fulladdress;
 
     /** @var image Logo. Optional attribute. */
@@ -71,14 +72,16 @@ class organization {
     /**
      * @var string used as an unique identifier for the qualification.
      */
-    public function get_id() {
+    public function get_id()
+    {
         return $this->id;
     }
 
     /**
      * Constructor.
      */
-    private function __construct() {
+    private function __construct()
+    {
         self::$count += 1;
     }
 
@@ -88,7 +91,8 @@ class organization {
      * @param \stdClass $issuer
      * @return void
      */
-    public static function issuer($issuer) {
+    public static function issuer($issuer)
+    {
         $new = new self();
 
         $new->id = 'urn:bcert:org:' . self::$count;
@@ -122,7 +126,8 @@ class organization {
      * @param mySimpleXMLElement $xml Contains the organization information in edci format.
      * @return organization
      */
-    public static function from_edci($xml) {
+    public static function from_edci($xml)
+    {
         $org = new organization();
         $orgxml = $xml->agentReferences->organization[0];
         $org->id = $orgxml['id'];
@@ -152,7 +157,8 @@ class organization {
      * @param mySimpleXMLElement $json Contains the organization information in openBadge format.
      * @return organization
      */
-    public static function from_ob($data) {
+    public static function from_ob($data)
+    {
         $org = new organization();
         $org->id = 'urn:bcert:org:' . self::$count;
         $org->identifier = $data->badge->issuer->id;
@@ -180,7 +186,8 @@ class organization {
      *
      * @return \stdClass
      */
-    public function get_ob() {
+    public function get_ob()
+    {
         $issuer = new \stdClass();
         if (isset($this->altlabel)) {
             $issuer->description = $this->altlabel;
@@ -213,7 +220,8 @@ class organization {
      *
      * @return mySimpleXMLElement
      */
-    public function get_edci() {
+    public function get_edci()
+    {
         $root = mySimpleXMLElement::create_empty('organization');
         $root->addAttribute('id', $this->id);
         $root->addChild('identifier', manager::xml_escape($this->identifier));

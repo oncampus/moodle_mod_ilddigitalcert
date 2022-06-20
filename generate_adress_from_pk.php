@@ -23,7 +23,8 @@
  */
 
 require_once('../../config.php');
-require_once('web3lib.php');
+
+use mod_ilddigitalcert\web3_manager;
 
 require_login();
 
@@ -56,6 +57,6 @@ echo $prefix.'Private Key: ';
 echo $pk;
 echo '</p><p>';
 echo 'address: ';
-echo get_address_from_pk($pk);
+echo web3_manager::get_address_from_pk($pk);
 echo '</p>';
 echo $OUTPUT->footer();

@@ -24,7 +24,8 @@
 
 require_once(__DIR__.'/../../config.php');
 require_once('locallib.php');
-require_once('web3lib.php');
+
+use mod_ilddigitalcert\web3_manager;
 
 require_login();
 
@@ -39,13 +40,17 @@ if ($action == 'meta' and $meta != '') {
     $certhash = calculate_hash($meta);
     echo $certhash;
 } else if ($action == 'hash' and $hash != '') {
-    try {
-        $cert = get_certificate($hash);
-    } catch (InvalidArgumentException $e) {
-        $cert = new stdClass();
+    $cert = web3_manager::get_certificate($hash);
+    if (!isset($cert)) {
+        die(json_encode(null));
     }
-    $cert->startingDate = date('d.m.Y', intval($cert->startingDate));
-    if (intval($cert->endingDate) != 0) {
+
+    if (!is_object($cert->startingDate) && intval($cert->startingDate) != 0) {
+        $cert->startingDate = date('d.m.Y', intval($cert->startingDate));
+    } else {
+        $cert->startingDate = 'false';
+    }
+    if (!is_object($cert->endingDate) && intval($cert->endingDate) != 0) {
         $cert->endingDate = date('d.m.Y', intval($cert->endingDate));
     } else {
         $cert->endingDate = 'false';
@@ -131,17 +136,15 @@ if ($action == 'meta' and $meta != '') {
     $ipfshash = get_ipfs_hash($institutionprofile);
     $institution = get_institution($ipfshash);
     // TODO return object with image and url.
-    if (isset($institution->url)) {
+    if (property_exists($institution, 'url')) {
         $institution->description = $institution->name;
-    } else {
-        if ($meta != '') {
-            $metaobj = json_decode($meta);
-            $institution->url = $metaobj->badge->issuer->url;
-            $institution->name = $metaobj->badge->issuer->name;
-            $institution->description = $metaobj->badge->issuer->description;
-            $institution->image = $metaobj->badge->issuer->image;
-            $institution->meta = $meta;
-        }
+    } else if ($meta != '') {
+        $metaobj = json_decode($meta);
+        $institution->url = $metaobj->badge->issuer->url;
+        $institution->name = $metaobj->badge->issuer->name;
+        $institution->description = $metaobj->badge->issuer->description;
+        $institution->image = $metaobj->badge->issuer->image;
+        $institution->meta = $meta;
     }
     echo json_encode($institution);
 } else if ($action == 'cert' and $hash != '') {

@@ -19,7 +19,6 @@ namespace mod_ilddigitalcert;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/ilddigitalcert/locallib.php');
-require_once($CFG->dirroot . '/mod/ilddigitalcert/web3lib.php');
 
 /**
  * Library of utility functions for mod_ilddigitalcert.
@@ -29,90 +28,6 @@ require_once($CFG->dirroot . '/mod/ilddigitalcert/web3lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-
-    /**
-     * Revokes a certificate and send an email to the former subject of the certificate.
-     *
-     * @param \stdClass $issuedcertificate Object that contains the certificate that should dbe revoked.
-     * @param \core_user $certifier Moodle user/certifier that revokes the certificate.
-     * @param string $pk private key of the certifier.
-     *
-     * @return bool Returns false if the cert couldn´t be revoked, else true.
-     */
-    public static function revoke($issuedcertificate, $certifier, $pk) {
-        global $DB, $CFG, $SITE;
-
-        $context = \context_module::instance($issuedcertificate->cmid);
-
-        $pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $certifier);
-        if (!$pref) {
-            \core\notification::error(get_string('not_a_certifier', 'mod_ilddigitalcert'));
-            return false;
-        } else {
-            if ($pref != get_address_from_pk($pk)) {
-                \core\notification::error(get_string('wrong_private_key', 'mod_ilddigitalcert'));
-                return false;
-            }
-        }
-
-        if (!isset($issuedcertificate->certhash)) {
-            return false;
-        }
-
-        // If revocation successful.
-        if (!revoke_certificate($issuedcertificate->certhash, $pk)) {
-            return false;
-        }
-
-        // Unset metadata that describes properties of a signed certifiacte.
-        $metadata = $issuedcertificate->metadata;
-        $metadata = json_decode($metadata);
-        unset($metadata->{'extensions:institutionTokenILD'});
-        unset($metadata->{'extensions:contractB4E'});
-        unset($metadata->{'extensions:institutionTokenILD'});
-        unset($metadata->verification->{'extensions:verifyB4E'});
-
-        $json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        // Save hashes in db issued.
-        $issuedcertificate->inblockchain = false;
-        $issuedcertificate->certhash = null;
-        $issuedcertificate->txhash = null;
-        $issuedcertificate->metadata = $json;
-        $issuedcertificate->institution_token = null;
-        $issuedcertificate->edci = null;
-
-        $DB->update_record('ilddigitalcert_issued', $issuedcertificate);
-
-        // Log certificate_registered event.
-        $event = \mod_ilddigitalcert\event\certificate_revoked::create(
-            array(
-                'context' => $context,
-                'objectid' => $issuedcertificate->id,
-                'userid' => $certifier->id,
-                'relateduserid' => $issuedcertificate->userid,
-            )
-        );
-        $event->trigger();
-
-        if ($receiver = $DB->get_record('user', array('id' => $issuedcertificate->userid))) {
-            // Email to user.
-            $fromuser = \core_user::get_support_user();
-            $fullname = explode(' ', get_string('modulenameplural', 'mod_ilddigitalcert'));
-            $fromuser->firstname = $fullname[0];
-            $fromuser->lastname = $fullname[1];
-            $subject = get_string('subject_certificate_revoked', 'mod_ilddigitalcert');
-            $a = new \stdClass();
-            $a->fullname = $receiver->firstname . ' ' . $receiver->lastname;
-            $a->url = $CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $issuedcertificate->cmid;
-            $a->from = $SITE->fullname;
-            $messagehtml = get_string('message_certificate_revoked', 'mod_ilddigitalcert', $a);
-            $message = html_to_text($messagehtml);
-            email_to_user($receiver, $fromuser, $subject, $message, $messagehtml);
-        }
-        return true;
-    }
-
-
     /**
      * Renders the given certificates array as a html table.
      *

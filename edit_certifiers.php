@@ -25,8 +25,9 @@
 require_once(__DIR__.'/../../config.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once('locallib.php');
-require_once('web3lib.php');
 require_once($CFG->libdir.'/adminlib.php');
+
+use mod_ilddigitalcert\web3_manager;
 
 $context = context_system::instance();
 
@@ -68,7 +69,6 @@ if (isset($selecteduser)) {
     $msg = 'new_certifier_message';
     $msghtml = 'new_certifier_message_html';
     if ($useraddress != '') {
-
         $success = add_certifier($selecteduser->id, $useraddress, $adminpk);
         $msg = 'new_certifier_message';
         $msghtml = 'new_certifier_message_html';
@@ -90,7 +90,10 @@ if (isset($selecteduser)) {
     // If success: email to certifier.
     if ($success) {
         // Address of certification authority.
-        $adminaddress = get_institution_from_certifier($useraddress);
+        $adminaddress = web3_manager::get_institution_from_certifier($useraddress);
+        if (!$adminaddress) {
+            throw new moodle_exception('Institution address not found.');
+        }
         $msgstrings->institution = get_issuer_name_from_address($adminaddress);
         $msgstrings->from = $msgstrings->institution;
         $message = get_string($msg, 'mod_ilddigitalcert', $msgstrings);

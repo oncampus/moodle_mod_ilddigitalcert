@@ -27,7 +27,8 @@
 
 require_once(__DIR__.'/../../config.php');
 require_once('locallib.php');
-require_once('web3lib.php');
+
+use mod_ilddigitalcert\web3_manager;
 
 $context = context_system::instance();
 
@@ -50,7 +51,7 @@ if (isset($userpref) and strpos($userpref, 'not_registered_token') !== false) {
     if ($preftoken == $token) {
         $bytes = random_bytes(32);
         $newpk = strtoupper(bin2hex($bytes));
-        $newaddress = get_address_from_pk($newpk);
+        $newaddress = web3_manager::get_address_from_pk($newpk);
         // TODO: check if address already exists in Blockchain.
         // TODO: Testen! Zeile wurde als Bugfix entfernt // $newpk = strtoupper(bin2hex($bytes)); //.
         $a = new stdClass();
@@ -60,6 +61,7 @@ if (isset($userpref) and strpos($userpref, 'not_registered_token') !== false) {
         set_user_preference('mod_ilddigitalcert_certifier', 'not_registered_pk_'.$newaddress, $USER->id);
         // TODO: email to institution (email address from settings).
     } else {
+        $a = new stdClass();
         $a->fullname = $USER->firstname.' '.$USER->lastname;
         echo get_string('no_pref_found', 'mod_ilddigitalcert', $a); // TODO Text ändern (token ungültig).
     }
