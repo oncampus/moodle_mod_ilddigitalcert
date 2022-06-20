@@ -39,11 +39,12 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'settings_headerconfig',
         get_string('settings_headerconfig', 'mod_ilddigitalcert'),
-        get_string('settings_descconfig', 'mod_ilddigitalcert'), ''
+        get_string('settings_descconfig', 'mod_ilddigitalcert'),
+        ''
     ));
 
     $settings->add(new admin_setting_configcheckbox(
-        'ilddigitalcert/demo_mode',
+        'mod_ilddigitalcert/demo_mode',
         get_string('configlabel_demo_mode', 'mod_ilddigitalcert'),
         get_string('configdesc_demo_mode', 'mod_ilddigitalcert'),
         1)
@@ -51,19 +52,22 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext(
         'ilddigitalcert/blockchain_url',
         get_string('configlabel_blockchain_url', 'mod_ilddigitalcert'),
-        get_string('configdesc_blockchain_url', 'mod_ilddigitalcert'), 'http://quorum.th-luebeck.de:8545'
+        get_string('configdesc_blockchain_url', 'mod_ilddigitalcert'),
+        'http://quorum.th-luebeck.de:8545'
     ));
     $settings->add(new admin_setting_configtext(
         'ilddigitalcert/failover_url',
         get_string('configlabel_failover_url', 'mod_ilddigitalcert'),
-        get_string('configdesc_failover_url', 'mod_ilddigitalcert'), 'http://quorum.th-luebeck.de:8545'
+        get_string('configdesc_failover_url', 'mod_ilddigitalcert'),
+        'http://quorum.th-luebeck.de:8545'
     ));
 
 
     $settings->add(new admin_setting_heading(
         'settings_headerconfig_general',
         get_string('settings_headerconfig_general', 'mod_ilddigitalcert'),
-        '', ''
+        '',
+        ''
     ));
 
     $settings->add(new admin_setting_configcheckbox(

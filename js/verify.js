@@ -296,7 +296,7 @@ async function processHash(hash, meta = '') {
     }, true);
     console.log(cert);
     await sleep(sleepTime);
-    if (!('institution' in cert) || cert.institution == '0x0000000000000000000000000000000000000000') {
+    if (!cert || !('institution' in cert) || cert.institution == '0x0000000000000000000000000000000000000000') {
         // Hash not found in blockchain!
         p_6.style.display = "block";
         botti_3.style.display = "none";
@@ -325,8 +325,6 @@ async function processHash(hash, meta = '') {
         // Show certificate details.
         divCertData.style.display = "block";
         spanResultHash.innerHTML = hash;
-        let startDate = new Date(cert.startingDate);
-        let endDate = new Date(cert.endingDate);
         spanResultStart.innerHTML = cert.startingDate;
         if (cert.endingDate != 'false') {
             prespanResultEnd.style.display = "block";

@@ -314,9 +314,9 @@ class bcert_test extends \advanced_testcase {
     }
 
     private function create_config() {
-        set_config('demo_mode', 1, 'ilddigitalcert');
-        set_config('blockchain_url', 'http://quorum.th-luebeck.de:8545', 'ilddigitalcert');
-        set_config('failover_url', 'http://quorum.th-luebeck.de:8545', 'ilddigitalcert');
+        set_config('demo_mode', 1, 'mod_ilddigitalcert');
+        set_config('blockchain_url', 'http://quorum.th-luebeck.de:8545', 'mod_ilddigitalcert');
+        set_config('failover_url', 'http://quorum.th-luebeck.de:8545', 'mod_ilddigitalcert');
     }
 
     private function create_issuer($issuerdata = array()) {

@@ -311,4 +311,5 @@ $string['waiting_for_pk_generation'] = 'Warte auf Erstellung eines Private Key d
 $string['waiting_for_registration'] = 'Warte auf Registrierung in der Blockchain';
 $string['waiting_for_request'] = 'Warte auf Anfrage';
 $string['wrongcertidornotloggedin'] = 'Falsche Zertifikat ID';
+$string['wrong_private_key'] = 'Falscher privater Schlüssel.';
 $string['wrong_relationship'] = 'Die Verbindung Ihrer Wallet mit dem System ist fehlerhaft. Bitte wenden Sie sich an einen Administrator.';

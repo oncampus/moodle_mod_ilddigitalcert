@@ -24,10 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('web3lib.php');
 require_once(__DIR__ . '/vendor/autoload.php');
 
 use mod_ilddigitalcert\bcert\certificate;
+use mod_ilddigitalcert\web3_manager;
+use mod_ilddigitalcert\certificate_manager;
 
 /**
  * Initiates and controls the download of the certificate in the requested format.
@@ -159,108 +160,6 @@ function get_pdf_footerhtml($hash) {
 }
 
 /**
- * Stores a hash of an openBadge certificate in the clockchain.
- * Before calculating the hash the signature and institution token has to be added to the certificate.
- *
- * @param stdClass $issuedcertificate stdClass that contains the data that needs to be stored in the bc.
- * @param core_user $certifier Moodle user that signs the certificate.
- * @param string $pk private key of the certifier.
- * @return bool Returns false if the cert couldn´t be written to the blockchain.
- */
-function to_blockchain($issuedcertificate, $certifier, $pk) {
-    global $DB, $SITE;
-
-    $context = context_module::instance($issuedcertificate->cmid);
-    $pref = get_user_preferences('mod_ilddigitalcert_certifier', false, $certifier);
-    if (!$pref) {
-        throw new moodle_exception('not_a_certifier', 'mod_ilddigitalcert');
-    } else {
-        if ($pref != get_address_from_pk($pk)) {
-            \core\notification::error(get_string('wrong_private_key', 'mod_ilddigitalcert'));
-            return false;
-        }
-    }
-
-    if (isset($issuedcertificate->txhash)) {
-        return false;
-    }
-
-    $metacertificate = certificate::from_ob($issuedcertificate->metadata);
-
-    // Add signature.
-    $metacertificate->sign($certifier, $issuedcertificate->courseid);
-
-    // Save salt/token to file.
-    if (!$tokenid = save_token()) {
-        $tokenid = 'error';
-    }
-    $salt = get_token($tokenid);
-
-    // Calculate hash with $salt.
-    $hash = $metacertificate->get_ob_hash($salt);
-
-    $startdate = strtotime($metacertificate->get_issuedon());
-    if ($metacertificate->get_validuntil() !== null) {
-        $enddate = strtotime($metacertificate->get_validuntil());
-    } else {
-        if (get_config('ilddigitalcert', 'demo_mode')) {
-            $enddate = 9999999999;
-        } else {
-            $enddate = 0;
-        }
-    }
-    if ($enddate != 0 and $enddate <= $startdate) {
-        \core\notification::error('Certificate endate cannot be before the stardate.');
-        return false;
-    }
-
-    $hashes = save_hash_in_blockchain($hash, $startdate, $enddate, $pk);
-    if (isset($hashes->txhash)) {
-        // Add verification.
-        $metacertificate->add_verification($hash);
-        // Save hashes in db issued.
-        $issuedcertificate->inblockchain = true;
-        $issuedcertificate->certhash = $hashes->certhash;
-        $issuedcertificate->txhash = $hashes->txhash;
-        $issuedcertificate->metadata = $metacertificate->get_ob();
-        $issuedcertificate->edci = $metacertificate->get_edci();
-        $issuedcertificate->institution_token = $tokenid;
-
-        // Update db record.
-        $DB->update_record('ilddigitalcert_issued', $issuedcertificate);
-
-        // Log certificate_registered event.
-        $event = \mod_ilddigitalcert\event\certificate_registered::create(
-            array(
-                'context' => $context,
-                'objectid' => $issuedcertificate->id,
-                'userid' => $certifier->id,
-                'relateduserid' => $issuedcertificate->userid,
-            )
-        );
-        $event->trigger();
-
-        if ($receiver = $DB->get_record('user', array('id' => $issuedcertificate->userid))) {
-            // Email to user.
-            $fromuser = core_user::get_support_user();
-            $fullname = explode(' ', get_string('modulenameplural', 'mod_ilddigitalcert'));
-            $fromuser->firstname = $fullname[0];
-            $fromuser->lastname = $fullname[1];
-            $subject = get_string('subject_new_digital_certificate', 'mod_ilddigitalcert');
-            $a = new stdClass();
-            $a->fullname = $receiver->firstname . ' ' . $receiver->lastname;
-            $a->url = (new \moodle_url('/mod/ilddigitalcert/view.php', array('id' => $issuedcertificate->cmid)))->out();
-            $a->from = $SITE->fullname;
-            $messagehtml = get_string('message_new_digital_certificate_html', 'mod_ilddigitalcert', $a);
-            $message = html_to_text($messagehtml);
-            email_to_user($receiver, $fromuser, $subject, $message, $messagehtml);
-        }
-        return true;
-    }
-    return false;
-}
-
-/**
  * Creates a random hexadecimal string and writes it to a file
  * located in $CFG->dataroot.'/ilddigitalcert_data.
  *
@@ -324,24 +223,6 @@ function calculate_hash($metadatajson) {
     $metadatajson = json_encode($metadata, JSON_UNESCAPED_SLASHES);
     $hash = '0x'.hash('sha256', $metadatajson);
     return $hash;
-}
-
-/**
- * Writes a hash to the blockchain.
- *
- * @param string $hash Hashed certificate.
- * @param int $startdate Start of certificate validity.
- * @param int $enddate End of certificate validity.
- * @param string $pk Private key of the certifier.
- * @return object|bool Returns a hash or false, if the hash couldn't be stored.
- */
-function save_hash_in_blockchain($hash, $startdate, $enddate, $pk) {
-    $hashes = store_certificate($hash, $startdate, $enddate, $pk);
-
-    if (isset($hashes->txhash)) {
-        return $hashes;
-    }
-    return false;
 }
 
 /**
@@ -635,7 +516,7 @@ function issue_certificate($certificate, $cm) {
     if ($certsettings->automation && $certsettings->auto_certifier && $certsettings->auto_pk) {
         if ($certifier = $DB->get_record('user', array('id' => $certsettings->auto_certifier), '*', IGNORE_MISSING)) {
             if ($pk = \mod_ilddigitalcert\crypto_manager::decrypt($certsettings->auto_pk)) {
-                if (to_blockchain($issued, $certifier, $pk)) {
+                if (certificate_manager::to_blockchain($issued, $certifier, $pk)) {
                     return $issued->metadata;
                 }
             }
@@ -786,21 +667,8 @@ function add_certifier($userid, $useraddress, $adminpk) {
         );
     }
     // Add to blockchain.
-    add_certifier_to_blockchain($useraddress, $adminpk);
-    // If success (isAccreditedCertifier).
-    $start = time();
-    $ac = false;
-    while (1) {
-        $now = time();
-        if ($ac = is_accredited_certifier($useraddress)) {
-            break;
-        }
-        if ($now - $start > 30) {
-            break;
-        }
-    }
-    if ($ac) {
-        // Add Userpref.
+    if (web3_manager::add_certifier_to_blockchain($useraddress, $adminpk)) {
+        // If added certifier successfully, add userpref.
         set_user_preference('mod_ilddigitalcert_certifier', $useraddress, $userid);
         return true;
     } else {
@@ -823,51 +691,40 @@ function add_certifier($userid, $useraddress, $adminpk) {
  */
 function remove_certifier($userprefid, $adminpk) {
     global $DB;
-    if ($userpref = $DB->get_record('user_preferences', array('id' => $userprefid))) {
-        $useraddress = $userpref->value;
-        if (is_accredited_certifier($useraddress)) {
-            // Remove certifier from blockchain.
-            remove_certifier_from_blockchain($useraddress, $adminpk);
-            $start = time();
-            $ac = true;
-            while (1) {
-                $now = time();
-                $ac = is_accredited_certifier($useraddress);
-                if (!$ac) {
-                    break;
-                }
-                if ($now - $start > 30) {
-                    break;
-                }
-            }
-            if ($ac) {
-                throw new coding_exception(
-                    'error_while_removing_certifier_from_blockchain',
-                    'mod_ilddigitalcert',
-                    new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
-                );
-            } else {
-                // If success, delete from userpref.
-                unset_user_preference('mod_ilddigitalcert_certifier', $userpref->userid);
-                // TODO Email to ex-certifier.
-                return true;
-            }
-        } else {
-            unset_user_preference('mod_ilddigitalcert_certifier', $userpref->userid);
-            throw new moodle_exception(
-                'certifier_already_removed_from_blockchain',
-                'mod_ilddigitalcert',
-                new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
-            );
-        }
-    } else {
+    if (!$userpref = $DB->get_record('user_preferences', array('id' => $userprefid))) {
+        // Not a certifier.
         throw new moodle_exception(
             'certifier_already_removed_from_blockchain',
             'mod_ilddigitalcert',
             new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
         );
     }
-    return false;
+
+    $useraddress = $userpref->value;
+
+    if (!web3_manager::is_accredited_certifier($useraddress)) {
+        // Certifier already removed.
+        unset_user_preference('mod_ilddigitalcert_certifier', $userpref->userid);
+        throw new moodle_exception(
+            'certifier_already_removed_from_blockchain',
+            'mod_ilddigitalcert',
+            new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
+        );
+    }
+
+    // Remove certifier from blockchain.
+    if (!web3_manager::remove_certifier_from_blockchain($useraddress, $adminpk)) {
+        throw new coding_exception(
+            'error_while_removing_certifier_from_blockchain',
+            'mod_ilddigitalcert',
+            new moodle_url('/mod/ilddigitalcert/edit_certifiers.php')
+        );
+    }
+
+    // If success, delete from userpref.
+    unset_user_preference('mod_ilddigitalcert_certifier', $userpref->userid);
+    // TODO Email to ex-certifier.
+    return true;
 }
 
 /**
