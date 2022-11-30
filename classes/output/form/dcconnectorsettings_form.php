@@ -47,8 +47,8 @@ class dcconnectorsettings_form extends \moodleform {
         $mform->setType('dcxapikey', PARAM_RAW);
         $mform->setDefault('dcxapikey', '0');
 
-        $mform->addElement('text', 'dcbirdid', get_string('dcbirdid', 'mod_ilddigitalcert'), $attributes);
-        $mform->setType('dcbirdid', PARAM_RAW);
+        $mform->addElement('text', 'dcconnectoraddress', get_string('dcconnectoraddress', 'mod_ilddigitalcert'), $attributes);
+        $mform->setType('dcconnectoraddress', PARAM_RAW);
         $mform->setDefault('dcxapikey', '');
 
         $this->add_action_buttons(true, get_string('save'));

@@ -55,6 +55,7 @@ echo $OUTPUT->header();
 
 $host = get_config('mod_ilddigitalcert', 'dchost');
 $xapikey = get_config('mod_ilddigitalcert', 'dcxapikey');
+$dcconnectoraddress = get_config('mod_ilddigitalcert', 'dcconnectoraddress');
 // $dcconnectorid = get_config('mod_ilddigitalcert', 'dcconnectorid');
 $walletid = get_user_preferences('mod_ilddigitalcert_wallet_id', 'error', $USER->id);
 $relationshipid = get_user_preferences('mod_ilddigitalcert_relationship_id', 'error', $USER->id);
@@ -64,11 +65,11 @@ if ($walletid != 'error' and $relationshipid != 'error') {
     $mform = new mod_ilddigitalcert\output\form\dcconnectorconfirm_form($url);
     if ($fromform = $mform->get_data()) {
         // Check if relationship exists between our dcconnectorid and wallet id.
-        $relresult = callAPI('GET', $host.'/api/v1/Relationships/'.$relationshipid, false, $xapikey);
+        $relresult = callAPI('GET', $host.'/api/v2/Relationships/'.$relationshipid, false, $xapikey);
         $relresult = json_decode($relresult);
+        
         if (isset($relresult->result->peer) and
-                $relresult->result->peer == $walletid
-                ) {
+                $relresult->result->peer == $walletid) {
             // Upload pdf.
             $modulecontext = context_module::instance($id);
             /*
@@ -76,14 +77,18 @@ if ($walletid != 'error' and $relationshipid != 'error') {
             '&icid='.$issuedcert->id.'&cmid='.$id.'&download=pdf';
             $fileid = uploadpdf($filename, $issuedcert->name);
             */
+
+            //*  comment: Disable sending file
             $pdfcontent = get_pdfcontent($modulecontext->id, $issuedcert->id);
             $fileid = uploadpdf($pdfcontent, $issuedcert->name);
             if (!$fileid) {
                 throw new moodle_exception(get_string('file_upload_error', 'mod_ilddigitalcert'));
             }
+            //print_object($fileid);die();
             // Send cert to wallet.
             $messagedata = new stdClass();
             $messagedata->recipients = array($walletid);
+            $messagedata->content = new stdClass();
             $messagedata->content->{'@type'} = 'Mail';
             $messagedata->content->body = get_string('message_sendtowallet_body', 'mod_ilddigitalcert');
             $messagedata->content->subject = get_string('message_sendtowallet_subject', 'mod_ilddigitalcert');
@@ -91,14 +96,16 @@ if ($walletid != 'error' and $relationshipid != 'error') {
             $messagedata->attachments = array($fileid);
             $messagedata = json_encode($messagedata, JSON_PRETTY_PRINT);
 
-            $msgresult = callAPI('POST', $host.'/api/v1/Messages', $messagedata, $xapikey);
+            $msgresult = callAPI('POST', $host.'/api/v2/Messages', $messagedata, $xapikey);
             $msgresult = json_decode($msgresult);
             if (isset($msgresult->error)) {
                 throw new coding_exception(get_string('msg_send_error', 'mod_ilddigitalcert'));
             }
             // TODO Display success and link back to cert.
+            //*/
 
-            // send attributes (THL.FLL.study_field) to user wallet
+            //*
+            // send attributes (Study.planning.field_of_interest) to user wallet
             //$courseid = $issuedcert->courseid;
             //$value = get_subjectarea($courseid);
             $attributes = get_dcattributes($id);
@@ -111,6 +118,7 @@ if ($walletid != 'error' and $relationshipid != 'error') {
                     throw new coding_exception(get_string('msg_send_error', 'mod_ilddigitalcert'));
                 }
             }
+            //*/
             echo '<p>'.get_string('send_certificate_to_wallet_success', 'mod_ilddigitalcert').'</p>';
             echo '<p>'.html_writer::link(
                 new moodle_url('/mod/ilddigitalcert/view.php?id='.$id),
@@ -131,7 +139,8 @@ if ($walletid != 'error' and $relationshipid != 'error') {
         // If template id exists.
         echo '<p>'.get_string('scan_qr_code', 'mod_ilddigitalcert').'</p>';
         // ... /RelationshipTemplates/<templateid>/Token [image] (siehe Header).
-        $image = callAPI('POST', $host.'/api/v1/RelationshipTemplates/Own/'.$templateid.'/Token', '{}', $xapikey, true);
+        //$image = callAPI('POST', $host.'/api/v2/RelationshipTemplates/Own/'.$templateid.'/Token', '{}', $xapikey, true);
+        $image = callAPI('GET', $host.'/api/v2/RelationshipTemplates/'.$templateid, '', $xapikey, true);
         $image = base64_encode($image);
         echo '<p><img src="data:image/png;base64,'.$image.'"/></p>';
         // Polling...
@@ -139,12 +148,52 @@ if ($walletid != 'error' and $relationshipid != 'error') {
         echo '<script src="./js/dcc.js"></script>';
     } else {
         // If no template id exists.
+        // create Identity Attribute
+        $data = '{
+            "content": {
+                "@type": "IdentityAttribute",
+                "owner": "'.$dcconnectoraddress.'",
+                "value": {
+                    "@type": "DisplayName",
+                    "value": "Connector Tutorial"
+                }
+            }
+        }';
+        $result = callAPI('POST', $host.'/api/v2/Attributes', $data, $xapikey);
+        if (isset($result->error)) {
+            throw new coding_exception($result->error->message);
+        }
+        else {
+            //print_object(json_encode(json_decode($result), JSON_PRETTY_PRINT));die();
+            $attributeid = json_decode($result)->result->id;
+        }
+        $data = file_get_contents('request_items.json');
+        $datajson = json_decode($data);
+        $issuername = 'TH Lübeck'; // TODO get name from e.g. moodle site name
+        if ($cm = $DB->get_record('course_modules', array('id' => $id))) {
+            if ($cert = $DB->get_record('ilddigitalcert', array('id' => $cm->instance))) {
+                if ($issuer = $DB->get_record('ilddigitalcert_issuer', array('id' => $cert->issuer))) {
+                    $issuername = $issuer->name;
+                }
+            }
+        }
+        $datajson->items[0]->items[0]->attribute->value->value = $issuername;
+        $datajson->items[0]->items[0]->sourceAttributeId = $attributeid;
+        //print_object($datajson);die();
+        //$request_items = json_encode($datajson);
+
         $data = file_get_contents('relationship_template.json');
+        
         $data = json_decode($data);
+        //print_object($data);die();
         $data->expiresAt = date('c', time() + 60 * 60 * 24);
+        $data->content->onNewRelationship = $datajson;
+        //print_object($data);die();
         $data = json_encode($data);
-        $result = callAPI('POST', $host.'/api/v1/RelationshipTemplates/Own', $data, $xapikey);
+        //print_object(json_encode(json_decode($data), JSON_PRETTY_PRINT));die();
+        $result = callAPI('POST', $host.'/api/v2/RelationshipTemplates/Own', $data, $xapikey);
         $result = json_decode($result);
+        //print_object($result);die();
         if (isset($result->error)) {
             throw new coding_exception($result->error->message);
         }

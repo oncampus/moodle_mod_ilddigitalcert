@@ -1,0 +1,57 @@
+{
+    
+        "items": [
+            {
+                "@type": "RequestItemGroup",
+                "mustBeAccepted": true,
+                "title": "Shared Attributes",
+                "items": [
+                    {
+                        "@type": "ShareAttributeRequestItem",
+                        "mustBeAccepted": true,
+                        "attribute": {
+                            "@type": "IdentityAttribute",
+                            "owner": "",
+                            "value": {
+                                "@type": "DisplayName",
+                                "value": "Technische Hochschule Lübeck"
+                            }
+                        },
+                        "sourceAttributeId": "<the id of the attribute created above>"
+                    }
+                ]
+            },
+            {
+                "@type": "RequestItemGroup",
+                "mustBeAccepted": true,
+                "title": "Requested Attributes",
+                "items": [
+                    {
+                        "@type": "ReadAttributeRequestItem",
+                        "mustBeAccepted": true,
+                        "query": {
+                            "@type": "IdentityAttributeQuery",
+                            "valueType": "GivenName"
+                        }
+                    },
+                    {
+                        "@type": "ReadAttributeRequestItem",
+                        "mustBeAccepted": true,
+                        "query": {
+                            "@type": "IdentityAttributeQuery",
+                            "valueType": "Surname"
+                        }
+                    },
+                    {
+                        "@type": "ReadAttributeRequestItem",
+                        "mustBeAccepted": true,
+                        "query": {
+                            "@type": "IdentityAttributeQuery",
+                            "valueType": "EMailAddress"
+                        }
+                    }
+                ]
+            }
+        ]
+    
+}

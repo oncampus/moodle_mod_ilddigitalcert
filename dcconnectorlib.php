@@ -41,10 +41,31 @@ function checkrequest($request) {
     $lastname = $request->content->content->attributes->{'Person.familyName'}->value;
     $email = $request->content->content->attributes->{'Comm.email'}->value;
     */
+    $firstname = '';
+    $lastname = '';
+    $email = '';
+
+    $items = $request->changes[0]->request->content->response->items;
+    foreach ($items as $item) {
+        foreach ($item->items as $it) {
+            if ($it->{'@type'} == 'ReadAttributeAcceptResponseItem') {
+                if ($it->attribute->value->{'@type'} == 'GivenName') {
+                    $firstname = $it->attribute->value->value;
+                }
+                else if ($it->attribute->value->{'@type'} == 'Surname') {
+                    $lastname = $it->attribute->value->value;
+                }
+                else if ($it->attribute->value->{'@type'} == 'EMailAddress') {
+                    $email = $it->attribute->value->value;
+                }
+            }
+        }
+    }
+    /*
     $firstname = $request->changes[0]->request->content->attributes->{'Person.givenName'}->value;
     $lastname = $request->changes[0]->request->content->attributes->{'Person.familyName'}->value;
     $email = $request->changes[0]->request->content->attributes->{'Comm.email'}->value;
-    /*
+    
     print_object('$USER: '.$USER->firstname.' '.$USER->lastname.' '.$USER->email);
     print_object('$request: '.$firstname.' '.$lastname.' '.$email);
     */
@@ -170,7 +191,7 @@ function uploadpdf($pdfcontent, $certname) {
     }
     $filename = $CFG->dataroot.'/temp/ilddigitalcert/dcconnector/'.$certname.'_'.uniqid().'.pdf';
     file_put_contents($filename, $filecontent);
-    $uploadresult = callAPIpdfUpload($filename, $title, $description, $host.'/api/v1/Files/Own', $xapikey);
+    $uploadresult = callAPIpdfUpload($filename, $title, $description, $host.'/api/v2/Files/Own', $xapikey);
     unlink($filename);
     $resultobj = json_decode($uploadresult);
     if (isset($resultobj->result->id)) {
@@ -210,45 +231,52 @@ function get_pdfcontent($modulecontextid, $icid) {
  * @return string Returns the response of the http request.
  */
 function send_attributes($attributes, $walletid, $reason, $url, $xapikey) {
-    $dcattributes = array();
+    $items = array();
     foreach ($attributes as $name => $value) {
         $attribute = new stdClass();
-        $attribute->{'@type'} = 'Attribute';
-        $attribute->name = trim($name);
-        $attribute->value = trim($value);
-        $attribute->validFrom = date('Y-m-d', time());
-        $dcattributes[] = $attribute;
+        $attribute->{'@type'} = 'CreateAttributeRequestItem';
+        //$attribute->{'@type'} = 'AuthenticationRequestItem';
+        $attribute->mustBeAccepted = true;
+        $attribute->title = get_string('subject_new_attribute', 'mod_ilddigitalcert');
+        //*
+        $attribute->attribute = new stdClass();
+        $attribute->attribute->{'@type'} = 'RelationshipAttribute';
+        $attribute->attribute->owner = get_config('mod_ilddigitalcert', 'dcconnectoraddress');
+        $attribute->attribute->validFrom = date('Y-m-d', time());
+        $attribute->attribute->validTo = date('Y-m-d', time() + 60*60*24*365*10);
+        $attribute->attribute->key = $name;
+        $attribute->attribute->value = new stdClass();
+        $attribute->attribute->value->{'@type'} = 'ProprietaryString';
+        $attribute->attribute->value->title = $name;
+        $attribute->attribute->value->value = $value;
+        $attribute->attribute->isTechnical = false;
+        $attribute->attribute->confidentiality = 'protected'; // "public" | "protected" | "private"
+        //*/
+        $items[] = $attribute;
     }
 
     $request = new stdClass();
-    $request->{'@type'} = 'AttributesChangeRequest';
-    $request->reason = $reason;
-    $request->attributes = $dcattributes;
-    $request->applyTo = $walletid;
+    //$request->{'@type'} = 'AttributesChangeRequest';
+    $request->content = new stdClass();
+    $request->content->items = $items;
+    //$request->reason = $reason;
+    //$request->attributes = $dcattributes;
+    //$request->applyTo = $walletid;
+    $request->peer = $walletid;
+    //print_object(json_encode($request, JSON_PRETTY_PRINT));
+    //$msgresult = callAPI('POST', $url.'/api/v2/Requests/Outgoing/Validate', json_encode($request), $xapikey);
+    //print_object(json_encode(json_decode($msgresult), JSON_PRETTY_PRINT));die();
+
+    $response = callAPI('POST', $url.'/api/v2/Requests/Outgoing', json_encode($request), $xapikey);
+    //print_object(json_encode(json_decode($response), JSON_PRETTY_PRINT));die();
 
     $messagedata = new stdClass();
     $messagedata->recipients = array($walletid);
-    $messagedata->content->{'@type'} = 'RequestMail';
-    $messagedata->content->to = array($walletid);
-    $messagedata->content->subject = get_string('subject_new_attribute', 'mod_ilddigitalcert');
-    $messagedata->content->body = get_string('body_new_attribute', 'mod_ilddigitalcert');
-    $messagedata->content->requests[] = $request;
-
-    $dcbirdid = get_config('mod_ilddigitalcert', 'dcbirdid');
-    if (isset($dcbirdid) and $dcbirdid != '') {
-        $sharerequest = new stdClass();
-        $sharerequest->{'@type'} = 'AttributesShareRequest';
-        foreach ($attributes as $name => $value) {
-            $sharerequest->attributes[] = $name;
-        }
-        $sharerequest->recipients = array($dcbirdid);
-        $sharerequest->reason = $reason;
-
-        $messagedata->content->requests[] = $sharerequest;
-    }
-
+    $messagedata->content = json_decode($response)->result->content;
     $messagedata = json_encode($messagedata, JSON_PRETTY_PRINT);
-    $msgresult = callAPI('POST', $url.'/api/v1/Messages', $messagedata, $xapikey);
+    //print_object($messagedata);die();
+
+    $msgresult = callAPI('POST', $url.'/api/v2/Messages', $messagedata, $xapikey);
     return $msgresult;
 }
 

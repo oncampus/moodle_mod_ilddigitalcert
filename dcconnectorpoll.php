@@ -37,19 +37,22 @@ if (isguestuser()) {
 
 $host = get_config('mod_ilddigitalcert', 'dchost');
 $xapikey = get_config('mod_ilddigitalcert', 'dcxapikey');
-callAPI('POST', $host.'/api/v1/Account/Sync', false, $xapikey);
-$apiresult = callAPI('GET', $host.'/api/v1/Relationships', false, $xapikey);
+callAPI('POST', $host.'/api/v2/Account/Sync', false, $xapikey);
+
+$apiresult = callAPI('GET', $host.'/api/v2/Relationships', false, $xapikey);
+
 $apiresult = json_decode($apiresult);
 $templateid = get_user_preferences('mod_ilddigitalcert_template_id', 'error', $USER->id);
 foreach ($apiresult->result as $ar) {
     if ($templateid == $ar->template->id) {
         if (count($ar->changes) == 1) {
+            
             if (checkrequest($ar)) {
                 // Accept request.
                 $data = '{"content": {}}';
                 $acceptresult = callAPI(
                     'PUT',
-                    $host.'/api/v1/Relationships/'.$ar->id.'/Changes/'.$ar->changes[0]->id.'/Accept',
+                    $host.'/api/v2/Relationships/'.$ar->id.'/Changes/'.$ar->changes[0]->id.'/Accept',
                     $data,
                     $xapikey
                 );
