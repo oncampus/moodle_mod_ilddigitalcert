@@ -145,6 +145,9 @@ if ($walletid != 'error' and $relationshipid != 'error') {
         $data = json_encode($data);
         $result = callAPI('POST', $host.'/api/v1/RelationshipTemplates/Own', $data, $xapikey);
         $result = json_decode($result);
+        if (isset($result->error)) {
+            throw new coding_exception($result->error->message);
+        }
         set_user_preference('mod_ilddigitalcert_template_id', $result->result->id, $USER->id);
         redirect($CFG->wwwroot.'/mod/ilddigitalcert/send_to_wallet.php?id='.$id);
     }
