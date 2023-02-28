@@ -202,6 +202,7 @@ $string['message_sendtowallet_subject'] = 'Your digital certificate';
 $string['message_sendtowallet_body'] = 'Attached to this message you receive your digital certificate. You can also find your certificate in the folder "Files".';
 $string['missingcertid'] = 'Certificate id is missing';
 $string['msg_send_error'] = 'Error while sending message';
+$string['mycertificates'] = 'My certificates';
 $string['new_certifier_message'] = 'Hello {$a->fullname}
 
 You were added as a new certifier for the issuing institution {a->institution} on {$a->url}
