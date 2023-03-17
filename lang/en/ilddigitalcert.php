@@ -104,6 +104,7 @@ $string['eventcertificateissued'] = 'Certificate issued';
 $string['eventcertificateregistered'] = 'Certificate registered';
 $string['eventcertificatereissued'] = 'Certificate reissued';
 $string['eventcertificaterevoked'] = 'Certificate revoked';
+$string['eventcertificateviewed'] = 'Viewed certificate';
 $string['eventverificationcompleted'] = 'Verification completed';
 $string['examination_end'] = 'Examniation end';
 $string['examination_place'] = 'Examniation place';

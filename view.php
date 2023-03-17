@@ -169,6 +169,12 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
     echo html_writer::link($CFG->wwwroot . '/mod/ilddigitalcert/view.php?id=' . $id . '&ueid=' . $ueid, get_string('back'));
     echo '</p>';
     echo $OUTPUT->footer();
+    $event = \mod_ilddigitalcert\event\certificate_viewed::create(
+        array('context' => $modulecontext, 
+              'objectid' => $issuedcertificate->id, 
+              'relateduserid' => $USER->id)
+    );
+    $event->trigger();
 } else if (has_capability('moodle/grade:viewall', context_course::instance($course->id)) and $view == 'preview') {
     // Vorschau anzeigen.
     echo $OUTPUT->header();
@@ -289,4 +295,10 @@ if ($issuedid > 0 and has_capability('moodle/grade:viewall', context_course::ins
         }
     }
     echo $OUTPUT->footer();
+    $event = \mod_ilddigitalcert\event\certificate_viewed::create(
+        array('context' => $modulecontext, 
+              'objectid' => $issuedcertificate->id, 
+              'relateduserid' => $USER->id)
+    );
+    $event->trigger();
 }

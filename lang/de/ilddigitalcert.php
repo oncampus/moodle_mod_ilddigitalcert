@@ -103,6 +103,7 @@ $string['eventcertificateissued'] = 'Zertifikat ausgestellt';
 $string['eventcertificateregistered'] = 'Zertifikat registriert';
 $string['eventcertificatereissued'] = 'Zertifikat neuausgestellt';
 $string['eventcertificaterevoked'] = 'Zertifikat wiederrufen';
+$string['eventcertificateviewed'] = 'Zertifikat angezeigt';
 $string['eventverificationcompleted'] = 'Verifikation abgeschlossen';
 $string['examination_end'] = 'Prüfungsende';
 $string['examination_place'] = 'Prüfungsort';
