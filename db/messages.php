@@ -29,10 +29,10 @@ $messageproviders = array (
     // Report about issued certificates that still need to be signed.
     'ilddigitalcert_issuedcerts_report' => array (
         'defaults' => array(
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-            'telegram' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'popup' => MESSAGE_PERMITTED,
+            'email' => MESSAGE_PERMITTED,
+            'telegram' => MESSAGE_PERMITTED,
+            'airnotifier' => MESSAGE_PERMITTED,
         ),
         'capability'  => 'mod/ilddigitalcert:addinstance',
     ),
@@ -40,10 +40,10 @@ $messageproviders = array (
     // Report about automatically signed certificates.
     'ilddigitalcert_automation_report' => array (
         'defaults' => array(
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-            'telegram' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-            'airnotifier' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'popup' => MESSAGE_PERMITTED,
+            'email' => MESSAGE_PERMITTED,
+            'telegram' => MESSAGE_PERMITTED,
+            'airnotifier' => MESSAGE_PERMITTED,
         ),
         'capability'  => 'mod/ilddigitalcert:addinstance',
     ),
